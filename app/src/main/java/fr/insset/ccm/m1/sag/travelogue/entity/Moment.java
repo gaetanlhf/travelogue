@@ -1,5 +1,9 @@
 package fr.insset.ccm.m1.sag.travelogue.entity;
 
+import androidx.annotation.NonNull;
+
+import com.google.gson.Gson;
+
 import java.time.Instant;
 
 /**
@@ -7,11 +11,11 @@ import java.time.Instant;
  */
 public class Moment {
 
-    private int ID;
+    private Integer ID;
     private Instant savingDate;
     private String caption;
     private String imageURL;
-    private int travelID;
+    private Integer travelID;
 //    private '' gpsPoint;
     private GpsPoint gpsPoint;
 
@@ -21,10 +25,16 @@ public class Moment {
      */
     private Moment(MomentBuilder momentBuilder) {
         this.savingDate = momentBuilder.savingDate;
-        this.travelID = momentBuilder.travelID;
         this.imageURL = momentBuilder.imageURL;
         this.caption = momentBuilder.caption;
         this.gpsPoint = momentBuilder.gpsPoint;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        Gson momentJson = new Gson();
+        return momentJson.toJson(this);
     }
 
     // Moment builder
@@ -32,20 +42,18 @@ public class Moment {
         private Instant savingDate;
         private String caption;
         private String imageURL;
-        private int travelID;
 
 //        private '' gpsPoint;
         private GpsPoint gpsPoint;
 
         /**
          * MomentBuilder Constructor
-         * @param travelID
+         * @param gpsPoint
          */
 //        public MomentBuilder(int travelID, '' gpsPoint) {
-        public MomentBuilder(int travelID, GpsPoint gpsPoint) {
+        public MomentBuilder(GpsPoint gpsPoint) {
             this.savingDate = Instant.now();
-            this.travelID = travelID;
-             this.gpsPoint = gpsPoint;
+            this.gpsPoint = gpsPoint;
         }
 
         /**
@@ -83,7 +91,7 @@ public class Moment {
      *
      * @return
      */
-    public int getID() {
+    public Integer getID() {
         return this.ID;
     }
 
@@ -91,7 +99,7 @@ public class Moment {
      *
      * @param ID
      */
-    public void setID(int ID) {
+    public void setID(Integer ID) {
         this.ID = ID;
     }
 
@@ -123,8 +131,16 @@ public class Moment {
      *
      * @return
      */
-    public int getTravelID() {
+    public Integer getTravelID() {
         return this.travelID;
+    }
+
+    /**
+     *
+     * @param travelID
+     */
+    public void setTravelID(Integer travelID) {
+        this.travelID = travelID;
     }
 
     /**
