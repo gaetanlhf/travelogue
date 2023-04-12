@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this, CAMERA_PERMISSION)
                 != PackageManager.PERMISSION_GRANTED){
             Log.d("PERMISSION", "Request permissions");
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA }, ALL_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] { CAMERA_PERMISSION, ACCESS_COARSE_LOCATION_PERMISSION, ACCESS_FINE_LOCATION_PERMISSION }, ALL_PERMISSION_CODE);
         }
         else {
             Log.d("PERMISSION", "Permissions already granted");
