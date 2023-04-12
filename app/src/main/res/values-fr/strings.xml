@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Carnet de Voyage</string>
+    <string name="start_btn">Commencer</string>
+    <string name="no_account_textview">N\'avez-vous pas de compte ?</string>
+    <string name="create_account_btn">Créer un compte</string>
+    <string name="login_textview">Se connecter à votre Carnet de Voyage</string>
+    <string name="email_text_hint">Votre adresse de courriel</string>
+    <string name="password_text_hint">Votre mot de passe</string>
+    <string name="login_btn">Connexion</string>
+    <string name="sign_up_textview">Créer un compte Carnet de Voyage</string>
+    <string name="sign_up_btn">Créer un compte</string>
+    <string name="sign_up_success_toast">Votre compte a été créé avec succès !</string>
+    <string name="log_in_success_toast">Connexion réussie !</string>
+    <string name="log_in_fail_toast">La connexion a échoué</string>
+    <string name="sign_up_fail_toast">La création du compte a échoué</string>
+</resources>

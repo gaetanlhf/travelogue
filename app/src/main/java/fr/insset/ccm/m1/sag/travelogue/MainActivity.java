@@ -5,14 +5,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.content.Intent;
+import android.view.View;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class MainActivity extends AppCompatActivity {
 
+    private FirebaseAuth mAuth;
     private static final int ALL_PERMISSION_CODE = 100;
     private static final String CAMERA_PERMISSION = Manifest.permission.CAMERA;
     private static final String ACCESS_COARSE_LOCATION_PERMISSION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -22,8 +28,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         checkPermission();
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            //todo
+        }
+        
     }
 
     public void checkPermission()
@@ -42,10 +54,33 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             Log.d("PERMISSION", "Permissions already granted");
+
         }
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            //todo
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            //todo
+        }
+    }
+
+    public void onClickStart(View view) {
+        Intent loginActivity = new Intent(this, LoginActivity.class);
+        startActivity(loginActivity);
+        overridePendingTransition(0, 0);
+    }
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == ALL_PERMISSION_CODE) {

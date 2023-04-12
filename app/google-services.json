@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "251810910551",
+    "project_id": "travelogue-51926",
+    "storage_bucket": "travelogue-51926.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:251810910551:android:2dd650ccc76279de696e12",
+        "android_client_info": {
+          "package_name": "fr.insset.ccm.m1.sag.travelogue"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "251810910551-vfkcq78856qnduv0oi35tnndrrfsneos.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9BbvwM4TKkG35hmcFTDIm8WQLbBLf8jw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "251810910551-vfkcq78856qnduv0oi35tnndrrfsneos.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
