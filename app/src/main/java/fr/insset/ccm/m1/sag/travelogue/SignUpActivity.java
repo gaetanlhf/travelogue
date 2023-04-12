@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +26,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private TextView email;
     private TextView password;
+    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,8 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         mAuth = FirebaseAuth.getInstance();
+        spinner = (ProgressBar) findViewById(R.id.sign_up_spinner);
+        spinner.setVisibility(View.GONE);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -51,6 +56,7 @@ public class SignUpActivity extends AppCompatActivity {
     public void onClickSignUp(View view) {
         email = findViewById(R.id.email_sign_up_text);
         password = findViewById(R.id.password_sign_up_text);
+        spinner.setVisibility(View.VISIBLE);
 
         mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
                 .addOnCompleteListener(this, task -> {
@@ -58,7 +64,9 @@ public class SignUpActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.sign_up_success_toast),
                                 Toast.LENGTH_SHORT).show();
                         finish();
+                        overridePendingTransition(0, 0);
                     } else {
+                        spinner.setVisibility(View.GONE);
                         Toast.makeText(SignUpActivity.this, getResources().getString(R.string.sign_up_fail_toast),
                                 Toast.LENGTH_SHORT).show();
                     }

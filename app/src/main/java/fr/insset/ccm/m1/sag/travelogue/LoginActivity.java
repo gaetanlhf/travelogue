@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private TextView email;
     private TextView password;
+    private ProgressBar spinner;
 
 
     @Override
@@ -29,6 +31,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        spinner = (ProgressBar) findViewById(R.id.log_in_spinner);
+        spinner.setVisibility(View.GONE);
         if (currentUser != null) {
             finish();
         }
@@ -52,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onClickLogin(View view) {
         email = findViewById(R.id.email_text);
         password = findViewById(R.id.password_text);
+        spinner.setVisibility(View.VISIBLE);
 
         mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
                 .addOnCompleteListener(this, task -> {
@@ -59,7 +64,9 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.log_in_success_toast),
                                 Toast.LENGTH_SHORT).show();
                         finish();
+                        overridePendingTransition(0, 0);
                     } else {
+                        spinner.setVisibility(View.GONE);
                         Toast.makeText(LoginActivity.this, getResources().getString(R.string.log_in_fail_toast),
                                 Toast.LENGTH_SHORT).show();
                     }
