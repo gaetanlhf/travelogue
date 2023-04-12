@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">travelogue</string>
+    <string name="app_name">Travelogue</string>
+    <string name="start_btn">Start</string>
+    <string name="no_account_textview">Did not have an account?</string>
+    <string name="create_account_btn">Create an account</string>
+    <string name="login_textview">Log to your Travelogue</string>
+    <string name="email_text_hint">Your e-mail address</string>
+    <string name="password_text_hint">Your password</string>
+    <string name="login_btn">Login</string>
+    <string name="sign_up_textview">Sign up to Travelogue</string>
+    <string name="sign_up_btn">Sign up</string>
+    <string name="sign_up_success_toast">Successful account creation!</string>
+    <string name="log_in_success_toast">Log in succeded!</string>
+    <string name="log_in_fail_toast">Log in failed</string>
+    <string name="sign_up_fail_toast">Account creation failed</string>
 </resources>
