@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.google.gson.Gson;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Class Moment
@@ -16,11 +18,14 @@ public class Moment {
     private String caption;
     private String imageURL;
     private Integer travelID;
-//    private '' gpsPoint;
+    //    private '' gpsPoint;
     private GpsPoint gpsPoint;
+
+    private static final String PATTERN_FORMAT = "dd.MM.yyyy, HH:mm:ss";
 
     /**
      * Moment constructor
+     *
      * @param momentBuilder
      */
     private Moment(MomentBuilder momentBuilder) {
@@ -43,11 +48,12 @@ public class Moment {
         private String caption;
         private String imageURL;
 
-//        private '' gpsPoint;
+        //        private '' gpsPoint;
         private GpsPoint gpsPoint;
 
         /**
          * MomentBuilder Constructor
+         *
          * @param gpsPoint
          */
 //        public MomentBuilder(int travelID, '' gpsPoint) {
@@ -57,7 +63,6 @@ public class Moment {
         }
 
         /**
-         *
          * @param caption
          * @return
          */
@@ -67,7 +72,6 @@ public class Moment {
         }
 
         /**
-         *
          * @param imageURL
          * @return
          */
@@ -77,7 +81,6 @@ public class Moment {
         }
 
         /**
-         *
          * @return
          */
         public Moment build() {
@@ -88,7 +91,6 @@ public class Moment {
     // GETTERS & ID SETTER
 
     /**
-     *
      * @return
      */
     public Integer getID() {
@@ -96,7 +98,6 @@ public class Moment {
     }
 
     /**
-     *
      * @param ID
      */
     public void setID(Integer ID) {
@@ -104,7 +105,6 @@ public class Moment {
     }
 
     /**
-     *
      * @return
      */
     public Instant getSavingDate() {
@@ -112,7 +112,14 @@ public class Moment {
     }
 
     /**
-     *
+     * @return
+     */
+    public String getSavingDateString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_FORMAT).withZone(ZoneId.systemDefault());
+        return formatter.format(this.savingDate);
+    }
+
+    /**
      * @return
      */
     public String getCaption() {
@@ -120,7 +127,6 @@ public class Moment {
     }
 
     /**
-     *
      * @return
      */
     public String getImageURL() {
@@ -128,7 +134,6 @@ public class Moment {
     }
 
     /**
-     *
      * @return
      */
     public Integer getTravelID() {
@@ -136,7 +141,6 @@ public class Moment {
     }
 
     /**
-     *
      * @param travelID
      */
     public void setTravelID(Integer travelID) {
@@ -144,7 +148,6 @@ public class Moment {
     }
 
     /**
-     *
      * @return
      */
 //    public '' getGpsPoint() {

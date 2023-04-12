@@ -13,8 +13,7 @@ public class MainActivityMethods {
 
     public static Travel startTravel(String title, GpsPoint gpsPoint) {
         Moment moment = new Moment.MomentBuilder(gpsPoint).build();
-        Travel travel = new Travel(title, moment);
-        return travel;
+        return new Travel(title, moment);
     }
 
     public static void endTravel(Integer travelID, GpsPoint gpsPoint) {
