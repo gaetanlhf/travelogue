@@ -42,7 +42,6 @@ public class SignUpActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                overridePendingTransition(0, 0);
                 return true;
         }
 
@@ -64,7 +63,6 @@ public class SignUpActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.sign_up_success_toast),
                                 Toast.LENGTH_SHORT).show();
                         finish();
-                        overridePendingTransition(0, 0);
                     } else {
                         spinner.setVisibility(View.GONE);
                         Toast.makeText(SignUpActivity.this, getResources().getString(R.string.sign_up_fail_toast),

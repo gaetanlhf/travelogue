@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="460dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/sign_up_btn"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/sign_up_btn" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -50,7 +50,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onClickCreateAccountActivity(View view) {
         Intent signUpActivity = new Intent(this, SignUpActivity.class);
         startActivity(signUpActivity);
-        overridePendingTransition(0, 0);
     }
 
     public void onClickLogin(View view) {
@@ -64,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.log_in_success_toast),
                                 Toast.LENGTH_SHORT).show();
                         finish();
-                        overridePendingTransition(0, 0);
                     } else {
                         spinner.setVisibility(View.GONE);
                         Toast.makeText(LoginActivity.this, getResources().getString(R.string.log_in_fail_toast),
