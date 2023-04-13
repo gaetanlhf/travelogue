@@ -19,4 +19,9 @@
     <string name="travels_text">Travels</string>
     <string name="settings_text">Settings</string>
     <string name="log_out_btn_settings">Log out</string>
+    <string name="forgot_password_textview">Forgot your password?</string>
+    <string name="forgot_password_header_textview">Reset your password</string>
+    <string name="forgot_password_btn">Reset</string>
+    <string name="forgot_password_success">Password successfully reset, please see the email you received</string>
+    <string name="forgot_password_failed">An error occured</string>
 </resources>
