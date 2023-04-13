@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,20 +56,21 @@ public class SignUpActivity extends AppCompatActivity {
     public void onClickSignUp(View view) {
         email = findViewById(R.id.email_sign_up_text);
         password = findViewById(R.id.password_sign_up_text);
-        spinner.setVisibility(View.VISIBLE);
-
-        mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.sign_up_success_toast),
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else {
-                        spinner.setVisibility(View.GONE);
-                        Toast.makeText(SignUpActivity.this, getResources().getString(R.string.sign_up_fail_toast),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+        if (!TextUtils.isEmpty(email.getText().toString()) && !TextUtils.isEmpty(password.getText().toString())) {
+            spinner.setVisibility(View.VISIBLE);
+            mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.sign_up_success_toast),
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            spinner.setVisibility(View.GONE);
+                            Toast.makeText(SignUpActivity.this, getResources().getString(R.string.sign_up_fail_toast),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 }
 
