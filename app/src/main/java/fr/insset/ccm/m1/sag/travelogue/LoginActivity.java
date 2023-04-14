@@ -3,15 +3,19 @@ package fr.insset.ccm.m1.sag.travelogue;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -32,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         if (currentUser != null) {
             finish();
         }
+
     }
 
     @Override

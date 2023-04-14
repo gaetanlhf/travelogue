@@ -3,13 +3,17 @@ package fr.insset.ccm.m1.sag.travelogue;
 import android.content.Intent;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import fr.insset.ccm.m1.sag.travelogue.db.InitDatabase;
+import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
-
 
     @Override
     public void onStart() {
@@ -66,4 +68,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
 }
