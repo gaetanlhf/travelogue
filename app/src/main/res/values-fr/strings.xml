@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Carnet de Voyage</string>
+    <string name="app_name">Travelogue</string>
     <string name="start_btn">Commencer</string>
     <string name="no_account_textview">N\'avez-vous pas de compte ?</string>
     <string name="create_account_btn">Créer un compte</string>
@@ -8,7 +8,7 @@
     <string name="email_text_hint">Votre adresse de courriel</string>
     <string name="password_text_hint">Votre mot de passe</string>
     <string name="login_btn">Connexion</string>
-    <string name="sign_up_textview">Créer un compte Carnet de Voyage</string>
+    <string name="sign_up_textview">Créer un compte Travelogue</string>
     <string name="sign_up_btn">Créer un compte</string>
     <string name="sign_up_success_toast">Votre compte a été créé avec succès !</string>
     <string name="log_in_success_toast">Connexion réussie !</string>
@@ -23,4 +23,6 @@
     <string name="forgot_password_btn">Réinitialiser</string>
     <string name="forgot_password_success">Le mot de passe a été réinitialisé avec succès, veuillez consulter l\'e-mail que vous avez reçu</string>
     <string name="forgot_password_failed">Une erreur s\'est produite</string>
+    <string name="no_travel_home_textview">Commencez votre nouveau voyage avec Travelogue</string>
+    <string name="no_travel_start_btn">Commencer un nouveau voyage</string>
 </resources>
