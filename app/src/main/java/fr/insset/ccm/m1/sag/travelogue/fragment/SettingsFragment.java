@@ -1,78 +1,63 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
+import static android.text.InputType.*;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
+import android.text.InputType;
+import android.util.Log;
+import android.widget.EditText;
 
-import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.EditTextPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreference;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Objects;
+
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class SettingsFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public SettingsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SettingsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SettingsFragment newInstance(String param1, String param2) {
-        SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.root_preferences, rootKey);
+        ((HomeActivity) requireActivity()).setFragmentRefreshListener(() -> {
+            FragmentTransaction tr = getParentFragmentManager().beginTransaction();
+            tr.replace(R.id.relativelayout, new SettingsFragment());
+            tr.commit();
+        });
+        SwitchPreference autoGps = findPreference("switch_enable_auto_gps");
+        assert autoGps != null;
+        autoGps.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
+                Log.d("test", ""+newValue);
+                return true;
+            }
+        });
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        Button button = (Button) view.findViewById(R.id.log_out_btn_settings);
-        button.setOnClickListener(v -> {
+        EditTextPreference waitTime = findPreference("edittext_time_between_auto");
+        assert waitTime != null;
+        waitTime.setOnBindEditTextListener(editText -> editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED));
+
+
+        Preference logOut = findPreference("log_out");
+        assert logOut != null;
+        logOut.setOnPreferenceClickListener(preference -> {
             FirebaseAuth.getInstance().signOut();
-            getActivity().finish();
+            requireActivity().finish();
             Intent mainActivity = new Intent(getActivity(), MainActivity.class);
             startActivity(mainActivity);
+            return true;
         });
-        return view;
     }
+
 
 }

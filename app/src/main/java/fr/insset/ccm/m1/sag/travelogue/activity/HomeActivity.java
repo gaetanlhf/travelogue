@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.fragment.HomeFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.SettingsFragment;
+import fr.insset.ccm.m1.sag.travelogue.fragment.SettingsOldFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.TravelsFragment;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 
