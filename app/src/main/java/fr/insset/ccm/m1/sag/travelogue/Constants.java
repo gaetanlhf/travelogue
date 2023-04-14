@@ -15,4 +15,5 @@ public class Constants {
     public static final String ACCESS_BACKGROUND_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_BACKGROUND_LOCATION;
 
     public static final String FOREGROUND_SERVICE_PERMISSION = android.Manifest.permission.FOREGROUND_SERVICE;
+
 }
