@@ -44,7 +44,7 @@ public class LocationService extends Service {
         return null;
     }
 
-    private void startLocationService() {
+    private void startLocationService(Long timeBetweenUpdateLocation) {
 
         String channelId = "location_notification_channel";
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -80,8 +80,8 @@ public class LocationService extends Service {
         }
 
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(4000);
-        locationRequest.setFastestInterval(2000);
+        locationRequest.setInterval(timeBetweenUpdateLocation*1000);
+        locationRequest.setFastestInterval(timeBetweenUpdateLocation*1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationServices.getFusedLocationProviderClient(getApplicationContext())
@@ -101,12 +101,12 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        Log.d("LOCATION SERVICE", "Receive command");
+        Log.d("LOCATION SERVICE", "Receive command with value : " + intent.getLongExtra("timeBetweenUpdate",10));
         if(intent != null){
             String action = intent.getAction();
             if(action != null){
                 if(action.equals(Constants.ACTION_START_LOCATION_SERVICE)){
-                    startLocationService();
+                    startLocationService(intent.getLongExtra("timeBetweenUpdate",5));
                 }else if(action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)){
                     stopLocationService();
                 }
