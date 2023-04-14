@@ -42,5 +42,6 @@ public class Travel {
         db.collection(id)
                 .document("state")
                 .set(updateState, SetOptions.merge());
+
     }
 }

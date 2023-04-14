@@ -18,13 +18,18 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 
 public class LocationService extends Service {
 
     public static boolean isServiceRunning = false;
+    private FirebaseAuth mAuth;
+    private GpsPoint gpsPoint = new GpsPoint(0,0);
 
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -33,8 +38,11 @@ public class LocationService extends Service {
             locationResult.getLastLocation();
             double latitude = locationResult.getLastLocation().getLatitude();
             double longitude = locationResult.getLastLocation().getLongitude();
+            gpsPoint.setLongitude(longitude);
+            gpsPoint.setLatitude(latitude);
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
-
+            Location location = new Location(mAuth.getCurrentUser().getUid());
+            location.addPoint(gpsPoint);
         }
     };
 
@@ -45,6 +53,7 @@ public class LocationService extends Service {
     }
 
     private void startLocationService(Long timeBetweenUpdateLocation) {
+        mAuth = FirebaseAuth.getInstance();
 
         String channelId = "location_notification_channel";
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -112,8 +121,8 @@ public class LocationService extends Service {
                 }
             }
         }
-        return START_STICKY; //test en remplacer par
-        //return super.onStartCommand(intent, flags, startId);
+        //return START_STICKY; //test en remplacer par
+        return super.onStartCommand(intent, flags, startId);
     }
 
     /* A implémenter dans l'activité qui utilise le service

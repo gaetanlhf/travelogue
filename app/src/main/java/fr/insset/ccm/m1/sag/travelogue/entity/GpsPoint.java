@@ -10,8 +10,8 @@ import java.time.Instant;
 
 public class GpsPoint {
     private static Integer ID = 0;
-    private final double longitude;
-    private final double latitude;
+    private double longitude;
+    private double latitude;
     private String hash;
 
 
@@ -45,6 +45,13 @@ public class GpsPoint {
         return GpsPoint.ID;
     }
 
+    public void setLongitude(double longitude){
+        this.longitude = longitude;
+    }
+
+    public void setLatitude(double latitude){
+        this.latitude = latitude;
+    }
 //    /**
 //     *
 //     * @param ID
