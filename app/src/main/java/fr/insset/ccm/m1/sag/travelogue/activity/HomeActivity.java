@@ -1,4 +1,4 @@
-package fr.insset.ccm.m1.sag.travelogue;
+package fr.insset.ccm.m1.sag.travelogue.activity;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -11,7 +11,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
-import fr.insset.ccm.m1.sag.travelogue.db.InitDatabase;
+import fr.insset.ccm.m1.sag.travelogue.fragment.HomeFragment;
+import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.fragment.SettingsFragment;
+import fr.insset.ccm.m1.sag.travelogue.fragment.TravelsFragment;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     BottomNavigationView bottomNavigationView;

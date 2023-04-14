@@ -1,6 +1,4 @@
-package fr.insset.ccm.m1.sag.travelogue.db;
-
-import android.util.Log;
+package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 

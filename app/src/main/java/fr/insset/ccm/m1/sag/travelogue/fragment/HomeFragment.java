@@ -1,4 +1,4 @@
-package fr.insset.ccm.m1.sag.travelogue;
+package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,9 @@ import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import fr.insset.ccm.m1.sag.travelogue.db.State;
+import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 
 /**
  * A simple {@link Fragment} subclass.
