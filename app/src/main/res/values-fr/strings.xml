@@ -23,6 +23,10 @@
     <string name="forgot_password_btn">Réinitialiser</string>
     <string name="forgot_password_success">Le mot de passe a été réinitialisé avec succès, veuillez consulter l\'e-mail que vous avez reçu</string>
     <string name="forgot_password_failed">Une erreur s\'est produite</string>
-    <string name="no_travel_home_textview">Commencez votre nouveau voyage avec Travelogue</string>
+    <string name="no_travel_home_textview">Aucun voyage en cours</string>
     <string name="no_travel_start_btn">Commencer un nouveau voyage</string>
+    <string name="create_new_travel">Créer un nouveau voyage</string>
+    <string name="activity_new_travel_textview">Entrez le nom de votre nouveau voyage</string>
+    <string name="activity_new_travel_edittext_hint">Une balade à Paris</string>
+    <string name="btn_save">Enregistrer</string>
 </resources>

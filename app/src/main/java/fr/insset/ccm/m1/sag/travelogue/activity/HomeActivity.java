@@ -11,18 +11,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
-import fr.insset.ccm.m1.sag.travelogue.fragment.HomeFragment;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.fragment.HomeFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.SettingsFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.TravelsFragment;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
+
 
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     BottomNavigationView bottomNavigationView;
     private FirebaseAuth mAuth;
 
     private Fragment fragment = null;
-
+    private FragmentRefreshListener fragmentRefreshListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +39,20 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_home_refresh);
         swipeRefreshLayout.setOnRefreshListener(
                 () -> {
-                    loadFragment(fragment);
+                    if (getFragmentRefreshListener() != null) {
+                        getFragmentRefreshListener().onRefresh();
+                    }
                     swipeRefreshLayout.setRefreshing(false);
                 }
         );
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getFragmentRefreshListener() != null) {
+            getFragmentRefreshListener().onRefresh();
+        }
     }
 
     @Override
@@ -83,6 +94,18 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         fragment = new SettingsFragment();
         getSupportActionBar().setTitle(getResources().getString(R.string.settings_text));
         return fragment;
+    }
+
+    public FragmentRefreshListener getFragmentRefreshListener() {
+        return fragmentRefreshListener;
+    }
+
+    public void setFragmentRefreshListener(FragmentRefreshListener fragmentRefreshListener) {
+        this.fragmentRefreshListener = fragmentRefreshListener;
+    }
+
+    public interface FragmentRefreshListener {
+        void onRefresh();
     }
 
 }

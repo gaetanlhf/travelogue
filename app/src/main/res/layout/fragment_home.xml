@@ -7,7 +7,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fragment_home_no_trip_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/no_travel_home_textview"
@@ -17,15 +18,16 @@
             android:text="@string/no_travel_home_textview"
             android:textSize="24sp"
             app:layout_constraintBottom_toTopOf="@+id/start_new_travel_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5"
-            tools:layout_editor_absoluteX="0dp" />
+            app:layout_constraintVertical_bias="0.5" />
 
         <Button
             android:id="@+id/start_new_travel_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onClickStartNewTravel"
             android:text="@string/no_travel_start_btn"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -41,6 +43,7 @@
         style="?android:progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        tools:visibility="gone" />
 
 </FrameLayout>

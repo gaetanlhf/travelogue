@@ -2,6 +2,7 @@ package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,12 +10,15 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
+import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
+import fr.insset.ccm.m1.sag.travelogue.activity.NewTravelActivity;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -87,10 +91,14 @@ public class HomeFragment extends Fragment {
         });
         Button newTravelBtn = (Button) view.findViewById(R.id.start_new_travel_btn);
         newTravelBtn.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            getActivity().finish();
-            Intent mainActivity = new Intent(getActivity(), MainActivity.class);
-            //startActivity(mainActivity);
+            Intent newTravelActivity = new Intent(getActivity(), NewTravelActivity.class);
+            startActivity(newTravelActivity);
+        });
+
+        ((HomeActivity)getActivity()).setFragmentRefreshListener(() -> {
+            FragmentTransaction tr = getParentFragmentManager().beginTransaction();
+            tr.replace(R.id.relativelayout, new HomeFragment());
+            tr.commit();
         });
         return view;
     }
