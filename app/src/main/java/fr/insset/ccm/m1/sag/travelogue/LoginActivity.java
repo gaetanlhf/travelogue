@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -50,26 +51,30 @@ public class LoginActivity extends AppCompatActivity {
     public void onClickCreateAccountActivity(View view) {
         Intent signUpActivity = new Intent(this, SignUpActivity.class);
         startActivity(signUpActivity);
-        overridePendingTransition(0, 0);
     }
 
     public void onClickLogin(View view) {
         email = findViewById(R.id.email_text);
         password = findViewById(R.id.password_text);
-        spinner.setVisibility(View.VISIBLE);
+        if (!TextUtils.isEmpty(email.getText().toString()) && !TextUtils.isEmpty(password.getText().toString())) {
+            spinner.setVisibility(View.VISIBLE);
+            mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.log_in_success_toast),
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            spinner.setVisibility(View.GONE);
+                            Toast.makeText(LoginActivity.this, getResources().getString(R.string.log_in_fail_toast),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
 
-        mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.log_in_success_toast),
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                        overridePendingTransition(0, 0);
-                    } else {
-                        spinner.setVisibility(View.GONE);
-                        Toast.makeText(LoginActivity.this, getResources().getString(R.string.log_in_fail_toast),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+    public void onClickForgotPassword(View view) {
+        Intent forgotPasswordActivity = new Intent(this, ForgotPasswordActivity.class);
+        startActivity(forgotPasswordActivity);
     }
 }

@@ -1,22 +1,33 @@
 package fr.insset.ccm.m1.sag.travelogue;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import android.content.Intent;
+import android.view.MenuItem;
+import android.view.View;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private FirebaseAuth mAuth;
     private static final int ALL_PERMISSION_CODE = 100;
     private static final String CAMERA_PERMISSION = Manifest.permission.CAMERA;
     private static final String ACCESS_COARSE_LOCATION_PERMISSION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final String ACCESS_FINE_LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
-
+    BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            //todo
+            launchNavigation();
         }
         
     }
@@ -56,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            //todo
+            launchNavigation();
         }
     }
 
@@ -65,14 +76,13 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            //todo
+            launchNavigation();
         }
     }
 
     public void onClickStart(View view) {
         Intent loginActivity = new Intent(this, LoginActivity.class);
         startActivity(loginActivity);
-        overridePendingTransition(0, 0);
     }
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -97,5 +107,40 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    public void launchNavigation() {
+        setContentView(R.layout.activity_home);
+        bottomNavigationView = findViewById(R.id.bottom_nav_home);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        getSupportActionBar().setTitle(getResources().getString(R.string.home_text));
+        loadFragment(new HomeFragment());
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        Fragment fragment = null;
+        switch (item.getItemId()) {
+            case R.id.home:
+                fragment = new HomeFragment();
+                getSupportActionBar().setTitle(getResources().getString(R.string.home_text));
+                break;
+            case R.id.travels:
+                getSupportActionBar().setTitle(getResources().getString(R.string.travels_text));
+                fragment = new TravelsFragment();
+                break;
+            case R.id.settings:
+                getSupportActionBar().setTitle(getResources().getString(R.string.settings_text));
+                fragment = new SettingsFragment();
+                break;
+        }
+        if (fragment != null) {
+            loadFragment(fragment);
+        }
+        return true;
+    }
+    void loadFragment(Fragment fragment) {
+        //to attach fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.relativelayout, fragment).commit();
     }
 }

@@ -14,4 +14,13 @@
     <string name="log_in_success_toast">Connexion réussie !</string>
     <string name="log_in_fail_toast">La connexion a échoué</string>
     <string name="sign_up_fail_toast">La création du compte a échoué</string>
+    <string name="home_text">Accueil</string>
+    <string name="travels_text">Voyages</string>
+    <string name="settings_text">Paramètres</string>
+    <string name="log_out_btn_settings">Se déconnecter</string>
+    <string name="forgot_password_textview">Mot de passe oublié ?</string>
+    <string name="forgot_password_header_textview">Réinitialiser votre mot de passe</string>
+    <string name="forgot_password_btn">Réinitialiser</string>
+    <string name="forgot_password_success">Le mot de passe a été réinitialisé avec succès, veuillez consulter l\'e-mail que vous avez reçu</string>
+    <string name="forgot_password_failed">Une erreur s\'est produite</string>
 </resources>
