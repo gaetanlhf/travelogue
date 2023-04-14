@@ -1,4 +1,4 @@
-package fr.insset.ccm.m1.sag.travelogue;
+package fr.insset.ccm.m1.sag.travelogue.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -15,6 +15,8 @@ import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import fr.insset.ccm.m1.sag.travelogue.R;
 
 public class WelcomeActivity extends AppCompatActivity {
 

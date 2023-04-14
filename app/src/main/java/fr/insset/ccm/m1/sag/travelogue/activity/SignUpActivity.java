@@ -1,4 +1,4 @@
-package fr.insset.ccm.m1.sag.travelogue;
+package fr.insset.ccm.m1.sag.travelogue.activity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
+
+import fr.insset.ccm.m1.sag.travelogue.R;
 
 public class SignUpActivity extends AppCompatActivity {
 

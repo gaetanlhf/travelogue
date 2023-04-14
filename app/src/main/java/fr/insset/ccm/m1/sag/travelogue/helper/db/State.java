@@ -1,4 +1,4 @@
-package fr.insset.ccm.m1.sag.travelogue.db;
+package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
 import androidx.annotation.NonNull;
 
