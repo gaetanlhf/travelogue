@@ -6,6 +6,7 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,6 +17,9 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     BottomNavigationView bottomNavigationView;
     private FirebaseAuth mAuth;
 
+    private Fragment fragment = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,24 +29,28 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
         bottomNavigationView = findViewById(R.id.bottom_nav_home);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-        Fragment fragment = homeFragment(null);
+        fragment = homeFragment();
         loadFragment(fragment);
-
-
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_home_refresh);
+        swipeRefreshLayout.setOnRefreshListener(
+                () -> {
+                    loadFragment(fragment);
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+        );
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Fragment fragment = null;
         switch (item.getItemId()) {
             case R.id.home:
-                fragment = homeFragment(fragment);
+                fragment = homeFragment();
                 break;
             case R.id.travels:
-                fragment = travelsFragment(fragment);
+                fragment = travelsFragment();
                 break;
             case R.id.settings:
-                fragment = settingsFragment(fragment);
+                fragment = settingsFragment();
                 break;
         }
         if (fragment != null) {
@@ -55,19 +63,19 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         getSupportFragmentManager().beginTransaction().replace(R.id.relativelayout, fragment).commit();
     }
 
-    Fragment homeFragment(Fragment fragment) {
+    Fragment homeFragment() {
         fragment = new HomeFragment();
         getSupportActionBar().setTitle(getResources().getString(R.string.home_text));
         return fragment;
     }
 
-    Fragment travelsFragment(Fragment fragment) {
+    Fragment travelsFragment() {
         fragment = new TravelsFragment();
         getSupportActionBar().setTitle(getResources().getString(R.string.travels_text));
         return fragment;
     }
 
-    Fragment settingsFragment(Fragment fragment) {
+    Fragment settingsFragment() {
         fragment = new SettingsFragment();
         getSupportActionBar().setTitle(getResources().getString(R.string.settings_text));
         return fragment;
