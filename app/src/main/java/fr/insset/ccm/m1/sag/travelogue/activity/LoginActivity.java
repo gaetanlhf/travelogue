@@ -34,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         if (currentUser != null) {
             finish();
         }
+
     }
 
     @Override
