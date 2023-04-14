@@ -6,6 +6,7 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -15,6 +16,9 @@ import fr.insset.ccm.m1.sag.travelogue.db.InitDatabase;
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     BottomNavigationView bottomNavigationView;
     private FirebaseAuth mAuth;
+
+    private Fragment fragment = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +31,17 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         Fragment fragment = homeFragment(null);
         loadFragment(fragment);
-
-
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_home_refresh);
+        swipeRefreshLayout.setOnRefreshListener(
+                () -> {
+                    loadFragment(fragment);
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+        );
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Fragment fragment = null;
         switch (item.getItemId()) {
             case R.id.home:
                 fragment = homeFragment(fragment);
