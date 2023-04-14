@@ -4,6 +4,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import android.util.Log;
+
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 
