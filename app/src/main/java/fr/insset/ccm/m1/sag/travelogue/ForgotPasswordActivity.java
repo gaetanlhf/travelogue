@@ -1,8 +1,5 @@
 package fr.insset.ccm.m1.sag.travelogue;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -12,8 +9,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
@@ -33,7 +30,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_forgot_password);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         spinner = (ProgressBar) findViewById(R.id.forgot_password_spinner);
-        spinner.setVisibility(View.GONE);    }
+        spinner.setVisibility(View.GONE);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

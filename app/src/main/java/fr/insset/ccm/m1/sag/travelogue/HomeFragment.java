@@ -1,12 +1,18 @@
 package fr.insset.ccm.m1.sag.travelogue;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+
+import androidx.fragment.app.Fragment;
+
+import com.google.firebase.auth.FirebaseAuth;
+
+import fr.insset.ccm.m1.sag.travelogue.db.State;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,12 +20,12 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
-
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    private FirebaseAuth mAuth;
+    private ProgressBar spinner;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -49,16 +55,41 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        spinner = (ProgressBar) view.findViewById(R.id.fragment_home_spinner);
+        View noTripContent = view.findViewById(R.id.fragment_home_no_trip_content);
+        noTripContent.setVisibility(View.GONE);
+        spinner.setVisibility(View.VISIBLE);
+        State state = new State(mAuth.getCurrentUser().getUid());
+        state.isTravelling(travelling -> {
+            if (travelling.get()) {
+                spinner.setVisibility(View.GONE);
+            } else {
+                spinner.setVisibility(View.GONE);
+                noTripContent.setVisibility(View.VISIBLE);
+
+
+            }
+        });
+        Button newTravelBtn = (Button) view.findViewById(R.id.start_new_travel_btn);
+        newTravelBtn.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            getActivity().finish();
+            Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+            //startActivity(mainActivity);
+        });
+        return view;
     }
 }
