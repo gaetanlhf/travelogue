@@ -47,11 +47,15 @@ public class LocationService extends Service {
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
             State state = new State(mAuth.getCurrentUser().getUid());
             state.getCurrentTravel(data -> {
-                Log.d("VOYAGE", data.get());
-                Location location = new Location(mAuth.getCurrentUser().getUid());
-                location.addPoint(gpsPoint, data.get());
-                Toast.makeText(getApplicationContext(), "Point GPS " + gpsPoint.getLatitude() + " - " + gpsPoint.getLongitude(), Toast.LENGTH_SHORT).show();
+                double speed = locationResult.getLastLocation().getSpeed() * 3.6;
 
+                Log.d("VOYAGE", data.get());
+
+                Location location = new Location(mAuth.getCurrentUser().getUid());
+                location.addPoint(gpsPoint, data.get(), speed);
+
+                Toast.makeText(getApplicationContext(), "Point GPS " + gpsPoint.getLatitude() + " - " + gpsPoint.getLongitude() + " Speed : " + speed + "km/h", Toast.LENGTH_SHORT).show();
+                //Log.d("SPEED", String.valueOf(locationResult.getLastLocation().getSpeed()));
 
             });
         }

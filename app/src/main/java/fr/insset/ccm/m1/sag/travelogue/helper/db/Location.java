@@ -1,8 +1,5 @@
 package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -20,13 +17,14 @@ public class Location {
         this.id = id;
     }
 
-    public void addPoint(GpsPoint gpsPoint, String currentTravel){
+    public void addPoint(GpsPoint gpsPoint, String currentTravel, double speed){
         Long timestampLong = System.currentTimeMillis() / 1000;
         String timestamp = timestampLong.toString();
 
         Map<String, Double> point = new HashMap<>();
         point.put("latitude", gpsPoint.getLatitude());
         point.put("longitude", gpsPoint.getLongitude());
+        point.put("speed", speed);
 
         db.collection(id)
                 .document("data")
