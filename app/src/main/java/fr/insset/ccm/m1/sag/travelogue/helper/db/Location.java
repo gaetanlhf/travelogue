@@ -5,9 +5,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 import android.util.Log;
+import android.widget.Toast;
 
+<<<<<<< HEAD
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+=======
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
+>>>>>>> 32e34aa (feat: track travel)
 
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 
@@ -21,7 +29,11 @@ public class Location {
         this.id = id;
     }
 
+<<<<<<< HEAD
     public void addPoint(GpsPoint gpsPoint, String currentTravel) {
+=======
+    public void addPoint(GpsPoint gpsPoint, String currentTravel){
+>>>>>>> 32e34aa (feat: track travel)
         Long timestampLong = System.currentTimeMillis() / 1000;
         String timestamp = timestampLong.toString();
 

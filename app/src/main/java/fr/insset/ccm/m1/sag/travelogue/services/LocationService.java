@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +33,8 @@ public class LocationService extends Service {
     private FirebaseAuth mAuth;
     private GpsPoint gpsPoint = new GpsPoint(0,0);
 
+
+
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -44,9 +47,17 @@ public class LocationService extends Service {
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
             State state = new State(mAuth.getCurrentUser().getUid());
             state.getCurrentTravel(data -> {
+<<<<<<< HEAD
 
                 Location location = new Location(mAuth.getCurrentUser().getUid());
                 location.addPoint(gpsPoint, data.get());
+=======
+                Log.d("VOYAGE", data.get());
+                Location location = new Location(mAuth.getCurrentUser().getUid());
+                location.addPoint(gpsPoint, data.get());
+                Toast.makeText(getApplicationContext(), "Point GPS " + gpsPoint.getLatitude() + " - " + gpsPoint.getLongitude(), Toast.LENGTH_SHORT).show();
+
+>>>>>>> 32e34aa (feat: track travel)
 
             });
         }
