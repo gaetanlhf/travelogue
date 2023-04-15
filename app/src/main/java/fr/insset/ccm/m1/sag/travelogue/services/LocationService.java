@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,12 +25,15 @@ import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 
 public class LocationService extends Service {
 
     public static boolean isServiceRunning = false;
     private FirebaseAuth mAuth;
     private GpsPoint gpsPoint = new GpsPoint(0,0);
+
+
 
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -41,8 +45,15 @@ public class LocationService extends Service {
             gpsPoint.setLongitude(longitude);
             gpsPoint.setLatitude(latitude);
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
-            Location location = new Location(mAuth.getCurrentUser().getUid());
-            location.addPoint(gpsPoint);
+            State state = new State(mAuth.getCurrentUser().getUid());
+            state.getCurrentTravel(data -> {
+                Log.d("VOYAGE", data.get());
+                Location location = new Location(mAuth.getCurrentUser().getUid());
+                location.addPoint(gpsPoint, data.get());
+                Toast.makeText(getApplicationContext(), "Point GPS " + gpsPoint.getLatitude() + " - " + gpsPoint.getLongitude(), Toast.LENGTH_SHORT).show();
+
+
+            });
         }
     };
 

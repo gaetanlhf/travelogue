@@ -8,6 +8,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class State {
     private final String id;
@@ -38,8 +39,27 @@ public class State {
                 });
     }
 
+    public void getCurrentTravel(Callback2 callback2){
+        AtomicReference<String> currentTravel = new AtomicReference<>();
+        db.collection(id)
+                .document("state")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        if(task.getResult().get("currentTravel") != null){
+                            currentTravel.set(task.getResult().get("currentTravel").toString());
+                        }
+                        callback2.onCallback2(currentTravel);
+                    }
+                });
+    }
+
     public interface Callback {
         void onCallback(AtomicBoolean travelling);
+    }
+
+    public interface Callback2 {
+        void onCallback2(AtomicReference<String> currentTravel);
     }
 
 
