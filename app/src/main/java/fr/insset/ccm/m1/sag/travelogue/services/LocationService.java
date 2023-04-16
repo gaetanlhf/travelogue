@@ -34,7 +34,6 @@ public class LocationService extends Service {
     private GpsPoint gpsPoint = new GpsPoint(0,0);
 
 
-
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -47,15 +46,9 @@ public class LocationService extends Service {
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
             State state = new State(mAuth.getCurrentUser().getUid());
             state.getCurrentTravel(data -> {
-                double speed = locationResult.getLastLocation().getSpeed() * 3.6;
-
-                Log.d("VOYAGE", data.get());
 
                 Location location = new Location(mAuth.getCurrentUser().getUid());
-                location.addPoint(gpsPoint, data.get(), speed);
-
-                Toast.makeText(getApplicationContext(), "Point GPS " + gpsPoint.getLatitude() + " - " + gpsPoint.getLongitude() + " Speed : " + speed + "km/h", Toast.LENGTH_SHORT).show();
-                //Log.d("SPEED", String.valueOf(locationResult.getLastLocation().getSpeed()));
+                location.addPoint(gpsPoint, data.get());
 
             });
         }
@@ -125,7 +118,6 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        Log.d("LOCATION SERVICE", "Receive command with value : " + intent.getLongExtra("timeBetweenUpdate",10));
         if(intent != null){
             String action = intent.getAction();
             if(action != null){
@@ -136,7 +128,6 @@ public class LocationService extends Service {
                 }
             }
         }
-        //return START_STICKY; //test en remplacer par
         return super.onStartCommand(intent, flags, startId);
     }
 

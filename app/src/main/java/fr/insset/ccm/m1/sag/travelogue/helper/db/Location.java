@@ -17,14 +17,13 @@ public class Location {
         this.id = id;
     }
 
-    public void addPoint(GpsPoint gpsPoint, String currentTravel, double speed){
+    public void addPoint(GpsPoint gpsPoint, String currentTravel){
         Long timestampLong = System.currentTimeMillis() / 1000;
         String timestamp = timestampLong.toString();
 
         Map<String, Double> point = new HashMap<>();
         point.put("latitude", gpsPoint.getLatitude());
         point.put("longitude", gpsPoint.getLongitude());
-        point.put("speed", speed);
 
         db.collection(id)
                 .document("data")

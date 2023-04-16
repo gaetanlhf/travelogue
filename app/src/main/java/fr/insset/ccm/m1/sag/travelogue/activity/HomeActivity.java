@@ -34,14 +34,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         mAuth = FirebaseAuth.getInstance();
         InitDatabase initDatabase = new InitDatabase(mAuth.getCurrentUser().getUid());
         setContentView(R.layout.activity_home);
-        Button btn = (Button)findViewById(R.id.btnMap);
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, MapActivity.class));
-            }
-        });
         bottomNavigationView = findViewById(R.id.bottom_nav_home);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         fragment = homeFragment();

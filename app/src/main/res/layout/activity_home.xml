@@ -17,11 +17,6 @@
         android:layout_marginBottom="65dp"
         android:padding="5dp">
 
-        <Button
-            android:id="@+id/btnMap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View map" />
     </RelativeLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <com.google.android.material.bottomnavigation.BottomNavigationView
