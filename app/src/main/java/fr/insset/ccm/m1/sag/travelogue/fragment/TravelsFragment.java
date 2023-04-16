@@ -79,8 +79,6 @@ public class TravelsFragment extends Fragment {
 
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
         travelHelper.getTravels(data -> {
-            Log.d("NB", String.valueOf(data.length()));
-            Log.d("OBJET", data.toString());
             for(int i = 0 ; i<data.length(); i++){
                 titles.add(String.valueOf(data.get(i).getTitle()));
             }

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -15,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
@@ -59,7 +61,7 @@ public class TravelHelper {
     }
 
     public void getPoints(Callback callback, String currentTravel){
-        Log.d("GETPOINTS", "get points of travel : " + currentTravel);
+        Log.d("TRAVEL_HELPER", "get points of travel : " + currentTravel);
         db.collection(id)
                 .document("data")
                 .collection("travels")
@@ -82,7 +84,7 @@ public class TravelHelper {
     }
 
     public void getTravels(Callback2 callback2){
-        Log.d("GET_TRAVELS", "get travels");
+        Log.d("TRAVEL_HELPER", "get travels");
         db.collection(id)
                 .document("data")
                 .collection("travels")
@@ -100,11 +102,38 @@ public class TravelHelper {
                 });
     }
 
+    public void getTravel(Callback3 callback3, String travel){
+        Log.d("TRAVEL_HELPER", "get travel " + travel);
+
+        db.collection(id)
+                .document("data")
+                .collection("travels")
+                .whereEqualTo("travelName", travel)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        QuerySnapshot querySnapshot = task.getResult();
+
+                        DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                        AtomicReference<Travel> travelAtomicReference = new AtomicReference<>();
+
+                        travelAtomicReference.set(new Travel(Integer.parseInt(documentSnapshot.getId()), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("startDate").toString(), documentSnapshot.getData().get("startTime").toString()));
+                        callback3.onCallback3(travelAtomicReference);
+
+                    }
+                });
+
+    }
+
     public interface Callback{
         void onCallback(AtomicReferenceArray<GpsPoint> points);
     }
 
     public interface Callback2{
         void onCallback2(AtomicReferenceArray<Travel> travels);
+    }
+
+    public interface Callback3{
+        void onCallback3(AtomicReference<Travel> travels);
     }
 }
