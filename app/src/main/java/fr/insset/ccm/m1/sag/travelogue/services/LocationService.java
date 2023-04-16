@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,13 +19,20 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 
 public class LocationService extends Service {
 
     public static boolean isServiceRunning = false;
+    private FirebaseAuth mAuth;
+    private GpsPoint gpsPoint = new GpsPoint(0,0);
+
 
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -33,8 +41,16 @@ public class LocationService extends Service {
             locationResult.getLastLocation();
             double latitude = locationResult.getLastLocation().getLatitude();
             double longitude = locationResult.getLastLocation().getLongitude();
+            gpsPoint.setLongitude(longitude);
+            gpsPoint.setLatitude(latitude);
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
+            State state = new State(mAuth.getCurrentUser().getUid());
+            state.getCurrentTravel(data -> {
 
+                Location location = new Location(mAuth.getCurrentUser().getUid());
+                location.addPoint(gpsPoint, data.get());
+
+            });
         }
     };
 
@@ -45,6 +61,7 @@ public class LocationService extends Service {
     }
 
     private void startLocationService(Long timeBetweenUpdateLocation) {
+        mAuth = FirebaseAuth.getInstance();
 
         String channelId = "location_notification_channel";
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -101,7 +118,6 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        Log.d("LOCATION SERVICE", "Receive command with value : " + intent.getLongExtra("timeBetweenUpdate",10));
         if(intent != null){
             String action = intent.getAction();
             if(action != null){
@@ -112,8 +128,7 @@ public class LocationService extends Service {
                 }
             }
         }
-        return START_STICKY; //test en remplacer par
-        //return super.onStartCommand(intent, flags, startId);
+        return super.onStartCommand(intent, flags, startId);
     }
 
     /* A implémenter dans l'activité qui utilise le service

@@ -9,39 +9,40 @@ public class Travel {
 
     private Integer ID;
     private String title;
-    private Moment startingMoment;
-    private Moment endingMoment;
-//    private '' userID;
 
-    private List<Moment> moments;
+    private String startDate;
 
-    private boolean canAddMoment;
+    private String startTime;
 
+    private String endDate;
 
+    private String endTime;
+
+    private boolean isFinish;
     /**
      * 
      */
-    public Travel(String title, Moment startingMoment) {
+    public Travel(Integer id, String title, String startDate, String startTime, String endDate, String endTime, boolean isFinish) {
+        this.ID = id;
         this.title = title;
-        this.startingMoment = startingMoment;
-        this.addMoment(this.startingMoment);
-        this.endingMoment = null;
-        this.canAddMoment = true;
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.endDate = endDate;
+        this.endTime = endTime;
+        this.isFinish = isFinish;
     }
 
-    public void addMoment(Moment moment) {
-        if(this.canAddMoment) {
-            if(!this.moments.contains(moment)) {
-                if(moment.getTravelID() == null) {
-                    moment.setTravelID(this.ID);
-                    this.moments.add(moment);
-                }
-            }
-        }
+    public Travel(String title, String startDate, String startTime, String endDate, String endTime, boolean isFinish) {
+        this.title = title;
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.endDate = endDate;
+        this.endTime = endTime;
+        this.isFinish = isFinish;
     }
 
-    private void stopAddingMoments() {
-        this.canAddMoment = false;
+    public Travel(String title) {
+        this.title = title;
     }
 
     @NonNull
@@ -63,6 +64,14 @@ public class Travel {
 
     // GETTERS & SETTERS
 
+    public String getStartDatetime(){
+        return this.startDate + " - " + this.startTime;
+    }
+    public String getEndDatetime(){
+        return this.endDate + " - " + this.endTime;
+    }
+
+
     public Integer getID() {
         return this.ID;
     }
@@ -75,21 +84,8 @@ public class Travel {
         return this.title;
     }
 
-    public Moment getStartingMoment() {
-        return this.startingMoment;
+    public void setTitle(String title){
+        this.title = title;
     }
 
-    public Moment getEndingMoment() {
-        return this.endingMoment;
-    }
-
-    public void setEndingMoment(Moment endingMoment) {
-        this.endingMoment = endingMoment;
-        this.addMoment(this.endingMoment);
-        this.stopAddingMoments();
-    }
-
-    public List<Moment> getMoments() {
-        return this.moments;
-    }
 }
