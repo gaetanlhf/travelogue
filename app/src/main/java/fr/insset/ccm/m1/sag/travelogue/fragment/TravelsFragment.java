@@ -1,13 +1,24 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.adapter.TravelAdapter;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,6 +31,8 @@ public class TravelsFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private FirebaseAuth mAuth;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -50,6 +63,7 @@ public class TravelsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -59,7 +73,28 @@ public class TravelsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_travels, container, false);
+        View view = inflater.inflate(R.layout.fragment_travels, container, false);
+        // create list:
+        List<String> titles = new ArrayList<>();
+
+        TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
+        travelHelper.getTravels(data -> {
+            for(int i = 0 ; i<data.length(); i++){
+                titles.add(String.valueOf(data.get(i).getTitle()));
+            }
+            TravelAdapter adapter = new TravelAdapter(getContext(), titles);
+
+            // set the RecyclerView:
+            RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+
+        });
+
+        // define the adapter:
+
+        return view;
     }
 }

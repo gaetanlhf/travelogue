@@ -1,7 +1,10 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +34,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         mAuth = FirebaseAuth.getInstance();
         InitDatabase initDatabase = new InitDatabase(mAuth.getCurrentUser().getUid());
         setContentView(R.layout.activity_home);
-
         bottomNavigationView = findViewById(R.id.bottom_nav_home);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         fragment = homeFragment();

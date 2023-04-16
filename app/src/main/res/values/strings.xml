@@ -44,4 +44,8 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="back">Back</string>
+    <string name="travel">Travel :</string>
+    <string name="start_of_the_travel">Start of the travel:</string>
+    <string name="end_of_the_travel">End of the travel :</string>
 </resources>
