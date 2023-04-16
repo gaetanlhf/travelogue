@@ -117,7 +117,7 @@ public class TravelHelper {
                         DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
                         AtomicReference<Travel> travelAtomicReference = new AtomicReference<>();
 
-                        travelAtomicReference.set(new Travel(Integer.parseInt(documentSnapshot.getId()), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("startDate").toString(), documentSnapshot.getData().get("startTime").toString()));
+                        travelAtomicReference.set(new Travel(Integer.parseInt(documentSnapshot.getId()), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("startDate").toString(), documentSnapshot.getData().get("startTime").toString(), documentSnapshot.getData().get("endDate").toString(), documentSnapshot.getData().get("endTime").toString(), (Boolean) documentSnapshot.getData().get("isFinish")));
                         callback3.onCallback3(travelAtomicReference);
 
                     }

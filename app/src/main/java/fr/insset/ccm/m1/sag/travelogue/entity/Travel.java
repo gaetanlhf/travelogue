@@ -14,20 +14,31 @@ public class Travel {
 
     private String startTime;
 
+    private String endDate;
+
+    private String endTime;
+
+    private boolean isFinish;
     /**
      * 
      */
-    public Travel(Integer id, String title, String startDate, String startTime) {
+    public Travel(Integer id, String title, String startDate, String startTime, String endDate, String endTime, boolean isFinish) {
         this.ID = id;
         this.title = title;
         this.startDate = startDate;
         this.startTime = startTime;
+        this.endDate = endDate;
+        this.endTime = endTime;
+        this.isFinish = isFinish;
     }
 
-    public Travel(String title, String startDate, String startTime) {
+    public Travel(String title, String startDate, String startTime, String endDate, String endTime, boolean isFinish) {
         this.title = title;
         this.startDate = startDate;
         this.startTime = startTime;
+        this.endDate = endDate;
+        this.endTime = endTime;
+        this.isFinish = isFinish;
     }
 
     public Travel(String title) {
@@ -52,6 +63,14 @@ public class Travel {
     }
 
     // GETTERS & SETTERS
+
+    public String getStartDatetime(){
+        return this.startDate + " - " + this.startTime;
+    }
+    public String getEndDatetime(){
+        return this.endDate + " - " + this.endTime;
+    }
+
 
     public Integer getID() {
         return this.ID;

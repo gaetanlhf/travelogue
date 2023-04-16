@@ -15,6 +15,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
@@ -46,6 +47,8 @@ public class TravelActivity extends AppCompatActivity implements
         mAuth = FirebaseAuth.getInstance();
 
         TextView travelName = findViewById(R.id.travel_name_textView);
+        TextView travelStartDateTime = findViewById(R.id.start_date_time_textView);
+        TextView travelEndDateTime = findViewById(R.id.end_date_time_textView);
 
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
 
@@ -56,6 +59,10 @@ public class TravelActivity extends AppCompatActivity implements
         travelHelper.getTravel(data -> {
 
             travel = data.get();
+            travelName.setText(travel.getTitle());
+            travelStartDateTime.setText(travel.getStartDatetime());
+            travelEndDateTime.setText(travel.getEndDatetime());
+
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
@@ -67,6 +74,10 @@ public class TravelActivity extends AppCompatActivity implements
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+
+        UiSettings uiSettings = googleMap.getUiSettings();
+        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setCompassEnabled(false);
 
         Polyline polyline = googleMap.addPolyline(new PolylineOptions()
                 .clickable(true));
