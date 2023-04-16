@@ -2,8 +2,13 @@ package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
@@ -13,12 +18,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
+import fr.insset.ccm.m1.sag.travelogue.entity.Moment;
+import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 
-public class Travel {
+public class TravelHelper {
     private final String id;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public Travel(String id) {
+    public TravelHelper(String id) {
         this.id = id;
     }
 
@@ -74,7 +81,30 @@ public class Travel {
                 });
     }
 
+    public void getTravels(Callback2 callback2){
+        Log.d("GET_TRAVELS", "get travels");
+        db.collection(id)
+                .document("data")
+                .collection("travels")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        AtomicReferenceArray<Travel> travels = new AtomicReferenceArray<>(task.getResult().size());
+                        int i = 0;
+                        for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                            travels.set(i, new Travel(documentSnapshot.getData().get("travelName").toString()));
+                            i++;
+                        }
+                        callback2.onCallback2(travels);
+                    }
+                });
+    }
+
     public interface Callback{
         void onCallback(AtomicReferenceArray<GpsPoint> points);
+    }
+
+    public interface Callback2{
+        void onCallback2(AtomicReferenceArray<Travel> travels);
     }
 }

@@ -29,6 +29,13 @@ public class Travel {
         this.canAddMoment = true;
     }
 
+    public Travel(String title) {
+        this.title = title;
+        this.startingMoment = null;
+        this.endingMoment = null;
+        this.canAddMoment = true;
+    }
+
     public void addMoment(Moment moment) {
         if(this.canAddMoment) {
             if(!this.moments.contains(moment)) {

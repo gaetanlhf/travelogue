@@ -21,7 +21,7 @@ import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
-import fr.insset.ccm.m1.sag.travelogue.helper.db.Travel;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 public class NewTravelActivity extends AppCompatActivity {
@@ -60,7 +60,7 @@ public class NewTravelActivity extends AppCompatActivity {
     public void onClickSaveTravel(View view) {
         travelName = findViewById(R.id.activity_new_travel_edittext);
         if (!TextUtils.isEmpty(travelName.getText().toString())) {
-            Travel newTravel = new Travel(mAuth.getCurrentUser().getUid());
+            TravelHelper newTravel = new TravelHelper(mAuth.getCurrentUser().getUid());
             newTravel.createTravel(travelName.getText().toString());
             Settings settings = new Settings(mAuth.getCurrentUser().getUid());
             settings.isPeriodicTrackingEnable(data -> {
