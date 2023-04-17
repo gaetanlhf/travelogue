@@ -14,7 +14,6 @@ public class State {
     private final String id;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-
     public State(String id) {
         this.id = id;
     }
@@ -35,23 +34,14 @@ public class State {
                 });
     }
 
-<<<<<<< HEAD
     public void getCurrentTravel(Callback2 callback2) {
-=======
-    public void getCurrentTravel(Callback2 callback2){
->>>>>>> 32e34aa (feat: track travel)
         AtomicReference<String> currentTravel = new AtomicReference<>();
         db.collection(id)
                 .document("state")
                 .get()
                 .addOnCompleteListener(task -> {
-<<<<<<< HEAD
                     if (task.isSuccessful()) {
                         if (task.getResult().get("currentTravel") != null) {
-=======
-                    if(task.isSuccessful()){
-                        if(task.getResult().get("currentTravel") != null){
->>>>>>> 32e34aa (feat: track travel)
                             currentTravel.set(task.getResult().get("currentTravel").toString());
                         }
                         callback2.onCallback2(currentTravel);
@@ -66,10 +56,5 @@ public class State {
     public interface Callback2 {
         void onCallback2(AtomicReference<String> currentTravel);
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 32e34aa (feat: track travel)
-
 
 }
