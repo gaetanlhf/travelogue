@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        spinner = (ProgressBar) findViewById(R.id.log_in_spinner);
+        spinner = findViewById(R.id.log_in_spinner);
         spinner.setVisibility(View.GONE);
         if (currentUser != null) {
             finish();

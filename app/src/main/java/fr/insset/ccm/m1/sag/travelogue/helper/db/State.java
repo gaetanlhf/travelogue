@@ -28,25 +28,21 @@ public class State {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                                if (task.getResult().get("isTravelling").toString() == "true") {
-                                    travelling.set(true);
-                                } else {
-                                    travelling.set(false);
-                                }
+                            travelling.set(task.getResult().get("isTravelling").toString() == "true");
                             callback.onCallback(travelling);
                         }
                     }
                 });
     }
 
-    public void getCurrentTravel(Callback2 callback2){
+    public void getCurrentTravel(Callback2 callback2) {
         AtomicReference<String> currentTravel = new AtomicReference<>();
         db.collection(id)
                 .document("state")
                 .get()
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
-                        if(task.getResult().get("currentTravel") != null){
+                    if (task.isSuccessful()) {
+                        if (task.getResult().get("currentTravel") != null) {
                             currentTravel.set(task.getResult().get("currentTravel").toString());
                         }
                         callback2.onCallback2(currentTravel);
@@ -61,7 +57,6 @@ public class State {
     public interface Callback2 {
         void onCallback2(AtomicReference<String> currentTravel);
     }
-
 
 
 }

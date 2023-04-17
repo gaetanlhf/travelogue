@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,11 +29,9 @@ import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 public class LocationService extends Service {
 
     public static boolean isServiceRunning = false;
+    private final GpsPoint gpsPoint = new GpsPoint(0, 0);
     private FirebaseAuth mAuth;
-    private GpsPoint gpsPoint = new GpsPoint(0,0);
-
-
-    private LocationCallback locationCallback = new LocationCallback() {
+    private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
             super.onLocationResult(locationResult);
@@ -97,18 +94,18 @@ public class LocationService extends Service {
         }
 
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(timeBetweenUpdateLocation*1000);
-        locationRequest.setFastestInterval(timeBetweenUpdateLocation*1000);
+        locationRequest.setInterval(timeBetweenUpdateLocation * 1000);
+        locationRequest.setFastestInterval(timeBetweenUpdateLocation * 1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationServices.getFusedLocationProviderClient(getApplicationContext())
-                    .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+                .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
         startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
         isServiceRunning = true;
 
     }
 
-    private void stopLocationService(){
+    public void stopLocationService() {
         LocationServices.getFusedLocationProviderClient(getApplicationContext())
                 .removeLocationUpdates(locationCallback);
         stopForeground(true);
@@ -117,13 +114,13 @@ public class LocationService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
-        if(intent != null){
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
             String action = intent.getAction();
-            if(action != null){
-                if(action.equals(Constants.ACTION_START_LOCATION_SERVICE)){
-                    startLocationService(intent.getLongExtra("timeBetweenUpdate",5));
-                }else if(action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)){
+            if (action != null) {
+                if (action.equals(Constants.ACTION_START_LOCATION_SERVICE)) {
+                    startLocationService(intent.getLongExtra("timeBetweenUpdate", 5));
+                } else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)) {
                     stopLocationService();
                 }
             }

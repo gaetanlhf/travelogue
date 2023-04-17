@@ -1,12 +1,13 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.adapter.TravelAdapter;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
@@ -33,6 +35,8 @@ public class TravelsFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private FirebaseAuth mAuth;
+
+    private ProgressBar spinner;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -74,12 +78,15 @@ public class TravelsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_travels, container, false);
+        View noTripContent = view.findViewById(R.id.fragment_travels_no_trip_content);
+        noTripContent.setVisibility(View.GONE);
+        spinner = view.findViewById(R.id.fragment_home_spinner);
         // create list:
         List<String> titles = new ArrayList<>();
-
+        spinner.setVisibility(View.VISIBLE);
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
         travelHelper.getTravels(data -> {
-            for(int i = 0 ; i<data.length(); i++){
+            for (int i = 0; i < data.length(); i++) {
                 titles.add(String.valueOf(data.get(i).getTitle()));
             }
             TravelAdapter adapter = new TravelAdapter(getContext(), titles);
@@ -90,7 +97,16 @@ public class TravelsFragment extends Fragment {
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+            spinner.setVisibility(View.GONE);
+            noTripContent.setVisibility(View.VISIBLE);
 
+
+        });
+
+        ((HomeActivity) getActivity()).setFragmentRefreshListener(() -> {
+            FragmentTransaction tr = getParentFragmentManager().beginTransaction();
+            tr.replace(R.id.relativelayout, new TravelsFragment());
+            tr.commit();
         });
 
         // define the adapter:

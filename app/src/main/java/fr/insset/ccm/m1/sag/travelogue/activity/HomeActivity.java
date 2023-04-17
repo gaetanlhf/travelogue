@@ -1,10 +1,7 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,7 +35,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         fragment = homeFragment();
         loadFragment(fragment);
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_home_refresh);
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.activity_home_refresh);
         swipeRefreshLayout.setOnRefreshListener(
                 () -> {
                     if (getFragmentRefreshListener() != null) {

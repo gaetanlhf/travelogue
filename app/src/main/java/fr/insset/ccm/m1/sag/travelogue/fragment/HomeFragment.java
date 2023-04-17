@@ -2,7 +2,6 @@ package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +13,12 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Objects;
+
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.NewTravelActivity;
+import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 
 
@@ -74,13 +76,15 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        spinner = (ProgressBar) view.findViewById(R.id.fragment_home_spinner);
+        spinner = view.findViewById(R.id.fragment_home_spinner);
         View noTripContent = view.findViewById(R.id.fragment_home_no_trip_content);
         noTripContent.setVisibility(View.GONE);
         spinner.setVisibility(View.VISIBLE);
-        State state = new State(mAuth.getCurrentUser().getUid());
+        State state = new State(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
         state.isTravelling(travelling -> {
             if (travelling.get()) {
+                AppSettings.setTravelling(travelling.get());
+                //TODO SERVICE ACTIVATION
                 spinner.setVisibility(View.GONE);
             } else {
                 spinner.setVisibility(View.GONE);
@@ -89,13 +93,13 @@ public class HomeFragment extends Fragment {
 
             }
         });
-        Button newTravelBtn = (Button) view.findViewById(R.id.start_new_travel_btn);
+        Button newTravelBtn = view.findViewById(R.id.start_new_travel_btn);
         newTravelBtn.setOnClickListener(v -> {
             Intent newTravelActivity = new Intent(getActivity(), NewTravelActivity.class);
             startActivity(newTravelActivity);
         });
 
-        ((HomeActivity)getActivity()).setFragmentRefreshListener(() -> {
+        ((HomeActivity) getActivity()).setFragmentRefreshListener(() -> {
             FragmentTransaction tr = getParentFragmentManager().beginTransaction();
             tr.replace(R.id.relativelayout, new HomeFragment());
             tr.commit();

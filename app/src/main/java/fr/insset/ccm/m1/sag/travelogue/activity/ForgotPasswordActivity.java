@@ -31,7 +31,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        spinner = (ProgressBar) findViewById(R.id.forgot_password_spinner);
+        spinner = findViewById(R.id.forgot_password_spinner);
         spinner.setVisibility(View.GONE);
     }
 

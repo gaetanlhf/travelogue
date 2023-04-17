@@ -1,78 +1,118 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
+import static android.text.InputType.TYPE_CLASS_NUMBER;
+import static android.text.InputType.TYPE_NUMBER_FLAG_SIGNED;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 
-import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.EditTextPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
+import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
+import fr.insset.ccm.m1.sag.travelogue.helper.MaterialEditTextPreference;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
+import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends PreferenceFragmentCompat {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FirebaseAuth mAuth;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        mAuth = FirebaseAuth.getInstance();
+        Settings settings = new Settings(mAuth.getCurrentUser().getUid());
 
-    public SettingsFragment() {
-        // Required empty public constructor
-    }
+        ((HomeActivity) requireActivity()).setFragmentRefreshListener(() -> {
+            FragmentTransaction tr = getParentFragmentManager().beginTransaction();
+            tr.replace(R.id.relativelayout, new SettingsFragment());
+            tr.commit();
+        });
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SettingsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SettingsFragment newInstance(String param1, String param2) {
-        SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(requireActivity());
+
+        PreferenceCategory localisationCat = new PreferenceCategory(requireActivity());
+        localisationCat.setTitle("Localisation");
+        screen.addPreference(localisationCat);
+
+        SwitchPreferenceCompat switchAutoGps = new SwitchPreferenceCompat(requireActivity());
+        switchAutoGps.setTitle("Enable auto getting GPS point");
+        switchAutoGps.setWidgetLayoutResource(R.layout.preference_widget_material_switch);
+        switchAutoGps.setKey("switch_enable_auto_gps");
+        switchAutoGps.setChecked(AppSettings.getAutoGps());
+        switchAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
+            settings.setAutoGps(Boolean.parseBoolean(newValue.toString()));
+            if (LocationService.isServiceRunning && !Boolean.parseBoolean(newValue.toString())) {
+                //TODO SERVICE SHUTDOWN
+            }
+            if (!LocationService.isServiceRunning && AppSettings.getTravelling() && Boolean.parseBoolean(newValue.toString())) {
+                //TODO SERVICE ACTIVATION
+            }
+            return true;
+        });
+        localisationCat.addPreference(switchAutoGps);
+
+        EditTextPreference timeBetweenAutoGps = new EditTextPreference(requireActivity());
+        timeBetweenAutoGps.setTitle("Time between each");
+        timeBetweenAutoGps.setDialogTitle("Time between each");
+        timeBetweenAutoGps.setOnBindEditTextListener(editText -> editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED));
+        timeBetweenAutoGps.setKey("edittext_time_between_auto");
+        timeBetweenAutoGps.setText(AppSettings.getTimeBetweenAutoGps().toString());
+        timeBetweenAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
+            settings.setTimeBetweenAutoGps(Integer.parseInt(newValue.toString()));
+            return true;
+        });
+        screen.addPreference(timeBetweenAutoGps);
+
+        PreferenceCategory accountCat = new PreferenceCategory(requireActivity());
+        accountCat.setTitle("Account");
+        screen.addPreference(accountCat);
+
+        Preference logOut = new Preference(requireActivity());
+        logOut.setTitle("Logout");
+        logOut.setSummary("Click here to log out from your account");
+        logOut.setOnPreferenceClickListener(preference -> {
+            mAuth.signOut();
+            requireActivity().finish();
+            Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+            startActivity(mainActivity);
+            return true;
+        });
+        screen.addPreference(logOut);
+
+        setPreferenceScreen(screen);
+        timeBetweenAutoGps.setDependency(switchAutoGps.getKey());
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onDisplayPreferenceDialog(@NonNull Preference preference) {
+        if (preference instanceof EditTextPreference) {
+            showEditTextPreferenceDialog((EditTextPreference) preference);
+        } else {
+            super.onDisplayPreferenceDialog(preference);
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        Button button = (Button) view.findViewById(R.id.log_out_btn_settings);
-        button.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            getActivity().finish();
-            Intent mainActivity = new Intent(getActivity(), MainActivity.class);
-            startActivity(mainActivity);
-        });
-        return view;
+    private void showEditTextPreferenceDialog(EditTextPreference preference) {
+        DialogFragment dialogFragment = new MaterialEditTextPreference();
+        Bundle bundle = new Bundle(1);
+        bundle.putString("key", preference.getKey());
+        dialogFragment.setArguments(bundle);
+        dialogFragment.setTargetFragment(this, 0);
+        dialogFragment.show(getParentFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
     }
+
 
 }

@@ -2,10 +2,6 @@ package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -20,7 +16,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
-import fr.insset.ccm.m1.sag.travelogue.entity.Moment;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 
 public class TravelHelper {
@@ -60,7 +55,7 @@ public class TravelHelper {
 
     }
 
-    public void getPoints(Callback callback, String currentTravel){
+    public void getPoints(Callback callback, String currentTravel) {
         Log.d("TRAVEL_HELPER", "get points of travel : " + currentTravel);
         db.collection(id)
                 .document("data")
@@ -69,11 +64,11 @@ public class TravelHelper {
                 .collection("points")
                 .get()
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         int i = 0;
                         AtomicReferenceArray<GpsPoint> points = new AtomicReferenceArray<>(task.getResult().size());
 
-                        for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                        for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                             points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString())));
                             i++;
                             //Log.d("POINTS", documentSnapshot.getId() + " => " + documentSnapshot.getData().get("latitude"));
@@ -83,17 +78,17 @@ public class TravelHelper {
                 });
     }
 
-    public void getTravels(Callback2 callback2){
+    public void getTravels(Callback2 callback2) {
         Log.d("TRAVEL_HELPER", "get travels");
         db.collection(id)
                 .document("data")
                 .collection("travels")
                 .get()
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         AtomicReferenceArray<Travel> travels = new AtomicReferenceArray<>(task.getResult().size());
                         int i = 0;
-                        for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                        for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                             travels.set(i, new Travel(documentSnapshot.getData().get("travelName").toString()));
                             i++;
                         }
@@ -102,7 +97,7 @@ public class TravelHelper {
                 });
     }
 
-    public void getTravel(Callback3 callback3, String travel){
+    public void getTravel(Callback3 callback3, String travel) {
         Log.d("TRAVEL_HELPER", "get travel " + travel);
 
         db.collection(id)
@@ -111,7 +106,7 @@ public class TravelHelper {
                 .whereEqualTo("travelName", travel)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
 
                         DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
@@ -125,15 +120,15 @@ public class TravelHelper {
 
     }
 
-    public interface Callback{
+    public interface Callback {
         void onCallback(AtomicReferenceArray<GpsPoint> points);
     }
 
-    public interface Callback2{
+    public interface Callback2 {
         void onCallback2(AtomicReferenceArray<Travel> travels);
     }
 
-    public interface Callback3{
+    public interface Callback3 {
         void onCallback3(AtomicReference<Travel> travels);
     }
 }

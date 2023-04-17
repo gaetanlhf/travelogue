@@ -13,11 +13,11 @@ public class Location {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public Location(String id){
+    public Location(String id) {
         this.id = id;
     }
 
-    public void addPoint(GpsPoint gpsPoint, String currentTravel){
+    public void addPoint(GpsPoint gpsPoint, String currentTravel) {
         Long timestampLong = System.currentTimeMillis() / 1000;
         String timestamp = timestampLong.toString();
 
