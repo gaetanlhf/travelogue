@@ -1,15 +1,16 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,10 +26,10 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
-import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
 public class TravelActivity extends AppCompatActivity implements
@@ -37,6 +38,7 @@ public class TravelActivity extends AppCompatActivity implements
     private Travel travel;
 
     private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
@@ -45,6 +47,9 @@ public class TravelActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel);
         mAuth = FirebaseAuth.getInstance();
+
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
 
         TextView travelName = findViewById(R.id.travel_name_textView);
         TextView travelStartDateTime = findViewById(R.id.start_date_time_textView);
@@ -62,6 +67,7 @@ public class TravelActivity extends AppCompatActivity implements
             travelName.setText(travel.getTitle());
             travelStartDateTime.setText(travel.getStartDatetime());
             travelEndDateTime.setText(travel.getEndDatetime());
+            getSupportActionBar().setTitle(travel.getTitle());
 
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
@@ -70,6 +76,21 @@ public class TravelActivity extends AppCompatActivity implements
         }, intent.getStringExtra("travelName"));
 
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
     }
 
     @Override
@@ -86,7 +107,7 @@ public class TravelActivity extends AppCompatActivity implements
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
 
         travelHelper.getPoints(data -> {
-            for(int i = 0; i<data.length(); i++){
+            for (int i = 0; i < data.length(); i++) {
                 listLatLng.add(new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude()));
             }
 
@@ -104,6 +125,7 @@ public class TravelActivity extends AppCompatActivity implements
 
     /**
      * Styles the polyline, based on type.
+     *
      * @param polyline The polyline object that needs styling.
      */
     private void stylePolyline(Polyline polyline) {

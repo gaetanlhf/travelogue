@@ -30,7 +30,7 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         mAuth = FirebaseAuth.getInstance();
-        spinner = (ProgressBar) findViewById(R.id.sign_up_spinner);
+        spinner = findViewById(R.id.sign_up_spinner);
         spinner.setVisibility(View.GONE);
     }
 

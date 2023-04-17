@@ -4,9 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.TravelsFragment">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fragment_travels_no_trip_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:visibility="visible">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="650dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/fragment_home_spinner"
+        style="?android:progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:visibility="gone" />
 </FrameLayout>

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class PermissionsHelper {
 
-    public static boolean hasPermission(Context context, String permission){
+    public static boolean hasPermission(Context context, String permission) {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
@@ -28,16 +28,16 @@ public class PermissionsHelper {
         return true;
     }
 
-    public static void requestPermissions(Activity activity, String[] permissions, int requestCode){
+    public static void requestPermissions(Activity activity, String[] permissions, int requestCode) {
         String[] permissionArray = getNonGrantedPermissions(activity, permissions);
-        if(permissionArray != null){
+        if (permissionArray != null) {
             ActivityCompat.requestPermissions(activity, permissionArray, requestCode);
         }
     }
 
-    public static void requestPermissions(Fragment fragment, String[] permissions, int requestCode){
+    public static void requestPermissions(Fragment fragment, String[] permissions, int requestCode) {
         String[] permissionArray = getNonGrantedPermissions(fragment.getContext(), permissions);
-        if(permissionArray != null){
+        if (permissionArray != null) {
             ActivityCompat.requestPermissions(fragment.getActivity(), permissionArray, requestCode);
         }
     }

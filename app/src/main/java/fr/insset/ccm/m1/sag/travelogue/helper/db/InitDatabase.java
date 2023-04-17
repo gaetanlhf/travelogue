@@ -19,11 +19,7 @@ public class InitDatabase {
         db.collection(id)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (!(task.getResult().size() > 0)) {
-                        init.set(true);
-                    } else {
-                        init.set(false);
-                    }
+                    init.set(!(task.getResult().size() > 0));
                     callback.onCallback(init);
                 });
     }

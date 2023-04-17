@@ -37,7 +37,7 @@ public class NewTravelActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(getResources().getString(R.string.create_new_travel));
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_new_travel);
-        if(!PermissionsHelper.hasPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION})){
+        if (!PermissionsHelper.hasPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION})) {
             PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
         }
     }
@@ -64,7 +64,7 @@ public class NewTravelActivity extends AppCompatActivity {
             newTravel.createTravel(travelName.getText().toString());
             Settings settings = new Settings(mAuth.getCurrentUser().getUid());
             settings.isPeriodicTrackingEnable(data -> {
-                if(data.get(0).equals("true")){
+                if (data.get(0).equals("true")) {
                     Log.d("TEST", data.get(1).toString());
                     startLocationService(Long.parseLong(data.get(1).toString()));
                 }
@@ -73,10 +73,10 @@ public class NewTravelActivity extends AppCompatActivity {
         }
     }
 
-    private void startLocationService(Long timeBetweenAutoGetPoint){
-        if(!LocationService.isServiceRunning){
-            if(!PermissionsHelper.hasPermission(this, Constants.ACCESS_FINE_LOCATION_PERMISSION)){
-                PermissionsHelper.requestPermissions(this, new String[] {Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
+    private void startLocationService(Long timeBetweenAutoGetPoint) {
+        if (!LocationService.isServiceRunning) {
+            if (!PermissionsHelper.hasPermission(this, Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
+                PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
             }
             Intent intent = new Intent(getApplicationContext(), LocationService.class);
             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
@@ -86,8 +86,8 @@ public class NewTravelActivity extends AppCompatActivity {
         }
     }
 
-    private void stopLocationService(){
-        if(LocationService.isServiceRunning){
+    private void stopLocationService() {
+        if (LocationService.isServiceRunning) {
             Intent intent = new Intent(getApplicationContext(), LocationService.class);
             intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
             startService(intent); //remplacé par startService car stopService ne fonctionne pas (wtf)
