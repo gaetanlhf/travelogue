@@ -38,6 +38,8 @@ public class TravelHelper {
         travel.put("startDate", date);
         travel.put("startTime", time);
         travel.put("travelName", travelName);
+        travel.put("endDate", null);
+        travel.put("endTime", null);
 
         db.collection(id)
                 .document("data")

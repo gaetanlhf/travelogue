@@ -65,7 +65,6 @@ public class NewTravelActivity extends AppCompatActivity {
             Settings settings = new Settings(mAuth.getCurrentUser().getUid());
             settings.isPeriodicTrackingEnable(data -> {
                 if (data.get(0).equals("true")) {
-                    Log.d("TEST", data.get(1).toString());
                     startLocationService(Long.parseLong(data.get(1).toString()));
                 }
             });
