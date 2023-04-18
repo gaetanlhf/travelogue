@@ -120,6 +120,21 @@ public class TravelHelper {
 
     }
 
+    public void deleteTravel(String travelName) {
+        db.collection(id)
+                .document("data")
+                .collection("travels")
+                .whereEqualTo("travelName", travelName)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            document.getReference().delete();
+                        }
+                    }
+                });
+    }
+
     public interface Callback {
         void onCallback(AtomicReferenceArray<GpsPoint> points);
     }

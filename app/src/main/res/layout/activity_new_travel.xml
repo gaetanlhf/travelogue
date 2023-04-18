@@ -22,6 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="17dp"
+        android:autofillHints=""
         android:ems="10"
         android:hint="@string/activity_new_travel_edittext_hint"
         android:inputType="textPersonName"
@@ -29,8 +30,7 @@
         app:layout_constraintEnd_toEndOf="@+id/activity_new_travel_textview"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/activity_new_travel_textview"
-        app:layout_constraintTop_toBottomOf="@+id/activity_new_travel_textview"
-        android:autofillHints="" />
+        app:layout_constraintTop_toBottomOf="@+id/activity_new_travel_textview" />
 
     <Button
         android:id="@+id/activity_new_travel_btn"

@@ -1,13 +1,14 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -39,38 +42,30 @@ public class TravelActivity extends AppCompatActivity implements
 
     private FirebaseAuth mAuth;
 
+    private TravelHelper travelHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
         travel = new Travel(intent.getStringExtra("travelName"));
 
         super.onCreate(savedInstanceState);
+        getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         setContentView(R.layout.activity_travel);
         mAuth = FirebaseAuth.getInstance();
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
 
 
-        TextView travelName = findViewById(R.id.travel_name_textView);
-        TextView travelStartDateTime = findViewById(R.id.start_date_time_textView);
-        TextView travelEndDateTime = findViewById(R.id.end_date_time_textView);
-
-        TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
-
-        Button button = findViewById(R.id.btn_back_view_travel);
-        button.setOnClickListener(v -> {
-            finish();
-        });
         travelHelper.getTravel(data -> {
 
             travel = data.get();
-            travelName.setText(travel.getTitle());
-            travelStartDateTime.setText(travel.getStartDatetime());
-            travelEndDateTime.setText(travel.getEndDatetime());
             getSupportActionBar().setTitle(travel.getTitle());
 
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
+            assert mapFragment != null;
             mapFragment.getMapAsync(this);
 
         }, intent.getStringExtra("travelName"));
@@ -78,18 +73,46 @@ public class TravelActivity extends AppCompatActivity implements
 
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.action_info:
+                String alertString1 = "Name of the travel: " + travel.getTitle();
+                String alertString2 = "Start time: " + travel.getStartDatetime();
+                String alertString3 = "End time: " + travel.getEndDatetime();
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Information about this trip")
+                        .setMessage(alertString1 + "\n" + alertString2 + "\n" + alertString3)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+                return true;
+            case R.id.action_delete:
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Delete this trip")
+                        .setMessage("Are you sure you want to delete this trip?")
+                        .setNegativeButton(android.R.string.no, null)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                travelHelper.deleteTravel(travel.getTitle());
+                                finish();
+                            }
+                        })
+                        .show();
+                return true;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.topbar_travel, menu);
         return true;
     }
 
@@ -115,26 +138,17 @@ public class TravelActivity extends AppCompatActivity implements
 
             stylePolyline(polyline);
 
-            // Position the map's camera near Alice Springs in the center of Australia,
-            // and set the zoom factor so most of Australia shows on the screen.
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
             Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
         }, travel.getID().toString());
 
     }
 
-    /**
-     * Styles the polyline, based on type.
-     *
-     * @param polyline The polyline object that needs styling.
-     */
     private void stylePolyline(Polyline polyline) {
-        // Get the data object stored with the polyline.
         polyline.setStartCap(new RoundCap());
-
         polyline.setEndCap(new RoundCap());
         polyline.setWidth(12);
-        polyline.setColor(Color.RED);
+        polyline.setColor(SurfaceColors.SURFACE_2.getColor(this));
         polyline.setJointType(JointType.ROUND);
         polyline.setWidth(20);
     }

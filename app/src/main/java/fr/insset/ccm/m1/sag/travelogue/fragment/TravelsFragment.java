@@ -78,27 +78,35 @@ public class TravelsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_travels, container, false);
-        View noTripContent = view.findViewById(R.id.fragment_travels_no_trip_content);
+        View noTripContent = view.findViewById(R.id.fragment_travels_no_content);
+        View tripContent = view.findViewById(R.id.fragment_travels_content);
         noTripContent.setVisibility(View.GONE);
+        tripContent.setVisibility(View.GONE);
         spinner = view.findViewById(R.id.fragment_home_spinner);
         // create list:
         List<String> titles = new ArrayList<>();
         spinner.setVisibility(View.VISIBLE);
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
         travelHelper.getTravels(data -> {
-            for (int i = 0; i < data.length(); i++) {
-                titles.add(String.valueOf(data.get(i).getTitle()));
-            }
-            TravelAdapter adapter = new TravelAdapter(getContext(), titles);
+            if (data.length() > 0) {
+                for (int i = 0; i < data.length(); i++) {
+                    titles.add(String.valueOf(data.get(i).getTitle()));
+                }
+                TravelAdapter adapter = new TravelAdapter(getContext(), titles);
 
-            // set the RecyclerView:
-            RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
-            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-            spinner.setVisibility(View.GONE);
-            noTripContent.setVisibility(View.VISIBLE);
+                // set the RecyclerView:
+                RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+                recyclerView.setLayoutManager(layoutManager);
+                recyclerView.setAdapter(adapter);
+                recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+                spinner.setVisibility(View.GONE);
+                tripContent.setVisibility(View.VISIBLE);
+            } else {
+                spinner.setVisibility(View.GONE);
+                noTripContent.setVisibility(View.VISIBLE);
+            }
+
 
 
         });

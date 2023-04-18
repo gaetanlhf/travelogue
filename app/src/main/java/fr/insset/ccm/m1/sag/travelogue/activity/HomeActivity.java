@@ -6,9 +6,9 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
@@ -27,6 +27,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         InitDatabase initDatabase = new InitDatabase(mAuth.getCurrentUser().getUid());
@@ -35,15 +36,15 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         fragment = homeFragment();
         loadFragment(fragment);
-        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.activity_home_refresh);
-        swipeRefreshLayout.setOnRefreshListener(
-                () -> {
-                    if (getFragmentRefreshListener() != null) {
-                        getFragmentRefreshListener().onRefresh();
-                    }
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-        );
+        //SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.activity_home_refresh);
+        //swipeRefreshLayout.setOnRefreshListener(
+        //        () -> {
+        //            if (getFragmentRefreshListener() != null) {
+        //                getFragmentRefreshListener().onRefresh();
+        //            }
+        //            swipeRefreshLayout.setRefreshing(false);
+        //        }
+        //);
     }
 
     @Override

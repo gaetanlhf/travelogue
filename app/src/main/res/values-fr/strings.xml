@@ -14,8 +14,8 @@
     <string name="log_in_success_toast">Connexion réussie !</string>
     <string name="log_in_fail_toast">La connexion a échoué</string>
     <string name="sign_up_fail_toast">La création du compte a échoué</string>
-    <string name="home_text">Accueil</string>
-    <string name="travels_text">Voyages</string>
+    <string name="home_text">En cours</string>
+    <string name="travels_text">Voyages passés</string>
     <string name="settings_text">Paramètres</string>
     <string name="log_out_btn_settings">Se déconnecter</string>
     <string name="forgot_password_textview">Mot de passe oublié ?</string>
@@ -29,4 +29,5 @@
     <string name="activity_new_travel_textview">Entrez le nom de votre nouveau voyage</string>
     <string name="activity_new_travel_edittext_hint">Une balade à Paris</string>
     <string name="btn_save">Enregistrer</string>
+    <string name="no_travels_textview">Aucun voyages précédents enregistrés</string>
 </resources>

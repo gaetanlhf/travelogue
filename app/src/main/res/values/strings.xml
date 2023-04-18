@@ -15,8 +15,8 @@
     <string name="sign_up_fail_toast">Account creation failed</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="home_text">Home</string>
-    <string name="travels_text">Travels</string>
+    <string name="home_text">In progress</string>
+    <string name="travels_text">Previous travels</string>
     <string name="settings_text">Settings</string>
     <string name="log_out_btn_settings">Log out</string>
     <string name="forgot_password_textview">Forgot your password?</string>
@@ -48,4 +48,5 @@
     <string name="travel">Travel :</string>
     <string name="start_of_the_travel">Start of the travel:</string>
     <string name="end_of_the_travel">End of the travel :</string>
+    <string name="no_travels_textview">No previous travel recorded</string>
 </resources>
