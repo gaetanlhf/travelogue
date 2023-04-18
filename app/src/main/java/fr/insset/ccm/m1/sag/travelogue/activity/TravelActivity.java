@@ -13,13 +13,19 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import android.view.View;
+import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
@@ -30,6 +36,7 @@ import java.util.List;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
@@ -107,8 +114,19 @@ public class TravelActivity extends AppCompatActivity implements
 
         travelHelper.getPoints(data -> {
             for (int i = 0; i < data.length(); i++) {
-                listLatLng.add(new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude()));
+                LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
+                listLatLng.add(position);
+                googleMap.addMarker(new MarkerOptions()
+                        .position(position)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             }
+            googleMap.setInfoWindowAdapter(new CustomInfoWindowMarkerAdapter(getApplicationContext()));
+            googleMap.setOnMarkerClickListener(marker -> {
+                Toast.makeText(getApplicationContext(), "Click on marker " + marker.getPosition(), Toast.LENGTH_SHORT).show();
+                marker.setTitle("Test");
+                marker.showInfoWindow();
+                return false;
+            });
 
             polyline.setPoints(listLatLng);
 
