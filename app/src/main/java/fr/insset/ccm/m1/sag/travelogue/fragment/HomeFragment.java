@@ -82,8 +82,6 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         spinner = view.findViewById(R.id.fragment_home_spinner);
-        View noTripContent = view.findViewById(R.id.fragment_home_no_trip_content);
-        //noTripContent.setVisibility(View.GONE);
         spinner.setVisibility(View.VISIBLE);
         State state = new State(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
         Button newTravelBtn = view.findViewById(R.id.start_new_travel_btn);
