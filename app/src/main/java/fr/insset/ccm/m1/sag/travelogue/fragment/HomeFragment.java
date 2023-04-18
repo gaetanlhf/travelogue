@@ -103,8 +103,12 @@ public class HomeFragment extends Fragment {
                 stopTravelBtn.setVisibility(View.VISIBLE);
                 stopTravelBtn.setOnClickListener(v -> {
                     stopLocationService();
-                    Log.d("TEST", "ok");
-                    AppSettings.setTravelling(false);
+                    state.setTravelling(false);
+                    AppSettings.setTravelling(!travelling.get());
+                    Toast.makeText(getContext(), "isTravelling set to false", Toast.LENGTH_SHORT).show();
+                    newTravelBtn.setVisibility(View.VISIBLE);
+                    noCurrentTravel.setVisibility(View.VISIBLE);
+                    stopTravelBtn.setVisibility(View.GONE);
                 });
 
             } else {
