@@ -1,20 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.TravelsFragment">
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/fragment_travels_no_trip_content"
+        android:id="@+id/fragment_travels_no_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:visibility="visible">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="650dp" />
+        <TextView
+            android:id="@+id/no_travels_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/no_travels_textview"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@+id/imageView3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="136dp"
+            android:layout_height="130dp"
+            android:src="@drawable/baseline_travel_explore"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/no_travels_textview" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="26dp"
+            android:layout_height="32dp"
+            android:src="@drawable/baseline_priority_high"
+            app:layout_constraintEnd_toEndOf="@+id/imageView3"
+            app:layout_constraintTop_toTopOf="@+id/imageView3" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/fragment_travels_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:visibility="gone">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/fragment_home_spinner"
@@ -23,4 +68,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         tools:visibility="gone" />
+
 </FrameLayout>

@@ -11,20 +11,37 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.TravelActivity;
 
-public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-{
-    private Context context;
+public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private final Context context;
     private List<String> titles;
+
+    private final List<String> initialTitles;
 
     public TravelAdapter(Context context, List<String> titles)
     {
         this.context = context;
-        this.titles = titles;
+        this.titles = this.initialTitles = titles;
+    }
+
+    public void filterList(String text) {
+        List<String> filteredlist = new ArrayList<>();
+        for (String item : initialTitles) {
+            // checking if the entered string matched with any item of our recycler view.
+            if (item.trim().toLowerCase().contains(text.trim().toLowerCase())) {
+                filteredlist.add(item);
+            }
+        }
+        if (!filteredlist.isEmpty()) {
+            titles = filteredlist;
+            notifyDataSetChanged();
+        }
+
     }
 
     @NonNull

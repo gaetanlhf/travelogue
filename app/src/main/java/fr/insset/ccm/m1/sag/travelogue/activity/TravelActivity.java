@@ -1,17 +1,23 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ShareCompat;
+import androidx.core.content.FileProvider;
 import android.view.View;
 import android.widget.Toast;
 
@@ -29,15 +35,23 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
+import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
+import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
 public class TravelActivity extends AppCompatActivity implements
@@ -46,37 +60,32 @@ public class TravelActivity extends AppCompatActivity implements
     private Travel travel;
 
     private FirebaseAuth mAuth;
+
+    private TravelHelper travelHelper;
+
+    private ArrayList<GpsPoint> pointsList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
         travel = new Travel(intent.getStringExtra("travelName"));
 
         super.onCreate(savedInstanceState);
+        getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         setContentView(R.layout.activity_travel);
         mAuth = FirebaseAuth.getInstance();
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
 
-        TextView travelName = findViewById(R.id.travel_name_textView);
-        TextView travelStartDateTime = findViewById(R.id.start_date_time_textView);
-        TextView travelEndDateTime = findViewById(R.id.end_date_time_textView);
-
-        TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
-
-        Button button = findViewById(R.id.btn_back_view_travel);
-        button.setOnClickListener(v -> {
-            finish();
-        });
         travelHelper.getTravel(data -> {
 
             travel = data.get();
-            travelName.setText(travel.getTitle());
-            travelStartDateTime.setText(travel.getStartDatetime());
-            travelEndDateTime.setText(travel.getEndDatetime());
             getSupportActionBar().setTitle(travel.getTitle());
 
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
+            assert mapFragment != null;
             mapFragment.getMapAsync(this);
 
         }, intent.getStringExtra("travelName"));
@@ -84,24 +93,98 @@ public class TravelActivity extends AppCompatActivity implements
 
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.action_info:
+                String alertString1 = "Name of the travel: " + travel.getTitle();
+                String alertString2 = "Start time: " + travel.getStartDatetime();
+                String alertString3 = "End time: " + travel.getEndDatetime();
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Information about this trip")
+                        .setMessage(alertString1 + "\n" + alertString2 + "\n" + alertString3)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+                return true;
+            case R.id.action_share:
+                final int[] defaultItem = {-1};
+                final String[] listItems = new String[]{"GPX", "KML"};
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Share this travel as:")
+                        .setSingleChoiceItems(listItems, defaultItem[0], (dialog, which) -> {
+                            if (which == 0) {
+                                File shareGpxFile = new File(getCacheDir(), "export/" + travel.getTitle()+"-"+travel.getID()+".gpx");
+                                try {
+                                    GenerateGpx.generateGfx(shareGpxFile, travel.getTitle(), pointsList);
+                                    Log.d("test",this.getPackageName()+".provider");
+                                    Uri uri = FileProvider.getUriForFile(this, this.getPackageName()+".provider", shareGpxFile);
+                                    Intent intent = new ShareCompat.IntentBuilder(this)
+                                            .setType("application/gpx+xml")
+                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setStream(uri)
+                                            .setChooserTitle("Sharing of GPS data")
+                                            .createChooserIntent()
+                                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    startActivity(intent);
+                                } catch (IOException e) {
+                                    Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
+                                }
+                            } else if (which == 1){
+                                File shareKmlFile = new File(getCacheDir(), "export/" + travel.getTitle()+"-"+travel.getID()+".kml");
+                                try {
+                                GenerateKml.generate(shareKmlFile, travel.getTitle(), pointsList);
+                                Log.d("test",this.getPackageName()+".provider");
+                                Uri uri = FileProvider.getUriForFile(this, this.getPackageName()+".provider", shareKmlFile);
+                                Intent intent = new ShareCompat.IntentBuilder(this)
+                                        .setType("application/vnd.google-earth.kml+xml")
+                                        .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                        .setStream(uri)
+                                        .setChooserTitle("Sharing of GPS data")
+                                        .createChooserIntent()
+                                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                startActivity(intent);
+                            } catch (IOException e) {
+                                        Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
+                                    }
+                            }
+                            dialog.dismiss();
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+
+                return true;
+            case R.id.action_delete:
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Delete this trip")
+                        .setMessage("Are you sure you want to delete this trip?")
+                        .setNegativeButton(android.R.string.no, null)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                travelHelper.deleteTravel(travel.getTitle());
+                                finish();
+                            }
+                        })
+                        .show();
+                return true;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.topbar_travel, menu);
         return true;
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
         uiSettings.setCompassEnabled(false);
@@ -116,6 +199,7 @@ public class TravelActivity extends AppCompatActivity implements
             for (int i = 0; i < data.length(); i++) {
                 LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
                 listLatLng.add(position);
+                pointsList.add(data.get(i));
                 googleMap.addMarker(new MarkerOptions()
                         .position(position)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
@@ -132,25 +216,17 @@ public class TravelActivity extends AppCompatActivity implements
 
             stylePolyline(polyline);
 
-            // Position the map's camera near Alice Springs in the center of Australia,
-            // and set the zoom factor so most of Australia shows on the screen.
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
             Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
         }, travel.getID().toString());
 
     }
 
-    /**
-     * Styles the polyline, based on type.
-     * @param polyline The polyline object that needs styling.
-     */
     private void stylePolyline(Polyline polyline) {
-        // Get the data object stored with the polyline.
         polyline.setStartCap(new RoundCap());
-
         polyline.setEndCap(new RoundCap());
         polyline.setWidth(12);
-        polyline.setColor(Color.RED);
+        polyline.setColor(SurfaceColors.SURFACE_2.getColor(this));
         polyline.setJointType(JointType.ROUND);
         polyline.setWidth(20);
     }

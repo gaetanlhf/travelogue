@@ -6,16 +6,15 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.fragment.HomeFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.SettingsFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.TravelsFragment;
-import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 
 
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -23,27 +22,28 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     private FirebaseAuth mAuth;
 
     private Fragment fragment = null;
+    private Fragment oldFragment = null;
     private FragmentRefreshListener fragmentRefreshListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
-        InitDatabase initDatabase = new InitDatabase(mAuth.getCurrentUser().getUid());
         setContentView(R.layout.activity_home);
         bottomNavigationView = findViewById(R.id.bottom_nav_home);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-        fragment = homeFragment();
+        fragment = oldFragment = homeFragment();
         loadFragment(fragment);
-        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.activity_home_refresh);
-        swipeRefreshLayout.setOnRefreshListener(
-                () -> {
-                    if (getFragmentRefreshListener() != null) {
-                        getFragmentRefreshListener().onRefresh();
-                    }
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-        );
+        //SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.activity_home_refresh);
+        //swipeRefreshLayout.setOnRefreshListener(
+        //        () -> {
+        //            if (getFragmentRefreshListener() != null) {
+        //                getFragmentRefreshListener().onRefresh();
+        //            }
+        //            swipeRefreshLayout.setRefreshing(false);
+        //        }
+        //);
     }
 
     @Override
@@ -56,6 +56,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        oldFragment = fragment;
         switch (item.getItemId()) {
             case R.id.home:
                 fragment = homeFragment();
@@ -74,7 +75,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     void loadFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.relativelayout, fragment).commit();
+        getSupportFragmentManager().beginTransaction().detach(oldFragment).replace(R.id.relativelayout, fragment).commit();
     }
 
     Fragment homeFragment() {
