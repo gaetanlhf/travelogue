@@ -1,9 +1,8 @@
 package fr.insset.ccm.m1.sag.travelogue.entity;
 
-import com.google.gson.Gson;
-
 import androidx.annotation.NonNull;
-import java.util.List;
+
+import com.google.gson.Gson;
 
 public class Travel {
 
@@ -19,8 +18,9 @@ public class Travel {
     private String endTime;
 
     private boolean isFinish;
+
     /**
-     * 
+     *
      */
     public Travel(Integer id, String title, String startDate, String startTime, String endDate, String endTime, boolean isFinish) {
         this.ID = id;
@@ -64,10 +64,11 @@ public class Travel {
 
     // GETTERS & SETTERS
 
-    public String getStartDatetime(){
+    public String getStartDatetime() {
         return this.startDate + " - " + this.startTime;
     }
-    public String getEndDatetime(){
+
+    public String getEndDatetime() {
         return this.endDate + " - " + this.endTime;
     }
 
@@ -84,7 +85,7 @@ public class Travel {
         return this.title;
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         this.title = title;
     }
 

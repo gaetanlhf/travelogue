@@ -19,12 +19,10 @@ import fr.insset.ccm.m1.sag.travelogue.activity.TravelActivity;
 
 public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context context;
+    private final List<String> initialTitles;
     private List<String> titles;
 
-    private final List<String> initialTitles;
-
-    public TravelAdapter(Context context, List<String> titles)
-    {
+    public TravelAdapter(Context context, List<String> titles) {
         this.context = context;
         this.titles = this.initialTitles = titles;
     }

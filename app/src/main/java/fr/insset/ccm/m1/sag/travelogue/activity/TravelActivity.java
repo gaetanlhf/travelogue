@@ -2,9 +2,6 @@ package fr.insset.ccm.m1.sag.travelogue.activity;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,19 +15,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
-import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -44,11 +37,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
+import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
@@ -63,7 +55,7 @@ public class TravelActivity extends AppCompatActivity implements
 
     private TravelHelper travelHelper;
 
-    private ArrayList<GpsPoint> pointsList = new ArrayList<>();
+    private final ArrayList<GpsPoint> pointsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,11 +109,11 @@ public class TravelActivity extends AppCompatActivity implements
                         .setTitle("Share this travel as:")
                         .setSingleChoiceItems(listItems, defaultItem[0], (dialog, which) -> {
                             if (which == 0) {
-                                File shareGpxFile = new File(getCacheDir(), "export/" + travel.getTitle()+"-"+travel.getID()+".gpx");
+                                File shareGpxFile = new File(getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".gpx");
                                 try {
-                                    GenerateGpx.generateGfx(shareGpxFile, travel.getTitle(), pointsList);
-                                    Log.d("test",this.getPackageName()+".provider");
-                                    Uri uri = FileProvider.getUriForFile(this, this.getPackageName()+".provider", shareGpxFile);
+                                    GenerateGpx.generate(shareGpxFile, travel.getTitle(), pointsList);
+                                    Log.d("test", this.getPackageName() + ".provider");
+                                    Uri uri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", shareGpxFile);
                                     Intent intent = new ShareCompat.IntentBuilder(this)
                                             .setType("application/gpx+xml")
                                             .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
@@ -133,23 +125,23 @@ public class TravelActivity extends AppCompatActivity implements
                                 } catch (IOException e) {
                                     Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
                                 }
-                            } else if (which == 1){
-                                File shareKmlFile = new File(getCacheDir(), "export/" + travel.getTitle()+"-"+travel.getID()+".kml");
+                            } else if (which == 1) {
+                                File shareKmlFile = new File(getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".kml");
                                 try {
-                                GenerateKml.generate(shareKmlFile, travel.getTitle(), pointsList);
-                                Log.d("test",this.getPackageName()+".provider");
-                                Uri uri = FileProvider.getUriForFile(this, this.getPackageName()+".provider", shareKmlFile);
-                                Intent intent = new ShareCompat.IntentBuilder(this)
-                                        .setType("application/vnd.google-earth.kml+xml")
-                                        .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
-                                        .setStream(uri)
-                                        .setChooserTitle("Sharing of GPS data")
-                                        .createChooserIntent()
-                                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                startActivity(intent);
-                            } catch (IOException e) {
-                                        Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
-                                    }
+                                    GenerateKml.generate(shareKmlFile, travel.getTitle(), pointsList);
+                                    Log.d("test", this.getPackageName() + ".provider");
+                                    Uri uri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", shareKmlFile);
+                                    Intent intent = new ShareCompat.IntentBuilder(this)
+                                            .setType("application/vnd.google-earth.kml+xml")
+                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setStream(uri)
+                                            .setChooserTitle("Sharing of GPS data")
+                                            .createChooserIntent()
+                                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    startActivity(intent);
+                                } catch (IOException e) {
+                                    Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
+                                }
                             }
                             dialog.dismiss();
                         })

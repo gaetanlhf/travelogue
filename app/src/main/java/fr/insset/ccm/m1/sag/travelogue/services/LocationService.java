@@ -30,10 +30,10 @@ public class LocationService extends Service {
 
     public static boolean isServiceRunning = false;
     private FirebaseAuth mAuth;
-    private GpsPoint gpsPoint = new GpsPoint(0,0, "0");
+    private final GpsPoint gpsPoint = new GpsPoint(0, 0, "0");
 
 
-    private LocationCallback locationCallback = new LocationCallback() {
+    private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
             super.onLocationResult(locationResult);
