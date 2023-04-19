@@ -41,6 +41,7 @@ import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
+import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
 public class TravelActivity extends AppCompatActivity implements
@@ -122,8 +123,23 @@ public class TravelActivity extends AppCompatActivity implements
                                 } catch (IOException e) {
                                     Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-
+                            } else if (which == 1){
+                                File shareKmlFile = new File(getCacheDir(), "export/" + travel.getTitle()+"-"+travel.getID()+".kml");
+                                try {
+                                GenerateKml.generate(shareKmlFile, travel.getTitle(), pointsList);
+                                Log.d("test",this.getPackageName()+".provider");
+                                Uri uri = FileProvider.getUriForFile(this, this.getPackageName()+".provider", shareKmlFile);
+                                Intent intent = new ShareCompat.IntentBuilder(this)
+                                        .setType("application/vnd.google-earth.kml+xml")
+                                        .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                        .setStream(uri)
+                                        .setChooserTitle("Sharing of GPS data")
+                                        .createChooserIntent()
+                                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                startActivity(intent);
+                            } catch (IOException e) {
+                                        Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
+                                    }
                             }
                             dialog.dismiss();
                         })
