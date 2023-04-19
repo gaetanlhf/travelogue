@@ -1,5 +1,8 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,9 +12,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.view.View;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,7 +39,6 @@ public class TravelActivity extends AppCompatActivity implements
     private Travel travel;
 
     private FirebaseAuth mAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
@@ -49,7 +49,6 @@ public class TravelActivity extends AppCompatActivity implements
         mAuth = FirebaseAuth.getInstance();
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
 
         TextView travelName = findViewById(R.id.travel_name_textView);
         TextView travelStartDateTime = findViewById(R.id.start_date_time_textView);
@@ -125,7 +124,10 @@ public class TravelActivity extends AppCompatActivity implements
 
     /**
      * Styles the polyline, based on type.
+<<<<<<< HEAD
      *
+=======
+>>>>>>> 26858e9 (View travel list + view travel (#14))
      * @param polyline The polyline object that needs styling.
      */
     private void stylePolyline(Polyline polyline) {

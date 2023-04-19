@@ -16,11 +16,13 @@ import java.util.List;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.TravelActivity;
 
-public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final Context context;
-    private final List<String> titles;
+public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+{
+    private Context context;
+    private List<String> titles;
 
-    public TravelAdapter(Context context, List<String> titles) {
+    public TravelAdapter(Context context, List<String> titles)
+    {
         this.context = context;
         this.titles = titles;
     }

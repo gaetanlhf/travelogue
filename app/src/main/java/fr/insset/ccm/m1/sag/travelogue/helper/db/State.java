@@ -6,14 +6,18 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 
 public class State {
     private final String id;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-
 
     public State(String id) {
         this.id = id;
@@ -50,6 +54,17 @@ public class State {
                 });
     }
 
+    public void setTravelling(Boolean value) {
+        Map<String, Object> updateState = new HashMap<>();
+        updateState.put("isTravelling", value);
+
+        db.collection(id)
+                .document("state")
+                .set(updateState, SetOptions.merge());
+
+        AppSettings.setTravelling(value);
+    }
+
     public interface Callback {
         void onCallback(AtomicBoolean travelling);
     }
@@ -57,6 +72,5 @@ public class State {
     public interface Callback2 {
         void onCallback2(AtomicReference<String> currentTravel);
     }
-
 
 }
