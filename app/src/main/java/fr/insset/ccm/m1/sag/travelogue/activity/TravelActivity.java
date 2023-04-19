@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -55,7 +57,6 @@ public class TravelActivity extends AppCompatActivity implements
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
-
 
         travelHelper.getTravel(data -> {
 

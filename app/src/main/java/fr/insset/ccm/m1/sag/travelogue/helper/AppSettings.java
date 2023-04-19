@@ -2,6 +2,7 @@ package fr.insset.ccm.m1.sag.travelogue.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.core.content.SharedPreferencesCompat;
 
@@ -17,6 +18,7 @@ public class AppSettings {
     }
 
     public static void setTravelling(Boolean value) {
+        Log.d("HEHEHEHE", "dozdz");
         Key.Travelling.setBoolean(value);
 
     }

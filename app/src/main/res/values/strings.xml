@@ -49,4 +49,5 @@
     <string name="start_of_the_travel">Start of the travel:</string>
     <string name="end_of_the_travel">End of the travel :</string>
     <string name="no_travels_textview">No previous travel recorded</string>
+    <string name="stop_travel_btn">Stop travel</string>
 </resources>
