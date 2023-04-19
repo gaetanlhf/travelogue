@@ -23,7 +23,8 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private final List<String> initialTitles;
 
-    public TravelAdapter(Context context, List<String> titles) {
+    public TravelAdapter(Context context, List<String> titles)
+    {
         this.context = context;
         this.titles = this.initialTitles = titles;
     }
