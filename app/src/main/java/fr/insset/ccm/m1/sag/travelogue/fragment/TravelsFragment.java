@@ -86,30 +86,32 @@ public class TravelsFragment extends Fragment {
         // create list:
         List<String> titles = new ArrayList<>();
         spinner.setVisibility(View.VISIBLE);
-        TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
-        travelHelper.getTravels(data -> {
-            if (data.length() > 0) {
-                for (int i = 0; i < data.length(); i++) {
-                    titles.add(String.valueOf(data.get(i).getTitle()));
+        if (isAdded()) {
+            TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
+            travelHelper.getTravels(data -> {
+                if (data.length() > 0) {
+                    for (int i = 0; i < data.length(); i++) {
+                        titles.add(String.valueOf(data.get(i).getTitle()));
+                    }
+                    TravelAdapter adapter = new TravelAdapter(requireActivity(), titles);
+
+                    // set the RecyclerView:
+                    RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireActivity());
+                    recyclerView.setLayoutManager(layoutManager);
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.addItemDecoration(new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL));
+                    spinner.setVisibility(View.GONE);
+                    tripContent.setVisibility(View.VISIBLE);
+                } else {
+                    spinner.setVisibility(View.GONE);
+                    noTripContent.setVisibility(View.VISIBLE);
                 }
-                TravelAdapter adapter = new TravelAdapter(getContext(), titles);
-
-                // set the RecyclerView:
-                RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-                recyclerView.setLayoutManager(layoutManager);
-                recyclerView.setAdapter(adapter);
-                recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-                spinner.setVisibility(View.GONE);
-                tripContent.setVisibility(View.VISIBLE);
-            } else {
-                spinner.setVisibility(View.GONE);
-                noTripContent.setVisibility(View.VISIBLE);
-            }
 
 
+            });
+        }
 
-        });
 
         ((HomeActivity) getActivity()).setFragmentRefreshListener(() -> {
             FragmentTransaction tr = getParentFragmentManager().beginTransaction();
