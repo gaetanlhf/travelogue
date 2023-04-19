@@ -3,16 +3,18 @@ package fr.insset.ccm.m1.sag.travelogue.activity;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
-import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ShareCompat;
+import androidx.core.content.FileProvider;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,12 +30,17 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
+import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
 public class TravelActivity extends AppCompatActivity implements
@@ -44,6 +51,8 @@ public class TravelActivity extends AppCompatActivity implements
     private FirebaseAuth mAuth;
 
     private TravelHelper travelHelper;
+
+    private ArrayList<GpsPoint> pointsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +99,38 @@ public class TravelActivity extends AppCompatActivity implements
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
                 return true;
+            case R.id.action_share:
+                final int[] defaultItem = {-1};
+                final String[] listItems = new String[]{"GPX", "KML"};
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Share this travel as:")
+                        .setSingleChoiceItems(listItems, defaultItem[0], (dialog, which) -> {
+                            if (which == 0) {
+                                File shareGpxFile = new File(getCacheDir(), "export/" + travel.getTitle()+"-"+travel.getID()+".gpx");
+                                try {
+                                    GenerateGpx.generateGfx(shareGpxFile, travel.getTitle(), pointsList);
+                                    Log.d("test",this.getPackageName()+".provider");
+                                    Uri uri = FileProvider.getUriForFile(this, this.getPackageName()+".provider", shareGpxFile);
+                                    Intent intent = new ShareCompat.IntentBuilder(this)
+                                            .setType("application/gpx+xml")
+                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setStream(uri)
+                                            .setChooserTitle("Sharing of GPS data")
+                                            .createChooserIntent()
+                                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    startActivity(intent);
+                                } catch (IOException e) {
+                                    Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+
+                            }
+                            dialog.dismiss();
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+
+                return true;
             case R.id.action_delete:
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("Delete this trip")
@@ -118,7 +159,6 @@ public class TravelActivity extends AppCompatActivity implements
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
         uiSettings.setCompassEnabled(false);
@@ -132,6 +172,7 @@ public class TravelActivity extends AppCompatActivity implements
         travelHelper.getPoints(data -> {
             for (int i = 0; i < data.length(); i++) {
                 listLatLng.add(new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude()));
+                pointsList.add(data.get(i));
             }
 
             polyline.setPoints(listLatLng);

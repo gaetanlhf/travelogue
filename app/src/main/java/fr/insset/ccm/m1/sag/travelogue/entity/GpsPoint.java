@@ -9,10 +9,9 @@ import com.google.gson.Gson;
 import java.time.Instant;
 
 public class GpsPoint {
-    private static Integer ID = 0;
     private double longitude;
     private double latitude;
-    private String hash;
+    private String timestamp;
 
 
 //    public GpsPoint()  Check with Augustin
@@ -20,12 +19,34 @@ public class GpsPoint {
     /**
      * GPS Point Constructor
      */
-    public GpsPoint(double longitude, double latitude) {
+    public GpsPoint(double longitude, double latitude, String timestamp) {
         this.longitude = longitude;
         this.latitude = latitude;
-        this.hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(this.latitude, this.longitude));
+        this.timestamp = timestamp;
+    }
 
-        GpsPoint.ID ++;
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     @NonNull
@@ -35,52 +56,4 @@ public class GpsPoint {
         return gpsJson.toJson(this);
     }
 
-    // GETTERS & ID SETTER
-
-    /**
-     *
-     * @return
-     */
-    public Integer getID() {
-        return GpsPoint.ID;
-    }
-
-    public void setLongitude(double longitude){
-        this.longitude = longitude;
-    }
-
-    public void setLatitude(double latitude){
-        this.latitude = latitude;
-    }
-//    /**
-//     *
-//     * @param ID
-//     */
-//    public void setID(Integer ID) {
-//        GpsPoint.ID = ID;
-//    }
-
-    /**
-     *
-     * @return
-     */
-    public double getLongitude() {
-        return this.longitude;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public double getLatitude() {
-        return this.latitude;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getHash() {
-        return this.hash;
-    }
 }

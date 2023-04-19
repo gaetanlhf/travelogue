@@ -130,7 +130,6 @@ public class TravelsFragment extends Fragment {
 
         MenuItem searchItem = menu.findItem(R.id.actionSearchTravels);
         SearchView searchView = (SearchView) searchItem.getActionView();
-        // below line is to call set on query text listener method.
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
