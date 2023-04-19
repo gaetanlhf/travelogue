@@ -142,10 +142,6 @@ public class TravelActivity extends AppCompatActivity implements
 
     /**
      * Styles the polyline, based on type.
-<<<<<<< HEAD
-     *
-=======
->>>>>>> 26858e9 (View travel list + view travel (#14))
      * @param polyline The polyline object that needs styling.
      */
     private void stylePolyline(Polyline polyline) {
