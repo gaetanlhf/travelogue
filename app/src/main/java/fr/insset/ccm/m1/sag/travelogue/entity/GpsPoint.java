@@ -2,11 +2,7 @@ package fr.insset.ccm.m1.sag.travelogue.entity;
 
 import androidx.annotation.NonNull;
 
-import com.firebase.geofire.GeoFireUtils;
-import com.firebase.geofire.GeoLocation;
 import com.google.gson.Gson;
-
-import java.time.Instant;
 
 public class GpsPoint {
     private double longitude;

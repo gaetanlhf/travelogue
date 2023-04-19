@@ -13,15 +13,14 @@ import java.time.format.DateTimeFormatter;
  */
 public class Moment {
 
+    private static final String PATTERN_FORMAT = "dd.MM.yyyy, HH:mm:ss";
     private Integer ID;
-    private Instant savingDate;
-    private String caption;
-    private String imageURL;
+    private final Instant savingDate;
+    private final String caption;
+    private final String imageURL;
     private Integer travelID;
     //    private '' gpsPoint;
-    private GpsPoint gpsPoint;
-
-    private static final String PATTERN_FORMAT = "dd.MM.yyyy, HH:mm:ss";
+    private final GpsPoint gpsPoint;
 
     /**
      * Moment constructor
@@ -42,60 +41,14 @@ public class Moment {
         return momentJson.toJson(this);
     }
 
-    // Moment builder
-    public static class MomentBuilder {
-        private Instant savingDate;
-        private String caption;
-        private String imageURL;
-
-        //        private '' gpsPoint;
-        private GpsPoint gpsPoint;
-
-        /**
-         * MomentBuilder Constructor
-         *
-         * @param gpsPoint
-         */
-//        public MomentBuilder(int travelID, '' gpsPoint) {
-        public MomentBuilder(GpsPoint gpsPoint) {
-            this.savingDate = Instant.now();
-            this.gpsPoint = gpsPoint;
-        }
-
-        /**
-         * @param caption
-         * @return
-         */
-        public MomentBuilder setCaption(String caption) {
-            this.caption = caption;
-            return this;
-        }
-
-        /**
-         * @param imageURL
-         * @return
-         */
-        public MomentBuilder setImageURL(String imageURL) {
-            this.imageURL = imageURL;
-            return this;
-        }
-
-        /**
-         * @return
-         */
-        public Moment build() {
-            return new Moment(this);
-        }
-    }
-
-    // GETTERS & ID SETTER
-
     /**
      * @return
      */
     public Integer getID() {
         return this.ID;
     }
+
+    // GETTERS & ID SETTER
 
     /**
      * @param ID
@@ -153,5 +106,51 @@ public class Moment {
 //    public '' getGpsPoint() {
     public GpsPoint getGpsPoint() {
         return this.gpsPoint;
+    }
+
+    // Moment builder
+    public static class MomentBuilder {
+        private final Instant savingDate;
+        private String caption;
+        private String imageURL;
+
+        //        private '' gpsPoint;
+        private final GpsPoint gpsPoint;
+
+        /**
+         * MomentBuilder Constructor
+         *
+         * @param gpsPoint
+         */
+//        public MomentBuilder(int travelID, '' gpsPoint) {
+        public MomentBuilder(GpsPoint gpsPoint) {
+            this.savingDate = Instant.now();
+            this.gpsPoint = gpsPoint;
+        }
+
+        /**
+         * @param caption
+         * @return
+         */
+        public MomentBuilder setCaption(String caption) {
+            this.caption = caption;
+            return this;
+        }
+
+        /**
+         * @param imageURL
+         * @return
+         */
+        public MomentBuilder setImageURL(String imageURL) {
+            this.imageURL = imageURL;
+            return this;
+        }
+
+        /**
+         * @return
+         */
+        public Moment build() {
+            return new Moment(this);
+        }
     }
 }
