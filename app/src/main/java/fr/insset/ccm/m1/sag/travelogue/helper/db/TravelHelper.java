@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
@@ -92,8 +93,12 @@ public class TravelHelper {
                         AtomicReferenceArray<Travel> travels = new AtomicReferenceArray<>(task.getResult().size());
                         int i = 0;
                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                            travels.set(i, new Travel(documentSnapshot.getData().get("travelName").toString()));
-                            i++;
+                            if (Boolean.parseBoolean(Objects.requireNonNull(documentSnapshot.getData().get("isFinish")).toString())) {
+                                travels.set(i, new Travel(documentSnapshot.getData().get("travelName").toString()));
+                                i++;
+                            } else {
+                                continue;
+                            }
                         }
                         callback2.onCallback2(travels);
                     }
