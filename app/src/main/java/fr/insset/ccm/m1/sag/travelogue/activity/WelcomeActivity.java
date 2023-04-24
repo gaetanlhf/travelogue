@@ -69,9 +69,9 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 if (position == layouts.length - 1) {
-                    nextBtn.setText("Log in");
+                    nextBtn.setText(R.string.login_activity_title);
                 } else {
-                    nextBtn.setText("Next");
+                    nextBtn.setText(R.string.welcome_activity_next_button);
                 }
                 setDots(position);
             }
