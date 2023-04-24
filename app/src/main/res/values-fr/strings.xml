@@ -53,7 +53,8 @@
     <string name="welcome_slide_4_text_view_2">avec un point GPS dans la carte</string>
     <string name="welcome_slide_5_text_view_1">Vos données synchronisées et protégées</string>
     <string name="welcome_slide_5_text_view_2">dans le cloud avec votre compte Travelogue</string>
-    <string name="login_activity_title">Se connecter</string>
-    <string name="sign_up_activity_title">S\'inscrire</string>
+    <string name="login_activity_title">Connexion</string>
+    <string name="sign_up_activity_title">Inscription</string>
     <string name="forgot_password_activity_title">Mot de passe oublié</string>
+    <string name="travel_adapter_view">Voir</string>
 </resources>
