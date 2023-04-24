@@ -6,46 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".fragment.TravelsFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/fragment_travels_no_content"
+    <LinearLayout
+        android:id="@+id/travels_fragment_no_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
         tools:visibility="visible">
 
-        <TextView
-            android:id="@+id/no_travels_textview"
+        <ImageView
+            android:id="@+id/travels_fragment_image_view"
             android:layout_width="wrap_content"
+            android:layout_height="206dp"
+            android:layout_marginBottom="20dp"
+            app:srcCompat="@drawable/undraw_void" />
+
+        <TextView
+            android:id="@+id/travels_fragment_text_view_1"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/no_travels_textview"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/imageView3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="@string/travels_fragment_text_view_1"
+            android:textSize="34sp" />
 
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="136dp"
-            android:layout_height="130dp"
-            android:src="@drawable/baseline_travel_explore"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/no_travels_textview" />
-
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="26dp"
-            android:layout_height="32dp"
-            android:src="@drawable/baseline_priority_high"
-            app:layout_constraintEnd_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toTopOf="@+id/imageView3" />
+        <TextView
+            android:id="@+id/travels_fragment_text_view_2"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:text="@string/travels_fragment_text_view_2" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/fragment_travels_content"
@@ -54,15 +44,15 @@
         android:orientation="vertical"
         tools:visibility="gone">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
     <ProgressBar
-        android:id="@+id/fragment_home_spinner"
+        android:id="@+id/travels_fragment_spinner"
         style="?android:progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

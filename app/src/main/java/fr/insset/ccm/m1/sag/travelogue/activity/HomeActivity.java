@@ -31,7 +31,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_home);
-        bottomNavigationView = findViewById(R.id.bottom_nav_home);
+        bottomNavigationView = findViewById(R.id.home_activity_bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         fragment = oldFragment = homeFragment();
         loadFragment(fragment);
@@ -75,7 +75,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     void loadFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().detach(oldFragment).replace(R.id.relativelayout, fragment).commit();
+        getSupportFragmentManager().beginTransaction().detach(oldFragment).replace(R.id.home_activity_relative_layout, fragment).commit();
     }
 
     Fragment homeFragment() {

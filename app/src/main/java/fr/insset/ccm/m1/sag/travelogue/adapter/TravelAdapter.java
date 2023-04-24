@@ -101,8 +101,8 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public ItemVH(View itemView) {
             super(itemView);
 
-            travelNameTextView = itemView.findViewById(R.id.travel_name_textView);
-            viewTravelbtn = itemView.findViewById(R.id.view_travel_btn);
+            travelNameTextView = itemView.findViewById(R.id.travel_item_name_text_view);
+            viewTravelbtn = itemView.findViewById(R.id.travel_item_button);
         }
     }
 }

@@ -83,11 +83,11 @@ public class TravelsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_travels, container, false);
-        View noTripContent = view.findViewById(R.id.fragment_travels_no_content);
+        View noTripContent = view.findViewById(R.id.travels_fragment_no_content);
         View tripContent = view.findViewById(R.id.fragment_travels_content);
         noTripContent.setVisibility(View.GONE);
         tripContent.setVisibility(View.GONE);
-        spinner = view.findViewById(R.id.fragment_home_spinner);
+        spinner = view.findViewById(R.id.travels_fragment_spinner);
         // create list
         spinner.setVisibility(View.VISIBLE);
 
@@ -117,7 +117,7 @@ public class TravelsFragment extends Fragment {
 
         ((HomeActivity) getActivity()).setFragmentRefreshListener(() -> {
             FragmentTransaction tr = getParentFragmentManager().beginTransaction();
-            tr.replace(R.id.relativelayout, new TravelsFragment());
+            tr.replace(R.id.home_activity_relative_layout, new TravelsFragment());
             tr.commit();
         });
         return view;

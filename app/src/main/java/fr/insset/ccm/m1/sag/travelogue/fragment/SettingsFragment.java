@@ -37,7 +37,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         ((HomeActivity) requireActivity()).setFragmentRefreshListener(() -> {
             FragmentTransaction tr = getParentFragmentManager().beginTransaction();
-            tr.replace(R.id.relativelayout, new SettingsFragment());
+            tr.replace(R.id.home_activity_relative_layout, new SettingsFragment());
             tr.commit();
         });
 

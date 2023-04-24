@@ -3,7 +3,7 @@
     <string name="start_btn">Start</string>
     <string name="no_account_textview">Did not have an account?</string>
     <string name="create_account_btn">Create an account</string>
-    <string name="login_textview">Log to your Travelogue</string>
+    <string name="login_textview">Log to your Travelogue account</string>
     <string name="email_text_hint">Your e-mail address</string>
     <string name="password_text_hint">Your password</string>
     <string name="login_btn">Login</string>
@@ -27,8 +27,8 @@
     <string name="no_travel_home_textview">No current travel</string>
     <string name="no_travel_start_btn">Start a new travel</string>
     <string name="create_new_travel">Create a new travel</string>
-    <string name="activity_new_travel_textview">Enter a travel name</string>
-    <string name="activity_new_travel_edittext_hint">A walk in Paris</string>
+    <string name="activity_new_travel_text_view">Enter a travel name</string>
+    <string name="activity_new_travel_edit_text_hint">A walk in Paris</string>
     <string name="btn_save">Save</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -50,4 +50,30 @@
     <string name="end_of_the_travel">End of the travel :</string>
     <string name="no_travels_textview">No previous travel recorded</string>
     <string name="stop_travel_btn">Stop travel</string>
+    <string name="forgot_password_activity_textview_1">Reset your password</string>
+    <string name="forgot_password_activity_textview_2">for your Travelogue account</string>
+    <string name="login_activity_textview_1">Log in</string>
+    <string name="login_activity_textview_2">to your Travelogue account</string>
+    <string name="sign_up_activity_textview_1">Sign up</string>
+    <string name="sign_up_activity_textview_2">to create your Travelogue account</string>
+    <string name="new_travel_activity_text_view_1">Start tracking a new travel</string>
+    <string name="new_travel_activity_text_view_2">with Travelogue</string>
+    <string name="sign_up_activity_text_view_2">to create your Travelogue account</string>
+    <string name="welcome_activity_next_button">Next</string>
+    <string name="welcome_activity_skip_button">Skip</string>
+    <string name="travels_fragment_text_view_1" >It is completely empty...</string>
+    <string name="travels_fragment_text_view_2">You will find your previous completed travels here</string>
+    <string name="welcome_slide_1_text_view_1">Welcome to Travelogue</string>
+    <string name="welcome_slide_1_text_view_2" >your new way to keep track of your travels</string>
+    <string name="welcome_slide_2_text_view_1">Keep GPS track of your travels</string>
+    <string name="welcome_slide_2_text_view_2">with automatic or on-demand recording</string>
+    <string name="welcome_slide_3_text_view_1">Share GPS points of your travel</string>
+    <string name="welcome_slide_3_text_view_2">in GPX or KML format</string>
+    <string name="welcome_slide_4_text_view_1">Take photos that can be located</string>
+    <string name="welcome_slide_4_text_view_2">with a GPS point in the map</string>
+    <string name="welcome_slide_5_text_view_1">Your data synchronised and protected</string>
+    <string name="welcome_slide_5_text_view_2">in the cloud with your Travelogue account</string>
+    <string name="login_activity_title">Log in</string>
+    <string name="sign_up_activity_title">Sign up</string>
+    <string name="forgot_password_activity_title">Forgotten password</string>
 </resources>

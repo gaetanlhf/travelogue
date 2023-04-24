@@ -80,7 +80,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        spinner = view.findViewById(R.id.fragment_home_spinner);
+        spinner = view.findViewById(R.id.travels_fragment_spinner);
         spinner.setVisibility(View.VISIBLE);
         State state = new State(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
         Button newTravelBtn = view.findViewById(R.id.start_new_travel_btn);
@@ -122,7 +122,7 @@ public class HomeFragment extends Fragment {
 
         ((HomeActivity) getActivity()).setFragmentRefreshListener(() -> {
             FragmentTransaction tr = getParentFragmentManager().beginTransaction();
-            tr.replace(R.id.relativelayout, new HomeFragment());
+            tr.replace(R.id.home_activity_relative_layout, new HomeFragment());
             tr.commit();
         });
         return view;

@@ -49,13 +49,10 @@ import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 public class TravelActivity extends AppCompatActivity implements
         OnMapReadyCallback {
 
-    private Travel travel;
-
-    private FirebaseAuth mAuth;
-
-    private TravelHelper travelHelper;
-
     private final ArrayList<GpsPoint> pointsList = new ArrayList<>();
+    private Travel travel;
+    private FirebaseAuth mAuth;
+    private TravelHelper travelHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +104,7 @@ public class TravelActivity extends AppCompatActivity implements
                 final String[] listItems = new String[]{"GPX", "KML"};
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("Share this travel as:")
-                        .setSingleChoiceItems(listItems, defaultItem[0], (dialog, which) -> {
+                        .setItems(listItems, (dialog, which) -> {
                             if (which == 0) {
                                 File shareGpxFile = new File(getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".gpx");
                                 try {

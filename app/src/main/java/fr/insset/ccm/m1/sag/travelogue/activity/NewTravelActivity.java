@@ -60,7 +60,7 @@ public class NewTravelActivity extends AppCompatActivity {
     }
 
     public void onClickSaveTravel(View view) {
-        travelName = findViewById(R.id.activity_new_travel_edittext);
+        travelName = findViewById(R.id.new_travel_activity_edit_text);
         if (!TextUtils.isEmpty(travelName.getText().toString())) {
             TravelHelper newTravel = new TravelHelper(mAuth.getCurrentUser().getUid());
             newTravel.createTravel(travelName.getText().toString());

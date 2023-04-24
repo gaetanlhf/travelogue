@@ -10,6 +10,7 @@ import java.util.List;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 
 public class GenerateKml {
+
     public static void generate(File fileName, String name, List<GpsPoint> points) throws IOException {
         String header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n<Placemark>\n";
         name = "<name>" + name + "</name>\n<description>" + name + "</description>\n";

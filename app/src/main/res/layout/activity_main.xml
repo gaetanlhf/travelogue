@@ -7,7 +7,7 @@
     tools:context=".activity.MainActivity">
 
     <ProgressBar
-        android:id="@+id/activity_main_spinner"
+        android:id="@+id/main_activity_spinner"
         style="?android:progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
