@@ -68,6 +68,10 @@ public class Travel {
         return this.startDate + " - " + this.startTime;
     }
 
+    public boolean isFinish() {
+        return isFinish;
+    }
+
     public String getEndDatetime() {
         return this.endDate + " - " + this.endTime;
     }
