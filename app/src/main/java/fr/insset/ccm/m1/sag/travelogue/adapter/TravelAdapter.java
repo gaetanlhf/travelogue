@@ -65,8 +65,6 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         ItemVH itemVH = (ItemVH) holder;
 
         itemVH.travelNameTextView.setText(titles.get(position));
-        itemVH.viewTravelbtn.setText("View");
-
 
         itemVH.viewTravelbtn.setOnClickListener(v -> {
             String travelName = itemVH.travelNameTextView.getText().toString();
