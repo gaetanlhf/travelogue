@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:gravity="center"
-android:orientation="vertical"
-tools:context=".activity.ForgotPasswordActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".activity.ForgotPasswordActivity">
 
-<ImageView
-    android:id="@+id/new_travel_activity_image_view"
-    android:layout_width="wrap_content"
-    android:layout_height="206dp"
-    android:layout_marginBottom="20dp"
-    app:srcCompat="@drawable/undraw_new_entries" />
+    <ImageView
+        android:id="@+id/new_travel_activity_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="206dp"
+        android:layout_marginBottom="20dp"
+        app:srcCompat="@drawable/undraw_new_entries" />
 
     <TextView
         android:id="@+id/new_travel_activity_textview_1"
@@ -40,12 +40,12 @@ tools:context=".activity.ForgotPasswordActivity">
         android:minHeight="48dp"
         android:textColorHint="#757575" />
 
-<Button
-    android:id="@+id/new_travel_activity_button"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:onClick="onClickSaveTravel"
-    android:text="@string/btn_save" />
+    <Button
+        android:id="@+id/new_travel_activity_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickSaveTravel"
+        android:text="@string/btn_save" />
 
     <ProgressBar
         android:id="@+id/new_travel_activity_spinner"
