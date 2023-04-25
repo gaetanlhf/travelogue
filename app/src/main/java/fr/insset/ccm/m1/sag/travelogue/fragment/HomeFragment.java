@@ -2,27 +2,49 @@ package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.JointType;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.NewTravelActivity;
+import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
+import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
+import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 
@@ -31,13 +53,19 @@ import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements
+        OnMapReadyCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private final ArrayList<GpsPoint> pointsList = new ArrayList<>();
     private FirebaseAuth mAuth;
     private ProgressBar spinner;
+    private TravelHelper travelHelper;
+    private Travel travel;
+
+    private String currentTravel;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -80,37 +108,48 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        spinner = view.findViewById(R.id.travels_fragment_spinner);
+        setHasOptionsMenu(false);
+        spinner = view.findViewById(R.id.fragment_home_spinner);
         spinner.setVisibility(View.VISIBLE);
         State state = new State(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-        Button newTravelBtn = view.findViewById(R.id.start_new_travel_btn);
-        Button stopTravelBtn = view.findViewById(R.id.stop_travel_btn);
 
-        TextView noCurrentTravel = view.findViewById(R.id.no_travel_home_textview);
-        newTravelBtn.setVisibility(View.GONE);
+        Button newTravelBtn = view.findViewById(R.id.home_fragment_start_new_travel_btn);
+        View noCurrentTravel = view.findViewById(R.id.home_fragment_no_trip_content);
+        View map = view.findViewById(R.id.fragment_home_map);
         noCurrentTravel.setVisibility(View.GONE);
-        stopTravelBtn.setVisibility(View.GONE);
+        map.setVisibility(View.GONE);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fragment_home_map);
+
 
         state.isTravelling(travelling -> {
             if (travelling.get()) {
                 AppSettings.setTravelling(travelling.get());
-                //TODO SERVICE ACTIVATION
-                spinner.setVisibility(View.GONE);
+                state.getCurrentTravel(currentTravel -> {
+                    travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
+                    travelHelper.getTravel(data -> {
+                        travel = data.get();
+                        assert mapFragment != null;
+                        mapFragment.getMapAsync(this);
+                    }, currentTravel.get());
+                    //TODO SERVICE ACTIVATION
+                    spinner.setVisibility(View.GONE);
+                    map.setVisibility(View.VISIBLE);
+                    setHasOptionsMenu(true);
 
-                stopTravelBtn.setVisibility(View.VISIBLE);
-                stopTravelBtn.setOnClickListener(v -> {
-                    stopLocationService();
-                    state.setTravelling(false);
-                    AppSettings.setTravelling(!travelling.get());
-                    Toast.makeText(getContext(), "isTravelling set to false", Toast.LENGTH_SHORT).show();
-                    newTravelBtn.setVisibility(View.VISIBLE);
-                    noCurrentTravel.setVisibility(View.VISIBLE);
-                    stopTravelBtn.setVisibility(View.GONE);
+                    //stopTravelBtn.setVisibility(View.VISIBLE);
+                    //stopTravelBtn.setOnClickListener(v -> {
+                    //    stopLocationService();
+                    //    state.setTravelling(false);
+                    //    AppSettings.setTravelling(!travelling.get());
+                    //    Toast.makeText(getContext(), "isTravelling set to false", Toast.LENGTH_SHORT).show();
+                    //    newTravelBtn.setVisibility(View.VISIBLE);
+                    //    stopTravelBtn.setVisibility(View.GONE);
+                    //});
                 });
+
 
             } else {
                 spinner.setVisibility(View.GONE);
-                newTravelBtn.setVisibility(View.VISIBLE);
                 noCurrentTravel.setVisibility(View.VISIBLE);
 
             }
@@ -128,6 +167,12 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.topbar_home_fragment, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
     private void stopLocationService() {
         if (LocationService.isServiceRunning) {
             Intent intent = new Intent(getContext(), LocationService.class);
@@ -135,5 +180,60 @@ public class HomeFragment extends Fragment {
             getActivity().startService(intent); //remplacé par startService car stopService ne fonctionne pas (wtf)
             Toast.makeText(getContext(), "Location service stopped", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        UiSettings uiSettings = googleMap.getUiSettings();
+        uiSettings.setZoomControlsEnabled(true);
+        uiSettings.setCompassEnabled(false);
+        uiSettings.setMapToolbarEnabled(false);
+        uiSettings.setMyLocationButtonEnabled(false);
+
+        Polyline polyline = googleMap.addPolyline(new PolylineOptions()
+                .clickable(true));
+
+        List<LatLng> listLatLng = new ArrayList<>();
+        TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
+
+        travelHelper.getPoints(data -> {
+            if (data.length() > 0) {
+                for (int i = 0; i < data.length(); i++) {
+                    LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
+                    listLatLng.add(position);
+                    pointsList.add(data.get(i));
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(position)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                }
+                googleMap.setInfoWindowAdapter(new CustomInfoWindowMarkerAdapter(getActivity().getApplicationContext()));
+                googleMap.setOnMarkerClickListener(marker -> {
+                    Toast.makeText(getActivity().getApplicationContext(), "Click on marker " + marker.getPosition(), Toast.LENGTH_SHORT).show();
+                    marker.setTitle("Test");
+                    marker.showInfoWindow();
+                    return false;
+                });
+
+                polyline.setPoints(listLatLng);
+
+                stylePolyline(polyline);
+
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
+                Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
+            }
+
+
+        }, travel.getID());
+
+
+    }
+
+    private void stylePolyline(Polyline polyline) {
+        polyline.setStartCap(new RoundCap());
+        polyline.setEndCap(new RoundCap());
+        polyline.setWidth(12);
+        polyline.setColor(SurfaceColors.SURFACE_2.getColor(getActivity()));
+        polyline.setJointType(JointType.ROUND);
+        polyline.setWidth(20);
     }
 }

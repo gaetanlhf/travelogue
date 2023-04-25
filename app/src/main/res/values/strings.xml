@@ -77,4 +77,6 @@
     <string name="sign_up_activity_title">Registration</string>
     <string name="forgot_password_activity_title">Forgotten password</string>
     <string name="travel_adapter_view">View</string>
+    <string name="home_fragment_text_view_1">Set off on a new adventure</string>
+    <string name="home_fragment_text_view_2">by starting a new travel with Travelogue</string>
 </resources>

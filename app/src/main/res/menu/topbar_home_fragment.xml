@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/actionInfo"
+        android:icon="@drawable/baseline_info"
+        android:orderInCategory="100"
+        android:title="Information"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/actionAdd"
+        android:icon="@drawable/baseline_add"
+        android:orderInCategory="200"
+        android:title="Add"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/actionStop"
+        android:icon="@drawable/baseline_stop"
+        android:orderInCategory="300"
+        android:title="Stop"
+        app:showAsAction="always" />
+</menu>
