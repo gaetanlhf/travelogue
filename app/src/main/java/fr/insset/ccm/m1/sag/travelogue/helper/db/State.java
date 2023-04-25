@@ -32,7 +32,7 @@ public class State {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            travelling.set(task.getResult().get("isTravelling").toString() == "true");
+                            travelling.set(Boolean.parseBoolean(task.getResult().get("isTravelling").toString()));
                             callback.onCallback(travelling);
                         }
                     }
