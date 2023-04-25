@@ -11,8 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.TravelActivity;
@@ -20,11 +23,18 @@ import fr.insset.ccm.m1.sag.travelogue.activity.TravelActivity;
 public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context context;
     private final List<String> initialTitles;
-    private List<String> titles;
 
-    public TravelAdapter(Context context, List<String> titles) {
+    private List<String> ids;
+    private List<String> titles;
+    Map<String, String> idToTravel = new HashMap<String, String>();
+
+    public TravelAdapter(Context context, List<String> ids, List<String> titles) {
         this.context = context;
+        this.ids = ids;
         this.titles = this.initialTitles = titles;
+        for (int i=0; i < ids.size(); i++) {
+            idToTravel.put(ids.get(i), titles.get(i));
+        }
     }
 
     public void filterList(String text) {
@@ -64,12 +74,13 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ItemVH itemVH = (ItemVH) holder;
 
-        itemVH.travelNameTextView.setText(titles.get(position));
+        itemVH.travelNameTextView.setText(idToTravel.get(ids.get(position)));
 
         itemVH.viewTravelbtn.setOnClickListener(v -> {
             String travelName = itemVH.travelNameTextView.getText().toString();
             Intent intent = new Intent(context.getApplicationContext(), TravelActivity.class);
             intent.putExtra("travelName", travelName);
+            intent.putExtra("travelId", ids.get(position));
             v.getContext().startActivity(intent);
         });
     }

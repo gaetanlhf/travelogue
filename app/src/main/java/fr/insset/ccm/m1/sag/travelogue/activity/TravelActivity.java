@@ -77,7 +77,7 @@ public class TravelActivity extends AppCompatActivity implements
             assert mapFragment != null;
             mapFragment.getMapAsync(this);
 
-        }, intent.getStringExtra("travelName"));
+        }, intent.getStringExtra("travelId"));
 
 
     }
@@ -177,6 +177,8 @@ public class TravelActivity extends AppCompatActivity implements
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
         uiSettings.setCompassEnabled(false);
+        uiSettings.setMapToolbarEnabled(false);
+        uiSettings.setMyLocationButtonEnabled(false);
 
         Polyline polyline = googleMap.addPolyline(new PolylineOptions()
                 .clickable(true));

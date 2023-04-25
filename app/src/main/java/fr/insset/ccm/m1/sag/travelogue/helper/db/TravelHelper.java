@@ -94,11 +94,10 @@ public class TravelHelper {
                         int i = 0;
                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                             if (Boolean.parseBoolean(Objects.requireNonNull(documentSnapshot.getData().get("isFinish")).toString())) {
-                                travels.set(i, new Travel(documentSnapshot.getData().get("travelName").toString()));
-                                i++;
-                            } else {
-                                continue;
+                                Log.d("test", documentSnapshot.getData().get("travelName").toString());
+                                travels.set(i, new Travel(documentSnapshot.getId(), documentSnapshot.getData().get("travelName").toString()));
                             }
+                            i++;
                         }
                         callback2.onCallback2(travels);
                     }
@@ -111,21 +110,16 @@ public class TravelHelper {
         db.collection(id)
                 .document("data")
                 .collection("travels")
-                .whereEqualTo("travelName", travel)
+                .document(travel)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-
-                        DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                        DocumentSnapshot documentSnapshot = task.getResult();
                         AtomicReference<Travel> travelAtomicReference = new AtomicReference<>();
-
-                        travelAtomicReference.set(new Travel(Integer.parseInt(documentSnapshot.getId()), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("startDate").toString(), documentSnapshot.getData().get("startTime").toString(), documentSnapshot.getData().get("endDate").toString(), documentSnapshot.getData().get("endTime").toString(), (Boolean) documentSnapshot.getData().get("isFinish")));
+                        travelAtomicReference.set(new Travel(documentSnapshot.getId(), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("startDate").toString(), documentSnapshot.getData().get("startTime").toString(), documentSnapshot.getData().get("endDate").toString(), documentSnapshot.getData().get("endTime").toString(), (Boolean) documentSnapshot.getData().get("isFinish")));
                         callback3.onCallback3(travelAtomicReference);
-
                     }
                 });
-
     }
 
     public void deleteTravel(String travelName) {

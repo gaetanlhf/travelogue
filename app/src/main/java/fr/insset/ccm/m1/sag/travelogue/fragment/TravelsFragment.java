@@ -1,6 +1,7 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +40,7 @@ public class TravelsFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     List<String> titles = new ArrayList<>();
+    List<String> ids = new ArrayList<>();
     private FirebaseAuth mAuth;
     private ProgressBar spinner;
     private TravelAdapter travelAdapter;
@@ -95,9 +97,12 @@ public class TravelsFragment extends Fragment {
         travelHelper.getTravels(data -> {
             if (data.length() > 0) {
                 for (int i = 0; i < data.length(); i++) {
-                    titles.add(String.valueOf(data.get(i).getTitle()));
+                    if (data.get(i) != null) {
+                        titles.add(String.valueOf(data.get(i).getTitle()));
+                        ids.add(String.valueOf(data.get(i).getID()));
+                    }
                 }
-                travelAdapter = new TravelAdapter(requireActivity(), titles);
+                travelAdapter = new TravelAdapter(requireActivity(), ids, titles);
 
                 // set the RecyclerView:
                 RecyclerView recyclerView = view.findViewById(R.id.recycler_view);

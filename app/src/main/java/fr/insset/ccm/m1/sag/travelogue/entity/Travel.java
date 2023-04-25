@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 
 public class Travel {
 
-    private Integer ID;
+    private String ID;
     private String title;
 
     private String startDate;
@@ -22,7 +22,7 @@ public class Travel {
     /**
      *
      */
-    public Travel(Integer id, String title, String startDate, String startTime, String endDate, String endTime, boolean isFinish) {
+    public Travel(String id, String title, String startDate, String startTime, String endDate, String endTime, boolean isFinish) {
         this.ID = id;
         this.title = title;
         this.startDate = startDate;
@@ -39,6 +39,11 @@ public class Travel {
         this.endDate = endDate;
         this.endTime = endTime;
         this.isFinish = isFinish;
+    }
+
+    public Travel(String id, String title) {
+        this.ID = id;
+        this.title = title;
     }
 
     public Travel(String title) {
@@ -77,11 +82,11 @@ public class Travel {
     }
 
 
-    public Integer getID() {
+    public String getID() {
         return this.ID;
     }
 
-    public void setID(Integer ID) {
+    public void setID(String ID) {
         this.ID = ID;
     }
 
