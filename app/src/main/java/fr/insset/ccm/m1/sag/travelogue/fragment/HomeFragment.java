@@ -38,7 +38,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
@@ -78,6 +77,14 @@ public class HomeFragment extends Fragment implements
     private State state;
     private Location locationDb;
     private SupportMapFragment mapFragment;
+    private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("test", "test");
+            mapFragment.getMapAsync(HomeFragment.this);
+        }
+    };
     private View noCurrentTravel;
 
     public HomeFragment() {
@@ -229,7 +236,7 @@ public class HomeFragment extends Fragment implements
                                 FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
                                 locationClient.getLastLocation()
-                                        .addOnSuccessListener((OnSuccessListener<android.location.Location>) location -> {
+                                        .addOnSuccessListener(location -> {
                                             // GPS location can be null if GPS is switched off
                                             if (location != null) {
                                                 spinner.setVisibility(View.VISIBLE);
@@ -339,13 +346,4 @@ public class HomeFragment extends Fragment implements
     public void onResume() {
         super.onResume();
     }
-
-    private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("test", "test");
-            mapFragment.getMapAsync(HomeFragment.this);
-        }
-    };
 }

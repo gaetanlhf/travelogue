@@ -11,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,16 +22,15 @@ import fr.insset.ccm.m1.sag.travelogue.activity.TravelActivity;
 public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context context;
     private final List<String> initialTitles;
-
-    private List<String> ids;
-    private List<String> titles;
     Map<String, String> idToTravel = new HashMap<String, String>();
+    private final List<String> ids;
+    private List<String> titles;
 
     public TravelAdapter(Context context, List<String> ids, List<String> titles) {
         this.context = context;
         this.ids = ids;
         this.titles = this.initialTitles = titles;
-        for (int i=0; i < ids.size(); i++) {
+        for (int i = 0; i < ids.size(); i++) {
             idToTravel.put(ids.get(i), titles.get(i));
         }
     }

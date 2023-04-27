@@ -28,8 +28,8 @@ public class Settings {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                            atomicReferenceArray.set(0, task.getResult().get("enableAutoGetPoint").toString());
-                            atomicReferenceArray.set(1, task.getResult().get("timeBetweenAutoGetPoint").toString());
+                        atomicReferenceArray.set(0, task.getResult().get("enableAutoGetPoint").toString());
+                        atomicReferenceArray.set(1, task.getResult().get("timeBetweenAutoGetPoint").toString());
                         callback.onCallback(atomicReferenceArray);
                     }
                 });

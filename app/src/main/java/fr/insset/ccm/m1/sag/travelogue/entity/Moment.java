@@ -14,13 +14,13 @@ import java.time.format.DateTimeFormatter;
 public class Moment {
 
     private static final String PATTERN_FORMAT = "dd.MM.yyyy, HH:mm:ss";
-    private Integer ID;
     private final Instant savingDate;
     private final String caption;
     private final String imageURL;
-    private Integer travelID;
     //    private '' gpsPoint;
     private final GpsPoint gpsPoint;
+    private Integer ID;
+    private Integer travelID;
 
     /**
      * Moment constructor
@@ -111,11 +111,10 @@ public class Moment {
     // Moment builder
     public static class MomentBuilder {
         private final Instant savingDate;
-        private String caption;
-        private String imageURL;
-
         //        private '' gpsPoint;
         private final GpsPoint gpsPoint;
+        private String caption;
+        private String imageURL;
 
         /**
          * MomentBuilder Constructor

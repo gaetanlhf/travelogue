@@ -29,10 +29,8 @@ import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 public class LocationService extends Service {
 
     public static boolean isServiceRunning = false;
-    private FirebaseAuth mAuth;
     private final GpsPoint gpsPoint = new GpsPoint(0, 0, "0");
-
-
+    private FirebaseAuth mAuth;
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {

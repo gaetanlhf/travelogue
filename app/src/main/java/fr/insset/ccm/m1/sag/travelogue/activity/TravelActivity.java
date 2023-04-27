@@ -216,7 +216,7 @@ public class TravelActivity extends AppCompatActivity implements
                 Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
             }
 
-        }, travel.getID().toString());
+        }, travel.getID());
 
     }
 
