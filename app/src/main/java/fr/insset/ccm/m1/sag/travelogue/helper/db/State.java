@@ -57,6 +57,9 @@ public class State {
     public void setTravelling(Boolean value) {
         Map<String, Object> updateState = new HashMap<>();
         updateState.put("isTravelling", value);
+        if (!value) {
+            updateState.put("currentTravel", null);
+        }
 
         db.collection(id)
                 .document("state")

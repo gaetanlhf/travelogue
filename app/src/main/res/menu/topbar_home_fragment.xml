@@ -2,23 +2,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/actionInfo"
+        android:id="@+id/topbar_home_fragment_info"
         android:icon="@drawable/baseline_info"
         android:orderInCategory="100"
         android:title="Information"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/actionAdd"
-        android:icon="@drawable/baseline_add"
+        android:id="@+id/topbar_home_fragment_share"
+        android:icon="@drawable/baseline_share"
         android:orderInCategory="200"
+        android:title="Share"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/topbar_home_fragment_add"
+        android:icon="@drawable/baseline_add"
+        android:orderInCategory="300"
         android:title="Add"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/actionStop"
+        android:id="@+id/topbar_home_fragment_stop"
         android:icon="@drawable/baseline_stop"
-        android:orderInCategory="300"
+        android:orderInCategory="400"
         android:title="Stop"
         app:showAsAction="always" />
 </menu>

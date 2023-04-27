@@ -154,7 +154,11 @@ public class TravelActivity extends AppCompatActivity implements
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                travelHelper.deleteTravel(travel.getTitle());
+                                travelHelper.deleteTravel(state -> {
+                                    if (state.get()) {
+                                        finish();
+                                    }
+                                }, travel.getID());
                                 finish();
                             }
                         })
@@ -187,28 +191,31 @@ public class TravelActivity extends AppCompatActivity implements
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
 
         travelHelper.getPoints(data -> {
-            for (int i = 0; i < data.length(); i++) {
-                LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
-                listLatLng.add(position);
-                pointsList.add(data.get(i));
-                googleMap.addMarker(new MarkerOptions()
-                        .position(position)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            if (data.length() > 0) {
+                for (int i = 0; i < data.length(); i++) {
+                    LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
+                    listLatLng.add(position);
+                    pointsList.add(data.get(i));
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(position)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                }
+                googleMap.setInfoWindowAdapter(new CustomInfoWindowMarkerAdapter(getApplicationContext()));
+                googleMap.setOnMarkerClickListener(marker -> {
+                    Toast.makeText(getApplicationContext(), "Click on marker " + marker.getPosition(), Toast.LENGTH_SHORT).show();
+                    marker.setTitle("Test");
+                    marker.showInfoWindow();
+                    return false;
+                });
+
+                polyline.setPoints(listLatLng);
+
+                stylePolyline(polyline);
+
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
+                Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
             }
-            googleMap.setInfoWindowAdapter(new CustomInfoWindowMarkerAdapter(getApplicationContext()));
-            googleMap.setOnMarkerClickListener(marker -> {
-                Toast.makeText(getApplicationContext(), "Click on marker " + marker.getPosition(), Toast.LENGTH_SHORT).show();
-                marker.setTitle("Test");
-                marker.showInfoWindow();
-                return false;
-            });
 
-            polyline.setPoints(listLatLng);
-
-            stylePolyline(polyline);
-
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
-            Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
         }, travel.getID().toString());
 
     }
