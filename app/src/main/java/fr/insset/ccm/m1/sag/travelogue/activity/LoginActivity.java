@@ -72,11 +72,6 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onClickCreateAccountActivity(View view) {
-        Intent signUpActivity = new Intent(this, SignUpActivity.class);
-        startActivity(signUpActivity);
-    }
-
     public void onClickLogin(View view) {
         email = findViewById(R.id.login_activity_edittext_email);
         password = findViewById(R.id.login_activity_edittext_password);
