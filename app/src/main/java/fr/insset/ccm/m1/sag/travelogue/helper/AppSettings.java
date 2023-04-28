@@ -18,8 +18,16 @@ public class AppSettings {
     }
 
     public static void setTravelling(Boolean value) {
-        Log.d("HEHEHEHE", "dozdz");
         Key.Travelling.setBoolean(value);
+
+    }
+
+    public static String getTravel() {
+        return Key.Travel.getString();
+    }
+
+    public static void setTravel(String value) {
+        Key.Travel.setString(value);
 
     }
 
@@ -32,16 +40,16 @@ public class AppSettings {
 
     }
 
-    public static Integer getTimeBetweenAutoGps() {
-        return Key.TimeBetweenAutoGps.getInt();
+    public static Long getTimeBetweenAutoGps() {
+        return Key.TimeBetweenAutoGps.getLong();
     }
 
-    public static void setTimeBetweenAutoGps(Integer value) {
-        Key.TimeBetweenAutoGps.setInt(value);
+    public static void setTimeBetweenAutoGps(Long value) {
+        Key.TimeBetweenAutoGps.setLong(value);
     }
 
     private enum Key {
-        Travelling("travelling"), TimeBetweenAutoGps("timeBetweenAutoGps"), AutoGps("autoGps");
+        Travelling("travelling"), Travel("travel"), TimeBetweenAutoGps("timeBetweenAutoGps"), AutoGps("autoGps");
 
         private final String name;
 

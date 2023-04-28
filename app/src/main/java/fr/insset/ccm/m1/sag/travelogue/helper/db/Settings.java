@@ -60,7 +60,7 @@ public class Settings {
         AppSettings.setAutoGps(value);
     }
 
-    public void setTimeBetweenAutoGps(Integer value) {
+    public void setTimeBetweenAutoGps(Long value) {
         Map<String, Object> updateSettings = new HashMap<>();
         updateSettings.put("timeBetweenAutoGetPoint", value);
 

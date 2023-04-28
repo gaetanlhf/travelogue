@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
+import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 
@@ -41,13 +42,8 @@ public class LocationService extends Service {
             gpsPoint.setLongitude(longitude);
             gpsPoint.setLatitude(latitude);
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
-            State state = new State(mAuth.getCurrentUser().getUid());
-            state.getCurrentTravel(data -> {
-
                 Location location = new Location(mAuth.getCurrentUser().getUid());
-                location.addPoint(gpsPoint, data.get());
-
-            });
+                location.addPoint(gpsPoint, AppSettings.getTravel());
         }
     };
 
@@ -94,8 +90,8 @@ public class LocationService extends Service {
         }
 
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(timeBetweenUpdateLocation * 1000);
-        locationRequest.setFastestInterval(timeBetweenUpdateLocation * 1000);
+        locationRequest.setInterval(timeBetweenUpdateLocation * 10000);
+        locationRequest.setFastestInterval(timeBetweenUpdateLocation * 10000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationServices.getFusedLocationProviderClient(getApplicationContext())

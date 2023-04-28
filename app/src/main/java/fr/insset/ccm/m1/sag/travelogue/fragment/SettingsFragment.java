@@ -5,6 +5,7 @@ import static android.text.InputType.TYPE_NUMBER_FLAG_SIGNED;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -18,11 +19,13 @@ import androidx.preference.SwitchPreferenceCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
 import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.MaterialEditTextPreference;
+import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
@@ -55,10 +58,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         switchAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
             settings.setAutoGps(Boolean.parseBoolean(newValue.toString()));
             if (LocationService.isServiceRunning && !Boolean.parseBoolean(newValue.toString())) {
-                //TODO SERVICE SHUTDOWN
+                Intent intent = new Intent(getContext(), LocationService.class);
+                intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+                requireContext().startService(intent);
             }
             if (!LocationService.isServiceRunning && AppSettings.getTravelling() && Boolean.parseBoolean(newValue.toString())) {
-                //TODO SERVICE ACTIVATION
+                if (!PermissionsHelper.hasPermission(requireContext(), Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
+                    PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
+                }
+                Intent intent = new Intent(requireContext(), LocationService.class);
+                intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+                intent.putExtra("timeBetweenUpdate", AppSettings.getTimeBetweenAutoGps());
+                requireContext().startService(intent);
             }
             return true;
         });
@@ -71,7 +82,20 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         timeBetweenAutoGps.setKey("edittext_time_between_auto");
         timeBetweenAutoGps.setText(AppSettings.getTimeBetweenAutoGps().toString());
         timeBetweenAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
-            settings.setTimeBetweenAutoGps(Integer.parseInt(newValue.toString()));
+            if (newValue != AppSettings.getTimeBetweenAutoGps()) {
+                settings.setTimeBetweenAutoGps(Long.parseLong(newValue.toString()));
+                AppSettings.setTimeBetweenAutoGps(Long.parseLong(newValue.toString()));
+                Intent intentStop = new Intent(getContext(), LocationService.class);
+                intentStop.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+                requireContext().startService(intentStop);
+                if (!PermissionsHelper.hasPermission(requireContext(), Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
+                    PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
+                }
+                Intent intentStart = new Intent(requireContext(), LocationService.class);
+                intentStart.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+                intentStart.putExtra("timeBetweenUpdate", AppSettings.getTimeBetweenAutoGps());
+                requireContext().startService(intentStart);
+            }
             return true;
         });
         screen.addPreference(timeBetweenAutoGps);

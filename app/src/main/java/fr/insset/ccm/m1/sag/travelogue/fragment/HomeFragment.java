@@ -38,7 +38,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,6 +58,7 @@ import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
+import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
@@ -116,40 +116,21 @@ public class HomeFragment extends Fragment implements
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fragment_home_map);
         requireActivity().registerReceiver(updateReceiver, new IntentFilter("updateHomeFragment"));
 
-        state.isTravelling(travelling -> {
-            if (travelling.get()) {
-                Log.d("test", String.valueOf(travelling.get()));
-                AppSettings.setTravelling(travelling.get());
-                state.getCurrentTravel(currentTravel -> {
-                    travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
-                    travelHelper.getTravel(data -> {
-                        travel = data.get();
-                        assert mapFragment != null;
-                        mapFragment.getMapAsync(this);
-                    }, currentTravel.get());
-                    //TODO SERVICE ACTIVATION
-                    spinner.setVisibility(View.GONE);
-                    map.setVisibility(View.VISIBLE);
-                    setHasOptionsMenu(true);
+        if (AppSettings.getTravelling()) {
+            travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
+            travelHelper.getTravel(data -> {
+                travel = data.get();
+                assert mapFragment != null;
+                mapFragment.getMapAsync(this);
+            }, AppSettings.getTravel());
+            spinner.setVisibility(View.GONE);
+            map.setVisibility(View.VISIBLE);
+            setHasOptionsMenu(true);
+        } else {
+            spinner.setVisibility(View.GONE);
+            noCurrentTravel.setVisibility(View.VISIBLE);
+        }
 
-                    //stopTravelBtn.setVisibility(View.VISIBLE);
-                    //stopTravelBtn.setOnClickListener(v -> {
-                    //    stopLocationService();
-                    //    state.setTravelling(false);
-                    //    AppSettings.setTravelling(!travelling.get());
-                    //    Toast.makeText(getContext(), "isTravelling set to false", Toast.LENGTH_SHORT).show();
-                    //    newTravelBtn.setVisibility(View.VISIBLE);
-                    //    stopTravelBtn.setVisibility(View.GONE);
-                    //});
-                });
-
-
-            } else {
-                spinner.setVisibility(View.GONE);
-                noCurrentTravel.setVisibility(View.VISIBLE);
-
-            }
-        });
         newTravelBtn.setOnClickListener(v -> {
             Intent newTravelActivity = new Intent(getActivity(), NewTravelActivity.class);
             startActivity(newTravelActivity);
@@ -245,11 +226,10 @@ public class HomeFragment extends Fragment implements
                                                 GpsPoint gpsPoint = new GpsPoint(0, 0);
                                                 gpsPoint.setLongitude(longitude);
                                                 gpsPoint.setLatitude(latitude);
-                                                state.getCurrentTravel(data -> {
-                                                    locationDb.addPoint(gpsPoint, data.get());
+                                                    locationDb.addPoint(gpsPoint, AppSettings.getTravel());
                                                     spinner.setVisibility(View.GONE);
                                                     mapFragment.getMapAsync(this);
-                                                });
+
                                             }
                                         })
                                         .addOnFailureListener(e -> {
@@ -270,6 +250,7 @@ public class HomeFragment extends Fragment implements
                 state.setTravelling(false);
                 travelHelper.finishTravel(travel.getID());
                 AppSettings.setTravelling(false);
+                AppSettings.setTravel(null);
                 setHasOptionsMenu(false);
                 map.setVisibility(View.GONE);
                 noCurrentTravel.setVisibility(View.VISIBLE);
