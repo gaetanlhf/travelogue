@@ -58,7 +58,6 @@ import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
-import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
@@ -226,9 +225,9 @@ public class HomeFragment extends Fragment implements
                                                 GpsPoint gpsPoint = new GpsPoint(0, 0);
                                                 gpsPoint.setLongitude(longitude);
                                                 gpsPoint.setLatitude(latitude);
-                                                    locationDb.addPoint(gpsPoint, AppSettings.getTravel());
-                                                    spinner.setVisibility(View.GONE);
-                                                    mapFragment.getMapAsync(this);
+                                                locationDb.addPoint(gpsPoint, AppSettings.getTravel());
+                                                spinner.setVisibility(View.GONE);
+                                                mapFragment.getMapAsync(this);
 
                                             }
                                         })

@@ -89,7 +89,6 @@ public class TravelsFragment extends Fragment {
         noTripContent.setVisibility(View.GONE);
         tripContent.setVisibility(View.GONE);
         spinner = view.findViewById(R.id.travels_fragment_spinner);
-        // create list
         spinner.setVisibility(View.VISIBLE);
 
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
@@ -103,7 +102,6 @@ public class TravelsFragment extends Fragment {
                 }
                 travelAdapter = new TravelAdapter(requireActivity(), ids, titles);
 
-                // set the RecyclerView:
                 RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireActivity());
                 recyclerView.setLayoutManager(layoutManager);
