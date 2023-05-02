@@ -23,7 +23,8 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private final Context context;
     private final List<String> initialTitles;
     Map<String, String> idToTravel = new HashMap<String, String>();
-    private final List<String> ids;
+    Map<String, String> travelToId = new HashMap<String, String>();
+    private List<String> ids;
     private List<String> titles;
 
     public TravelAdapter(Context context, List<String> ids, List<String> titles) {
@@ -31,20 +32,23 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.ids = ids;
         this.titles = this.initialTitles = titles;
         for (int i = 0; i < ids.size(); i++) {
-            idToTravel.put(ids.get(i), titles.get(i));
+            idToTravel.put(ids.get(i), initialTitles.get(i));
+            travelToId.put(initialTitles.get(i), ids.get(i));
         }
     }
 
     public void filterList(String text) {
-        List<String> filteredlist = new ArrayList<>();
+        List<String> filteredTitleslist = new ArrayList<>();
+        List<String> filteredIdslist = new ArrayList<>();
         for (String item : initialTitles) {
-            // checking if the entered string matched with any item of our recycler view.
             if (item.trim().toLowerCase().contains(text.trim().toLowerCase())) {
-                filteredlist.add(item);
+                filteredTitleslist.add(item);
+                filteredIdslist.add(travelToId.get(item));
             }
         }
-        if (!filteredlist.isEmpty()) {
-            titles = filteredlist;
+        if (!filteredTitleslist.isEmpty()) {
+            ids = filteredIdslist;
+            titles = filteredTitleslist;
             notifyDataSetChanged();
         }
 
