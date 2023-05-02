@@ -27,7 +27,7 @@ public class TravelHelper {
         this.id = id;
     }
 
-    public void createTravel(String travelName) {
+    public String createTravel(String travelName) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
         String date = dateFormat.format(new Date());
@@ -57,6 +57,7 @@ public class TravelHelper {
                 .document("state")
                 .set(updateState, SetOptions.merge());
 
+        return timestamp;
     }
 
     public void getPoints(Callback callback, String currentTravel) {
