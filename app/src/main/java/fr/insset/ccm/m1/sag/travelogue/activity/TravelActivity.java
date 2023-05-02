@@ -49,13 +49,10 @@ import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 public class TravelActivity extends AppCompatActivity implements
         OnMapReadyCallback {
 
-    private Travel travel;
-
-    private FirebaseAuth mAuth;
-
-    private TravelHelper travelHelper;
-
     private final ArrayList<GpsPoint> pointsList = new ArrayList<>();
+    private Travel travel;
+    private FirebaseAuth mAuth;
+    private TravelHelper travelHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +77,7 @@ public class TravelActivity extends AppCompatActivity implements
             assert mapFragment != null;
             mapFragment.getMapAsync(this);
 
-        }, intent.getStringExtra("travelName"));
+        }, intent.getStringExtra("travelId"));
 
 
     }
@@ -107,7 +104,7 @@ public class TravelActivity extends AppCompatActivity implements
                 final String[] listItems = new String[]{"GPX", "KML"};
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("Share this travel as:")
-                        .setSingleChoiceItems(listItems, defaultItem[0], (dialog, which) -> {
+                        .setItems(listItems, (dialog, which) -> {
                             if (which == 0) {
                                 File shareGpxFile = new File(getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".gpx");
                                 try {
@@ -157,7 +154,11 @@ public class TravelActivity extends AppCompatActivity implements
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                travelHelper.deleteTravel(travel.getTitle());
+                                travelHelper.deleteTravel(state -> {
+                                    if (state.get()) {
+                                        finish();
+                                    }
+                                }, travel.getID());
                                 finish();
                             }
                         })
@@ -180,6 +181,8 @@ public class TravelActivity extends AppCompatActivity implements
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
         uiSettings.setCompassEnabled(false);
+        uiSettings.setMapToolbarEnabled(false);
+        uiSettings.setMyLocationButtonEnabled(false);
 
         Polyline polyline = googleMap.addPolyline(new PolylineOptions()
                 .clickable(true));
@@ -188,29 +191,32 @@ public class TravelActivity extends AppCompatActivity implements
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
 
         travelHelper.getPoints(data -> {
-            for (int i = 0; i < data.length(); i++) {
-                LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
-                listLatLng.add(position);
-                pointsList.add(data.get(i));
-                googleMap.addMarker(new MarkerOptions()
-                        .position(position)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            if (data.length() > 0) {
+                for (int i = 0; i < data.length(); i++) {
+                    LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
+                    listLatLng.add(position);
+                    pointsList.add(data.get(i));
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(position)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                }
+                googleMap.setInfoWindowAdapter(new CustomInfoWindowMarkerAdapter(getApplicationContext()));
+                googleMap.setOnMarkerClickListener(marker -> {
+                    Toast.makeText(getApplicationContext(), "Click on marker " + marker.getPosition(), Toast.LENGTH_SHORT).show();
+                    marker.setTitle("Test");
+                    marker.showInfoWindow();
+                    return false;
+                });
+
+                polyline.setPoints(listLatLng);
+
+                stylePolyline(polyline);
+
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
+                Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
             }
-            googleMap.setInfoWindowAdapter(new CustomInfoWindowMarkerAdapter(getApplicationContext()));
-            googleMap.setOnMarkerClickListener(marker -> {
-                Toast.makeText(getApplicationContext(), "Click on marker " + marker.getPosition(), Toast.LENGTH_SHORT).show();
-                marker.setTitle("Test");
-                marker.showInfoWindow();
-                return false;
-            });
 
-            polyline.setPoints(listLatLng);
-
-            stylePolyline(polyline);
-
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
-            Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
-        }, travel.getID().toString());
+        }, travel.getID());
 
     }
 

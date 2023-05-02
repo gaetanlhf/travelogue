@@ -1,112 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".activity.LoginActivity">
 
-    <Button
-        android:id="@+id/create_account_btn"
+    <ImageView
+        android:id="@+id/login_activity_imageview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:onClick="onClickCreateAccountActivity"
-        android:text="@string/create_account_btn"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="206dp"
+        android:layout_marginBottom="20dp"
+        app:srcCompat="@drawable/undraw_login" />
 
     <TextView
-        android:id="@+id/no_account_textview"
-        android:layout_width="wrap_content"
+        android:id="@+id/login_activity_textview_1"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="@string/no_account_textview"
-        app:layout_constraintBottom_toTopOf="@+id/create_account_btn"
-        app:layout_constraintEnd_toEndOf="@+id/create_account_btn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/create_account_btn" />
+        android:text="@string/login_activity_textview_1"
+        android:textSize="34sp" />
+
+    <TextView
+        android:id="@+id/login_activity_textview_2"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/login_activity_textview_2" />
 
     <EditText
-        android:id="@+id/email_text"
+        android:id="@+id/login_activity_edittext_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="21dp"
         android:autofillHints=""
         android:ems="10"
         android:hint="@string/email_text_hint"
         android:inputType="textEmailAddress"
         android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="@+id/login_textview"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/login_textview"
-        app:layout_constraintTop_toBottomOf="@+id/login_textview" />
-
-    <TextView
-        android:id="@+id/login_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center|center_horizontal"
-        android:text="@string/login_textview"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/login_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onClickLogin"
-        android:text="@string/login_btn"
-        app:layout_constraintEnd_toEndOf="@+id/forget_password_textview"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/forget_password_textview"
-        app:layout_constraintTop_toBottomOf="@+id/password_text" />
+        android:textColorHint="#757575" />
 
     <EditText
-        android:id="@+id/password_text"
+        android:id="@+id/login_activity_edittext_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="13dp"
         android:autofillHints=""
         android:ems="10"
         android:hint="@string/password_text_hint"
         android:inputType="textPassword"
         android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="@+id/email_text"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/email_text"
-        app:layout_constraintTop_toBottomOf="@+id/email_text" />
+        android:textColorHint="#757575" />
 
-    <ProgressBar
-        android:id="@+id/log_in_spinner"
-        style="?android:attr/progressBarStyle"
+    <Button
+        android:id="@+id/login_activity_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
-        app:layout_constraintBottom_toTopOf="@+id/no_account_textview"
-        app:layout_constraintEnd_toEndOf="@+id/login_btn"
-        app:layout_constraintHorizontal_bias="0.475"
-        app:layout_constraintStart_toStartOf="@+id/login_btn"
-        app:layout_constraintTop_toBottomOf="@+id/forget_password_textview"
-        app:layout_constraintVertical_bias="0.5" />
+        android:layout_marginBottom="20dp"
+        android:onClick="onClickLogin"
+        android:text="@string/login_btn" />
 
     <TextView
-        android:id="@+id/forget_password_textview"
+        android:id="@+id/login_activity_textview_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:minHeight="48dp"
         android:onClick="onClickForgotPassword"
-        android:text="@string/forgot_password_textview"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_btn" />
+        android:text="@string/forgot_password_textview" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ProgressBar
+        android:id="@+id/login_activity_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>

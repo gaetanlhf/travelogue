@@ -39,6 +39,7 @@ public class TravelsFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     List<String> titles = new ArrayList<>();
+    List<String> ids = new ArrayList<>();
     private FirebaseAuth mAuth;
     private ProgressBar spinner;
     private TravelAdapter travelAdapter;
@@ -83,23 +84,24 @@ public class TravelsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_travels, container, false);
-        View noTripContent = view.findViewById(R.id.fragment_travels_no_content);
+        View noTripContent = view.findViewById(R.id.travels_fragment_no_content);
         View tripContent = view.findViewById(R.id.fragment_travels_content);
         noTripContent.setVisibility(View.GONE);
         tripContent.setVisibility(View.GONE);
-        spinner = view.findViewById(R.id.fragment_home_spinner);
-        // create list
+        spinner = view.findViewById(R.id.travels_fragment_spinner);
         spinner.setVisibility(View.VISIBLE);
 
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
         travelHelper.getTravels(data -> {
             if (data.length() > 0) {
                 for (int i = 0; i < data.length(); i++) {
-                    titles.add(String.valueOf(data.get(i).getTitle()));
+                    if (data.get(i) != null) {
+                        titles.add(String.valueOf(data.get(i).getTitle()));
+                        ids.add(String.valueOf(data.get(i).getID()));
+                    }
                 }
-                travelAdapter = new TravelAdapter(requireActivity(), titles);
+                travelAdapter = new TravelAdapter(requireActivity(), ids, titles);
 
-                // set the RecyclerView:
                 RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireActivity());
                 recyclerView.setLayoutManager(layoutManager);
@@ -117,7 +119,7 @@ public class TravelsFragment extends Fragment {
 
         ((HomeActivity) getActivity()).setFragmentRefreshListener(() -> {
             FragmentTransaction tr = getParentFragmentManager().beginTransaction();
-            tr.replace(R.id.relativelayout, new TravelsFragment());
+            tr.replace(R.id.home_activity_relative_layout, new TravelsFragment());
             tr.commit();
         });
         return view;

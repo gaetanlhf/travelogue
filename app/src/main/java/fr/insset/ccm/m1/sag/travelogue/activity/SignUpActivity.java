@@ -29,10 +29,11 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
+        getSupportActionBar().setTitle(R.string.sign_up_activity_title);
         setContentView(R.layout.activity_sign_up);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         mAuth = FirebaseAuth.getInstance();
-        spinner = findViewById(R.id.sign_up_spinner);
+        spinner = findViewById(R.id.sign_up_activity_spinner);
         spinner.setVisibility(View.GONE);
     }
 
@@ -52,8 +53,8 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     public void onClickSignUp(View view) {
-        email = findViewById(R.id.email_sign_up_text);
-        password = findViewById(R.id.password_sign_up_text);
+        email = findViewById(R.id.sign_up_activity_edittext_email);
+        password = findViewById(R.id.sign_up_activity_edittext_password);
         if (!TextUtils.isEmpty(email.getText().toString()) && !TextUtils.isEmpty(password.getText().toString())) {
             spinner.setVisibility(View.VISIBLE);
             mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())

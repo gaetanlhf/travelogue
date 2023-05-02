@@ -20,8 +20,8 @@ import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
-import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
@@ -60,16 +60,15 @@ public class NewTravelActivity extends AppCompatActivity {
     }
 
     public void onClickSaveTravel(View view) {
-        travelName = findViewById(R.id.activity_new_travel_edittext);
+        travelName = findViewById(R.id.new_travel_activity_edit_text);
         if (!TextUtils.isEmpty(travelName.getText().toString())) {
             TravelHelper newTravel = new TravelHelper(mAuth.getCurrentUser().getUid());
-            newTravel.createTravel(travelName.getText().toString());
-            Settings settings = new Settings(mAuth.getCurrentUser().getUid());
-            settings.isPeriodicTrackingEnable(data -> {
-                if (data.get(0).equals("true")) {
-                    startLocationService(Long.parseLong(data.get(1).toString()));
-                }
-            });
+            String newTravelId = newTravel.createTravel(travelName.getText().toString());
+            if (AppSettings.getAutoGps()) {
+                startLocationService(AppSettings.getTimeBetweenAutoGps());
+            }
+            AppSettings.setTravelling(true);
+            AppSettings.setTravel(newTravelId);
             finish();
         }
     }

@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
@@ -28,10 +29,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setTitle(R.string.forgot_password_activity_title);
         setContentView(R.layout.activity_forgot_password);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        spinner = findViewById(R.id.forgot_password_spinner);
+        spinner = findViewById(R.id.forgot_password_activity_spinner);
         spinner.setVisibility(View.GONE);
     }
 
@@ -51,7 +54,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     }
 
     public void onClickResetPassword(View view) {
-        email = findViewById(R.id.email_forgot_password_textview);
+        email = findViewById(R.id.forgot_password_activity_edittext_email);
         if (!TextUtils.isEmpty(email.getText().toString())) {
             spinner.setVisibility(View.VISIBLE);
             FirebaseAuth.getInstance().sendPasswordResetEmail(email.getText().toString())

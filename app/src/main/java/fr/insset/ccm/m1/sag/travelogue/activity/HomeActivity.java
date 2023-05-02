@@ -31,10 +31,10 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_home);
-        bottomNavigationView = findViewById(R.id.bottom_nav_home);
+        bottomNavigationView = findViewById(R.id.home_activity_bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         fragment = oldFragment = homeFragment();
-        loadFragment(fragment);
+        loadFragment(fragment, oldFragment);
         //SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.activity_home_refresh);
         //swipeRefreshLayout.setOnRefreshListener(
         //        () -> {
@@ -69,13 +69,17 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                 break;
         }
         if (fragment != null) {
-            loadFragment(fragment);
+            loadFragment(fragment, oldFragment);
         }
         return true;
     }
 
-    void loadFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().detach(oldFragment).replace(R.id.relativelayout, fragment).commit();
+    void loadFragment(Fragment fragment, Fragment oldFragment) {
+        if (fragment == oldFragment) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.home_activity_relative_layout, fragment).commit();
+        } else {
+            getSupportFragmentManager().beginTransaction().detach(oldFragment).replace(R.id.home_activity_relative_layout, fragment).commit();
+        }
     }
 
     Fragment homeFragment() {

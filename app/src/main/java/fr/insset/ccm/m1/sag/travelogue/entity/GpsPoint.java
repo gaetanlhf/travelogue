@@ -21,6 +21,11 @@ public class GpsPoint {
         this.timestamp = timestamp;
     }
 
+    public GpsPoint(double longitude, double latitude) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
+
     public double getLongitude() {
         return longitude;
     }

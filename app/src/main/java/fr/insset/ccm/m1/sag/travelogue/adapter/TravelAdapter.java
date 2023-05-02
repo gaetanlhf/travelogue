@@ -12,7 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.TravelActivity;
@@ -20,23 +22,33 @@ import fr.insset.ccm.m1.sag.travelogue.activity.TravelActivity;
 public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context context;
     private final List<String> initialTitles;
+    Map<String, String> idToTravel = new HashMap<String, String>();
+    Map<String, String> travelToId = new HashMap<String, String>();
+    private List<String> ids;
     private List<String> titles;
 
-    public TravelAdapter(Context context, List<String> titles) {
+    public TravelAdapter(Context context, List<String> ids, List<String> titles) {
         this.context = context;
+        this.ids = ids;
         this.titles = this.initialTitles = titles;
+        for (int i = 0; i < ids.size(); i++) {
+            idToTravel.put(ids.get(i), initialTitles.get(i));
+            travelToId.put(initialTitles.get(i), ids.get(i));
+        }
     }
 
     public void filterList(String text) {
-        List<String> filteredlist = new ArrayList<>();
+        List<String> filteredTitleslist = new ArrayList<>();
+        List<String> filteredIdslist = new ArrayList<>();
         for (String item : initialTitles) {
-            // checking if the entered string matched with any item of our recycler view.
             if (item.trim().toLowerCase().contains(text.trim().toLowerCase())) {
-                filteredlist.add(item);
+                filteredTitleslist.add(item);
+                filteredIdslist.add(travelToId.get(item));
             }
         }
-        if (!filteredlist.isEmpty()) {
-            titles = filteredlist;
+        if (!filteredTitleslist.isEmpty()) {
+            ids = filteredIdslist;
+            titles = filteredTitleslist;
             notifyDataSetChanged();
         }
 
@@ -64,14 +76,13 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ItemVH itemVH = (ItemVH) holder;
 
-        itemVH.travelNameTextView.setText(titles.get(position));
-        itemVH.viewTravelbtn.setText("View");
-
+        itemVH.travelNameTextView.setText(idToTravel.get(ids.get(position)));
 
         itemVH.viewTravelbtn.setOnClickListener(v -> {
             String travelName = itemVH.travelNameTextView.getText().toString();
             Intent intent = new Intent(context.getApplicationContext(), TravelActivity.class);
             intent.putExtra("travelName", travelName);
+            intent.putExtra("travelId", ids.get(position));
             v.getContext().startActivity(intent);
         });
     }
@@ -101,8 +112,8 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public ItemVH(View itemView) {
             super(itemView);
 
-            travelNameTextView = itemView.findViewById(R.id.travel_name_textView);
-            viewTravelbtn = itemView.findViewById(R.id.view_travel_btn);
+            travelNameTextView = itemView.findViewById(R.id.travel_item_name_text_view);
+            viewTravelbtn = itemView.findViewById(R.id.travel_item_button);
         }
     }
 }

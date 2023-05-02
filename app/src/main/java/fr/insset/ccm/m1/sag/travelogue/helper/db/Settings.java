@@ -28,10 +28,8 @@ public class Settings {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        if (task.getResult().get("enableAutoGetPoint").toString().equals("true")) {
-                            atomicReferenceArray.set(0, "true");
-                            atomicReferenceArray.set(1, task.getResult().get("timeBetweenAutoGetPoint").toString());
-                        }
+                        atomicReferenceArray.set(0, task.getResult().get("enableAutoGetPoint").toString());
+                        atomicReferenceArray.set(1, task.getResult().get("timeBetweenAutoGetPoint").toString());
                         callback.onCallback(atomicReferenceArray);
                     }
                 });
@@ -62,7 +60,7 @@ public class Settings {
         AppSettings.setAutoGps(value);
     }
 
-    public void setTimeBetweenAutoGps(Integer value) {
+    public void setTimeBetweenAutoGps(Long value) {
         Map<String, Object> updateSettings = new HashMap<>();
         updateSettings.put("timeBetweenAutoGetPoint", value);
 

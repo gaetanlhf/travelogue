@@ -5,13 +5,14 @@ import android.util.Log;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
@@ -26,7 +27,7 @@ public class TravelHelper {
         this.id = id;
     }
 
-    public void createTravel(String travelName) {
+    public String createTravel(String travelName) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
         String date = dateFormat.format(new Date());
@@ -56,6 +57,7 @@ public class TravelHelper {
                 .document("state")
                 .set(updateState, SetOptions.merge());
 
+        return timestamp;
     }
 
     public void getPoints(Callback callback, String currentTravel) {
@@ -92,7 +94,10 @@ public class TravelHelper {
                         AtomicReferenceArray<Travel> travels = new AtomicReferenceArray<>(task.getResult().size());
                         int i = 0;
                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                            travels.set(i, new Travel(documentSnapshot.getData().get("travelName").toString()));
+                            if (Boolean.parseBoolean(Objects.requireNonNull(documentSnapshot.getData().get("isFinish")).toString())) {
+                                Log.d("test", documentSnapshot.getData().get("travelName").toString());
+                                travels.set(i, new Travel(documentSnapshot.getId(), documentSnapshot.getData().get("travelName").toString()));
+                            }
                             i++;
                         }
                         callback2.onCallback2(travels);
@@ -106,34 +111,59 @@ public class TravelHelper {
         db.collection(id)
                 .document("data")
                 .collection("travels")
-                .whereEqualTo("travelName", travel)
+                .document(travel)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-
-                        DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                        DocumentSnapshot documentSnapshot = task.getResult();
                         AtomicReference<Travel> travelAtomicReference = new AtomicReference<>();
-
-                        travelAtomicReference.set(new Travel(Integer.parseInt(documentSnapshot.getId()), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("startDate").toString(), documentSnapshot.getData().get("startTime").toString(), documentSnapshot.getData().get("endDate").toString(), documentSnapshot.getData().get("endTime").toString(), (Boolean) documentSnapshot.getData().get("isFinish")));
+                        travelAtomicReference.set(new Travel(documentSnapshot.getId(), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("startDate").toString(), documentSnapshot.getData().get("startTime").toString(), documentSnapshot.getData().get("endDate").toString(), documentSnapshot.getData().get("endTime").toString(), (Boolean) documentSnapshot.getData().get("isFinish")));
                         callback3.onCallback3(travelAtomicReference);
-
                     }
                 });
-
     }
 
-    public void deleteTravel(String travelName) {
+    public void finishTravel(String travel) {
+        Map<String, Object> updateTravel = new HashMap<>();
+        updateTravel.put("isFinish", true);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+        String date = dateFormat.format(new Date());
+        String time = timeFormat.format(new Date());
+        updateTravel.put("endDate", date);
+        updateTravel.put("endTime", time);
         db.collection(id)
                 .document("data")
                 .collection("travels")
-                .whereEqualTo("travelName", travelName)
+                .document(travel)
+                .update(updateTravel);
+    }
+
+    public void deleteTravel(Callback4 callback4, String travelId) {
+        AtomicBoolean state = new AtomicBoolean(false);
+        db.collection(id)
+                .document("data")
+                .collection("travels")
+                .document(travelId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            document.getReference().delete();
-                        }
+                        task.getResult().getReference().delete();
+                        db.collection(id)
+                                .document("data")
+                                .collection("travels")
+                                .document(travelId)
+                                .collection("points")
+                                .get()
+                                .addOnCompleteListener(task1 -> {
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document : task1.getResult()) {
+                                            document.getReference().delete();
+                                        }
+                                        state.set(true);
+                                        callback4.onCallback4(state);
+                                    }
+                                });
                     }
                 });
     }
@@ -148,5 +178,9 @@ public class TravelHelper {
 
     public interface Callback3 {
         void onCallback3(AtomicReference<Travel> travels);
+    }
+
+    public interface Callback4 {
+        void onCallback4(AtomicBoolean state);
     }
 }
