@@ -1,5 +1,7 @@
 package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,13 +30,10 @@ public class State {
         db.collection(id)
                 .document("state")
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            travelling.set(Boolean.parseBoolean(task.getResult().get("isTravelling").toString()));
-                            callback.onCallback(travelling);
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        travelling.set(Boolean.parseBoolean(task.getResult().get("isTravelling").toString()));
+                        callback.onCallback(travelling);
                     }
                 });
     }
