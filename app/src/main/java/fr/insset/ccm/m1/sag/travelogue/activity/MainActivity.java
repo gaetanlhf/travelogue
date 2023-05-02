@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
                                 MainActivity.this.startService(intent);
                             }
                         });
+                    } else {
+                        AppSettings.setTravelling(false);
                     }
                 });
                 File folder = new File(getCacheDir(), "/export/");
