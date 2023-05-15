@@ -1,5 +1,7 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
+import static androidx.core.content.ContextCompat.registerReceiver;
+
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -71,8 +73,6 @@ public class HomeFragment extends Fragment implements
     private TravelHelper travelHelper;
     private Travel travel;
     private View map;
-
-
     private State state;
     private Location locationDb;
     private SupportMapFragment mapFragment;
@@ -80,7 +80,6 @@ public class HomeFragment extends Fragment implements
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("test", "test");
             mapFragment.getMapAsync(HomeFragment.this);
         }
     };
@@ -115,7 +114,7 @@ public class HomeFragment extends Fragment implements
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fragment_home_map);
         requireActivity().registerReceiver(updateReceiver, new IntentFilter("updateHomeFragment"));
 
-        if (AppSettings.getTravelling()) {
+        if (AppSettings.getTravelling() || AppSettings.getTravelling() == null) {
             travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
             travelHelper.getTravel(data -> {
                 travel = data.get();
@@ -125,7 +124,7 @@ public class HomeFragment extends Fragment implements
             spinner.setVisibility(View.GONE);
             map.setVisibility(View.VISIBLE);
             setHasOptionsMenu(true);
-        } else {
+        } else if (!AppSettings.getTravelling() || AppSettings.getTravelling() == null){
             spinner.setVisibility(View.GONE);
             noCurrentTravel.setVisibility(View.VISIBLE);
         }
@@ -149,7 +148,7 @@ public class HomeFragment extends Fragment implements
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @SuppressLint("NonConstantResourceId")
+    @SuppressLint({"NonConstantResourceId", "MissingPermission"})
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -326,4 +325,5 @@ public class HomeFragment extends Fragment implements
     public void onResume() {
         super.onResume();
     }
+
 }

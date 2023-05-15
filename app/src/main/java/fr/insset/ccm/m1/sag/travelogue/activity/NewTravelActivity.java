@@ -1,5 +1,15 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
+import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION;
+import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_COARSE_LOCATION_PERMISSION;
+import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_FINE_LOCATION_PERMISSION;
+import static fr.insset.ccm.m1.sag.travelogue.Constants.BACKGROUND_LOCATION_PERMISSION_CODE;
+import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION;
+import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION_CODE;
+import static fr.insset.ccm.m1.sag.travelogue.Constants.FOREGROUND_SERVICE_PERMISSION;
+import static fr.insset.ccm.m1.sag.travelogue.Constants.LOCATION_PERMISSION_CODE;
+import static fr.insset.ccm.m1.sag.travelogue.Constants.PERMISSION_SETTINGS_CODE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -39,9 +49,13 @@ public class NewTravelActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(getResources().getString(R.string.create_new_travel));
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_new_travel);
-        if (!PermissionsHelper.hasPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION})) {
-            PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
-        }
+        checkGrantedPermissions();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkGrantedPermissions();
     }
 
     @Override
@@ -75,8 +89,8 @@ public class NewTravelActivity extends AppCompatActivity {
 
     private void startLocationService(Long timeBetweenAutoGetPoint) {
         if (!LocationService.isServiceRunning) {
-            if (!PermissionsHelper.hasPermission(this, Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
-                PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
+            if (!PermissionsHelper.hasPermission(this, ACCESS_FINE_LOCATION_PERMISSION)) {
+                PermissionsHelper.requestPermissions(this, new String[]{ACCESS_BACKGROUND_LOCATION_PERMISSION, ACCESS_COARSE_LOCATION_PERMISSION, ACCESS_FINE_LOCATION_PERMISSION, FOREGROUND_SERVICE_PERMISSION}, LOCATION_PERMISSION_CODE);
             }
             Intent intent = new Intent(getApplicationContext(), LocationService.class);
             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
@@ -95,13 +109,123 @@ public class NewTravelActivity extends AppCompatActivity {
         }
     }
 
+    private void checkGrantedPermissions() {
+        if (PermissionsHelper.hasPermissions(this, new String[]{ACCESS_FINE_LOCATION_PERMISSION})) {
+            onPermissionGranted();
+        } else {
+            PermissionsHelper.requestPermissions(this, new String[]{ACCESS_COARSE_LOCATION_PERMISSION, ACCESS_FINE_LOCATION_PERMISSION}, LOCATION_PERMISSION_CODE);
+        }
+        if (PermissionsHelper.hasPermissions(this, new String[]{ACCESS_BACKGROUND_LOCATION_PERMISSION, FOREGROUND_SERVICE_PERMISSION})) {
+            onPermissionGranted();
+        } else {
+            PermissionsHelper.requestPermissions(this, new String[]{ACCESS_BACKGROUND_LOCATION_PERMISSION, FOREGROUND_SERVICE_PERMISSION}, BACKGROUND_LOCATION_PERMISSION_CODE);
+        }
+        if (PermissionsHelper.hasPermissions(this, new String[]{CAMERA_PERMISSION})) {
+            onPermissionGranted();
+        } else {
+            PermissionsHelper.requestPermissions(this, new String[]{CAMERA_PERMISSION}, CAMERA_PERMISSION_CODE);
+        }
+
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (PermissionsHelper.hasPermissions(this, permissions)) {
-            Log.d("Permission", "Accordé");
+            onPermissionGranted();
         } else {
-            Log.d("Permission", "Refusé");
+            if (PermissionsHelper.shouldShowPermissionRationale(this, permissions)) {
+                showPermissionRationale(requestCode);
+            } else {
+                onPermissionDenied(requestCode);
+            }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PERMISSION_SETTINGS_CODE) {
+            if (PermissionsHelper.hasPermission(this, ACCESS_FINE_LOCATION_PERMISSION)) {
+                onPermissionGranted();
+            }
+            if (PermissionsHelper.hasPermission(this, ACCESS_BACKGROUND_LOCATION_PERMISSION)) {
+                onPermissionGranted();
+            }
+            if (PermissionsHelper.hasPermission(this, CAMERA_PERMISSION)) {
+                onPermissionGranted();
+            }
+        }
+    }
+
+    private void showPermissionRationale(int requestCode) {
+        PermissionsHelper.showDialog(this, "Permissions", getPermissionFromRequestCode(requestCode), "OK", (dialog, buttonType) -> {
+            if (buttonType == PermissionsHelper.OnDialogCloseListener.TYPE_POSITIVE) {
+
+                if (requestCode == PERMISSION_SETTINGS_CODE) {
+                    PermissionsHelper.requestPermissions(this, new String[]{ACCESS_COARSE_LOCATION_PERMISSION, ACCESS_FINE_LOCATION_PERMISSION}, PERMISSION_SETTINGS_CODE);
+                }
+
+                if (requestCode == LOCATION_PERMISSION_CODE) {
+                    PermissionsHelper.requestPermissions(this, new String[]{ACCESS_COARSE_LOCATION_PERMISSION, ACCESS_FINE_LOCATION_PERMISSION}, LOCATION_PERMISSION_CODE);
+                }
+
+                if (requestCode == BACKGROUND_LOCATION_PERMISSION_CODE) {
+                    PermissionsHelper.requestPermissions(this, new String[]{ACCESS_BACKGROUND_LOCATION_PERMISSION, FOREGROUND_SERVICE_PERMISSION}, BACKGROUND_LOCATION_PERMISSION_CODE);
+                }
+
+                if (requestCode == CAMERA_PERMISSION_CODE) {
+                    PermissionsHelper.requestPermissions(this, new String[]{CAMERA_PERMISSION}, CAMERA_PERMISSION_CODE);
+                }
+
+            } else {
+                onPermissionDenied(requestCode);
+            }
+        });
+    }
+
+    private void onPermissionDenied(int requestCode) {
+        PermissionsHelper.showDialog(this, "Permission Settings", getPermissionFromRequestCode(requestCode), "OK", (PermissionsHelper.OnDialogCloseListener) (dialog, buttonType) -> {
+            if (buttonType == PermissionsHelper.OnDialogCloseListener.TYPE_POSITIVE) {
+
+                if (requestCode == PERMISSION_SETTINGS_CODE) {
+                    PermissionsHelper.openSettingScreen(this, PERMISSION_SETTINGS_CODE);
+                }
+
+                if (requestCode == LOCATION_PERMISSION_CODE) {
+                    PermissionsHelper.openSettingScreen(this, LOCATION_PERMISSION_CODE);
+                }
+
+                if (requestCode == BACKGROUND_LOCATION_PERMISSION_CODE) {
+                    PermissionsHelper.openSettingScreen(this, BACKGROUND_LOCATION_PERMISSION_CODE);
+                }
+
+                if (requestCode == CAMERA_PERMISSION_CODE) {
+                    PermissionsHelper.openSettingScreen(this, CAMERA_PERMISSION_CODE);
+                }
+            }
+        });
+    }
+
+    private void onPermissionGranted() {
+
+    }
+
+    public String getPermissionFromRequestCode(int requestCode) {
+        String str;
+        switch (requestCode) {
+            case Constants.LOCATION_PERMISSION_CODE:
+                str = "This app require location permission!";
+                break;
+            case Constants.BACKGROUND_LOCATION_PERMISSION_CODE:
+                str = "This app require background location permission!";
+                break;
+            case CAMERA_PERMISSION_CODE:
+                str = "This app require camera permission!";
+                break;
+            default:
+                str = "Grant background location permission from settings screen!";
+        }
+        return str;
     }
 }

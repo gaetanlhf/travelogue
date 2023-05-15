@@ -1,5 +1,6 @@
 package fr.insset.ccm.m1.sag.travelogue.services;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,10 +15,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.gms.location.Granularity;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
@@ -42,8 +45,8 @@ public class LocationService extends Service {
             gpsPoint.setLongitude(longitude);
             gpsPoint.setLatitude(latitude);
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
-                Location location = new Location(mAuth.getCurrentUser().getUid());
-                location.addPoint(gpsPoint, AppSettings.getTravel());
+            Location location = new Location(mAuth.getCurrentUser().getUid());
+            location.addPoint(gpsPoint, AppSettings.getTravel());
         }
     };
 
@@ -53,6 +56,7 @@ public class LocationService extends Service {
         return null;
     }
 
+    @SuppressLint("MissingPermission")
     private void startLocationService(Long timeBetweenUpdateLocation) {
         mAuth = FirebaseAuth.getInstance();
 
@@ -89,10 +93,12 @@ public class LocationService extends Service {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(timeBetweenUpdateLocation * 10000);
-        locationRequest.setFastestInterval(timeBetweenUpdateLocation * 10000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationRequest locationRequest = new LocationRequest.Builder(timeBetweenUpdateLocation*1000)
+                .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+                .setMinUpdateIntervalMillis(timeBetweenUpdateLocation*1000)
+                .setGranularity(Granularity.GRANULARITY_FINE)
+                .build();
+
 
         LocationServices.getFusedLocationProviderClient(getApplicationContext())
                 .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
