@@ -14,6 +14,7 @@ import java.io.File;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
@@ -30,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         setContentView(R.layout.activity_main);
+        new Thread(() -> {
+            NetworkConnectivityCheck.checkConnection(this);
+        }).start();
         AppSettings.setup(this);
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -71,13 +75,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 Intent homeActivity = new Intent(this, HomeActivity.class);
+                overridePendingTransition(0, 0);
                 startActivity(homeActivity);
                 finish();
             });
         } else {
             Intent welcomeActivity = new Intent(this, WelcomeActivity.class);
+            overridePendingTransition(0, 0);
             startActivity(welcomeActivity);
             finish();
         }
+
     }
 }

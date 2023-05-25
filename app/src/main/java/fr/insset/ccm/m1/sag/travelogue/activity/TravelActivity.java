@@ -44,6 +44,7 @@ import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
 public class TravelActivity extends AppCompatActivity implements
@@ -53,6 +54,7 @@ public class TravelActivity extends AppCompatActivity implements
     private Travel travel;
     private FirebaseAuth mAuth;
     private TravelHelper travelHelper;
+    private Thread networkCheckThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,20 @@ public class TravelActivity extends AppCompatActivity implements
         travel = new Travel(intent.getStringExtra("travelName"));
 
         super.onCreate(savedInstanceState);
+        new Thread(() -> {
+            NetworkConnectivityCheck.checkConnection(this);
+        }).start();
+        networkCheckThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(5000);
+                    NetworkConnectivityCheck.checkConnection(this);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        networkCheckThread.start();
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         setContentView(R.layout.activity_travel);
         mAuth = FirebaseAuth.getInstance();
@@ -227,5 +243,12 @@ public class TravelActivity extends AppCompatActivity implements
         polyline.setColor(SurfaceColors.SURFACE_2.getColor(this));
         polyline.setJointType(JointType.ROUND);
         polyline.setWidth(20);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (networkCheckThread != null) {
+            networkCheckThread.interrupt();
+        }
     }
 }

@@ -17,15 +17,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-
     private TextView email;
-
     private ProgressBar spinner;
-
+    private Thread networkCheckThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +35,20 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         spinner = findViewById(R.id.forgot_password_activity_spinner);
         spinner.setVisibility(View.GONE);
+        new Thread(() -> {
+            NetworkConnectivityCheck.checkConnection(this);
+        }).start();
+        networkCheckThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(5000);
+                    NetworkConnectivityCheck.checkConnection(this);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        networkCheckThread.start();
     }
 
     @Override
@@ -69,6 +82,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (networkCheckThread != null) {
+            networkCheckThread.interrupt();
         }
     }
 }

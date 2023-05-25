@@ -11,11 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.adapter.SliderAdapter;
+import fr.insset.ccm.m1.sag.travelogue.helper.PermissionHelper;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -50,9 +52,24 @@ public class WelcomeActivity extends AppCompatActivity {
             if (currentPage < layouts.length) {
                 viewPager.setCurrentItem(currentPage);
             } else {
-                Intent loginActivity = new Intent(WelcomeActivity.this, LoginActivity.class);
-                startActivity(loginActivity);
-                finish();
+                if(PermissionHelper.areAllPermissionsGranted(this)) {
+                    Intent loginActivity = new Intent(WelcomeActivity.this, LoginActivity.class);
+                    startActivity(loginActivity);
+                    finish();
+                } else {
+                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+                            .setTitle("Before going on")
+                            .setMessage("You must grant permissions to the application for the features described in this screen to work.\n" +
+                                    "You can then log in.")
+                            .setCancelable(false)
+                            .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                                dialogInterface.dismiss();
+                                PermissionHelper.verifyPermissions(this);
+                            });
+                    builder.show();
+                }
+
+
             }
 
         });
@@ -98,6 +115,28 @@ public class WelcomeActivity extends AppCompatActivity {
 
         if (dotsTextView.length > 0) {
             dotsTextView[page].setTextColor(Color.parseColor("#ffffff"));
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (!PermissionHelper.arePermissionsGranted(requestCode, permissions, grantResults)) {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+                    .setTitle("Nosdq")
+                    .setMessage("qsdsdq")
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                        PermissionHelper.verifyPermissions(this);
+                    })
+                    .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                        finish();
+                    });
+            builder.show();
+        } else {
+            // Les permissions ont été accordées.
         }
     }
 }

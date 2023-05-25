@@ -13,6 +13,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.util.ArrayList;
 
 import fr.insset.ccm.m1.sag.travelogue.BuildConfig;
@@ -109,7 +111,7 @@ public class PermissionsHelper {
     }
 
     public static void showDialog(Context context, String title, String message, String positiveButtonText, final OnDialogCloseListener listener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context)
                 .setTitle(title)
                 .setMessage(message)
                 .setCancelable(false)
@@ -119,7 +121,7 @@ public class PermissionsHelper {
                 })
                 .setNegativeButton("Cancel", (dialogInterface, i) -> {
                     dialogInterface.dismiss();
-                    listener.onDialogClose(dialogInterface, OnDialogCloseListener.TYPE_NEGATIVE);
+                    ((Activity) context).finish();
                 });
         builder.show();
     }

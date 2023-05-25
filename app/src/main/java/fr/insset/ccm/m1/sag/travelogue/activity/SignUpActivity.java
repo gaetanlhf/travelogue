@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -24,6 +25,7 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView email;
     private TextView password;
     private ProgressBar spinner;
+    private Thread networkCheckThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,20 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         spinner = findViewById(R.id.sign_up_activity_spinner);
         spinner.setVisibility(View.GONE);
+        new Thread(() -> {
+            NetworkConnectivityCheck.checkConnection(this);
+        }).start();
+        networkCheckThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(5000);
+                    NetworkConnectivityCheck.checkConnection(this);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        networkCheckThread.start();
     }
 
     @Override
@@ -69,6 +85,14 @@ public class SignUpActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (networkCheckThread != null) {
+            networkCheckThread.interrupt();
         }
     }
 }

@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -26,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView email;
     private TextView password;
     private ProgressBar spinner;
+    private Thread networkCheckThread;
 
 
     @Override
@@ -41,7 +43,20 @@ public class LoginActivity extends AppCompatActivity {
         if (currentUser != null) {
             finish();
         }
-
+        new Thread(() -> {
+            NetworkConnectivityCheck.checkConnection(this);
+        }).start();
+        networkCheckThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(5000);
+                    NetworkConnectivityCheck.checkConnection(this);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        networkCheckThread.start();
     }
 
     @Override
@@ -97,5 +112,13 @@ public class LoginActivity extends AppCompatActivity {
     public void onClickForgotPassword(View view) {
         Intent forgotPasswordActivity = new Intent(this, ForgotPasswordActivity.class);
         startActivity(forgotPasswordActivity);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (networkCheckThread != null) {
+            networkCheckThread.interrupt();
+        }
     }
 }

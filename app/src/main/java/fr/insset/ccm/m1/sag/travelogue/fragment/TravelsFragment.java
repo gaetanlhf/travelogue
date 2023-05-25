@@ -25,6 +25,7 @@ import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.adapter.TravelAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
 /**
@@ -90,7 +91,9 @@ public class TravelsFragment extends Fragment {
         tripContent.setVisibility(View.GONE);
         spinner = view.findViewById(R.id.travels_fragment_spinner);
         spinner.setVisibility(View.VISIBLE);
-
+        new Thread(() -> {
+            NetworkConnectivityCheck.checkConnection(requireContext());
+        }).start();
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
         travelHelper.getTravels(data -> {
             if (data.length() > 0) {

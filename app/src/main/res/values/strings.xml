@@ -61,10 +61,10 @@
     <string name="sign_up_activity_text_view_2">to create your Travelogue account</string>
     <string name="welcome_activity_next_button">Next</string>
     <string name="welcome_activity_skip_button">Skip</string>
-    <string name="travels_fragment_text_view_1" >It is completely empty...</string>
+    <string name="travels_fragment_text_view_1">It is completely empty...</string>
     <string name="travels_fragment_text_view_2">You will find your previous completed travels here</string>
     <string name="welcome_slide_1_text_view_1">Welcome to Travelogue</string>
-    <string name="welcome_slide_1_text_view_2" >your new way to keep track of your travels</string>
+    <string name="welcome_slide_1_text_view_2">your new way to keep track of your travels</string>
     <string name="welcome_slide_2_text_view_1">Keep GPS track of your travels</string>
     <string name="welcome_slide_2_text_view_2">with automatic or on-demand recording</string>
     <string name="welcome_slide_3_text_view_1">Share GPS points of your travel</string>
@@ -79,4 +79,7 @@
     <string name="travel_adapter_view">View</string>
     <string name="home_fragment_text_view_1">Set off on a new adventure</string>
     <string name="home_fragment_text_view_2">by starting a new travel with Travelogue</string>
+    <string name="no_connection_activity_textview_1">No Internet connection</string>
+    <string name="no_connection_activity_textview_2">Travelogue is a cloud application and requires an internet connection. Don\'t worry, we will reconnect you when the connection is restored</string>
+    <string name="require_location_permission">Please grant permission to access the location</string>
 </resources>

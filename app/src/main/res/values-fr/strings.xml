@@ -59,4 +59,6 @@
     <string name="travel_adapter_view">Voir</string>
     <string name="home_fragment_text_view_1">Lancez-vous dans une nouvelle aventure</string>
     <string name="home_fragment_text_view_2">en commançant un nouveau voyage avec Travelogue</string>
+    <string name="no_connection_activity_textview_1">Pas de connexion Internet</string>
+    <string name="no_connection_activity_textview_2">Travelogue est une application en nuage et nécessite une connexion internet. Ne vous inquiétez pas, nous vous reconnecterons dès que la connexion sera rétablie</string>
 </resources>

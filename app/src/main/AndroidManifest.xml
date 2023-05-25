@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-feature
         android:name="android.hardware.location"
@@ -28,6 +31,9 @@
         android:theme="@style/Theme.Travelogue"
         tools:targetApi="31">
         <activity
+            android:name=".activity.NoConnection"
+            android:exported="false" />
+        <activity
             android:name=".activity.TravelActivity"
             android:exported="false" />
 
@@ -37,7 +43,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -75,24 +80,19 @@
 
         <service
             android:name=".services.LocationService"
+            android:foregroundServiceType="location"
             android:enabled="true"
             android:exported="false" />
+
         <provider
-
             android:name="androidx.core.content.FileProvider"
-
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
-
             <meta-data
-
                 android:name="android.support.FILE_PROVIDER_PATHS"
-
                 android:resource="@xml/provider_paths" />
-
         </provider>
-
     </application>
 
 </manifest>
