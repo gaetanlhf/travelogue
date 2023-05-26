@@ -52,7 +52,7 @@ public class WelcomeActivity extends AppCompatActivity {
             if (currentPage < layouts.length) {
                 viewPager.setCurrentItem(currentPage);
             } else {
-                if(PermissionHelper.areAllPermissionsGranted(this)) {
+                if(PermissionHelper.areAllBasicPermissionsGranted(this)) {
                     Intent loginActivity = new Intent(WelcomeActivity.this, LoginActivity.class);
                     startActivity(loginActivity);
                     finish();
