@@ -13,6 +13,7 @@ import static fr.insset.ccm.m1.sag.travelogue.Constants.PERMISSION_SETTINGS_CODE
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,10 +31,10 @@ import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
@@ -43,6 +44,8 @@ public class NewTravelActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private Thread networkCheckThread;
+    private SharedPrefManager sharedPrefManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,7 @@ public class NewTravelActivity extends AppCompatActivity {
         new Thread(() -> {
             NetworkConnectivityCheck.checkConnection(this);
         }).start();
+        sharedPrefManager = SharedPrefManager.getInstance(this);
         networkCheckThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
@@ -89,11 +93,12 @@ public class NewTravelActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(travelName.getText().toString())) {
             TravelHelper newTravel = new TravelHelper(mAuth.getCurrentUser().getUid());
             String newTravelId = newTravel.createTravel(travelName.getText().toString());
-            if (AppSettings.getAutoGps()) {
-                startLocationService(AppSettings.getTimeBetweenAutoGps());
+            if (sharedPrefManager.getBool("AutoGps")) {
+                startLocationService(sharedPrefManager.getLong("TimeBetweenAutoGps"));
             }
-            AppSettings.setTravelling(true);
-            AppSettings.setTravel(newTravelId);
+            Log.d("test", newTravelId);
+            sharedPrefManager.updateBool("Travelling", true);
+            sharedPrefManager.saveString("CurrentTravel", String.valueOf(newTravelId));
             finish();
         }
     }
@@ -140,5 +145,11 @@ public class NewTravelActivity extends AppCompatActivity {
         } else {
             // Les permissions ont été accordées.
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PermissionHelper.verifyPermissions(this);
     }
 }

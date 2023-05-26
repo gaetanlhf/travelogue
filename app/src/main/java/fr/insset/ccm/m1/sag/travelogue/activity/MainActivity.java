@@ -2,6 +2,7 @@ package fr.insset.ccm.m1.sag.travelogue.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,9 +14,9 @@ import java.io.File;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
@@ -25,6 +26,8 @@ import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private SharedPrefManager sharedPrefManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             NetworkConnectivityCheck.checkConnection(this);
         }).start();
-        AppSettings.setup(this);
+        sharedPrefManager = SharedPrefManager.getInstance(this);
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
@@ -45,27 +48,29 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Settings settings = new Settings(mAuth.getCurrentUser().getUid());
                 settings.getSettings(atomicReferenceArray -> {
-                    AppSettings.setTimeBetweenAutoGps(Long.parseLong(atomicReferenceArray.get(1).toString()));
-                    AppSettings.setAutoGps(Boolean.parseBoolean(atomicReferenceArray.get(0).toString()));
+                    sharedPrefManager.saveLong("TimeBetweenAutoGps", Long.parseLong(atomicReferenceArray.get(1).toString()));
+                    sharedPrefManager.saveBool("AutoGps", Boolean.parseBoolean(atomicReferenceArray.get(0).toString()));
                 });
                 State state = new State(mAuth.getCurrentUser().getUid());
                 state.isTravelling(travelling -> {
                     if (travelling.get()) {
-                        AppSettings.setTravelling(travelling.get());
+                        sharedPrefManager.saveBool("Travelling", travelling.get());
                         state.getCurrentTravel(currentTravel -> {
-                            AppSettings.setTravel(currentTravel.get());
-                            if (!LocationService.isServiceRunning && AppSettings.getTravelling() && AppSettings.getAutoGps()) {
+                            sharedPrefManager.saveString("CurrentTravel", currentTravel.get());
+                            Log.d("test", sharedPrefManager.getString("CurrentTravel"));
+                            if (!LocationService.isServiceRunning && sharedPrefManager.getBool("Travelling") && sharedPrefManager.getBool("AutoGps")) {
                                 if (!PermissionsHelper.hasPermission(MainActivity.this, Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
                                     PermissionsHelper.requestPermissions(MainActivity.this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
                                 }
                                 Intent intent = new Intent(MainActivity.this, LocationService.class);
                                 intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-                                intent.putExtra("timeBetweenUpdate", AppSettings.getTimeBetweenAutoGps());
+                                intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
                                 MainActivity.this.startService(intent);
                             }
                         });
                     } else {
-                        AppSettings.setTravelling(false);
+                        sharedPrefManager.saveBool("Travelling", false);
+                        sharedPrefManager.saveString("CurrentTravel", null);
                     }
                 });
                 File folder = new File(getCacheDir(), "/export/");

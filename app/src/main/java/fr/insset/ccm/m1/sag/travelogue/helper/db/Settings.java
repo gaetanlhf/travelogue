@@ -1,5 +1,7 @@
 package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
+import android.content.Context;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -8,13 +10,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
-import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 
 public class Settings {
 
     private final String id;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private SharedPrefManager sharedPrefManager;
+
 
     public Settings(String id) {
         this.id = id;
@@ -49,7 +53,7 @@ public class Settings {
                 });
     }
 
-    public void setAutoGps(Boolean value) {
+    public void setAutoGps(Context context, Boolean value) {
         Map<String, Object> updateSettings = new HashMap<>();
         updateSettings.put("enableAutoGetPoint", value);
 
@@ -57,10 +61,11 @@ public class Settings {
                 .document("settings")
                 .set(updateSettings, SetOptions.merge());
 
-        AppSettings.setAutoGps(value);
+        sharedPrefManager = SharedPrefManager.getInstance(context);
+        sharedPrefManager.updateBool("AutoGps", value);
     }
 
-    public void setTimeBetweenAutoGps(Long value) {
+    public void setTimeBetweenAutoGps(Context context, Long value) {
         Map<String, Object> updateSettings = new HashMap<>();
         updateSettings.put("timeBetweenAutoGetPoint", value);
 
@@ -68,7 +73,8 @@ public class Settings {
                 .document("settings")
                 .set(updateSettings, SetOptions.merge());
 
-        AppSettings.setTimeBetweenAutoGps(value);
+        sharedPrefManager = SharedPrefManager.getInstance(context);
+        sharedPrefManager.updateLong("TimeBetweenAutoGps", value);
     }
 
     public interface Callback {

@@ -22,21 +22,24 @@ import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
-import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.MaterialEditTextPreference;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     private FirebaseAuth mAuth;
+    private SharedPrefManager sharedPrefManager;
+
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         mAuth = FirebaseAuth.getInstance();
         Settings settings = new Settings(mAuth.getCurrentUser().getUid());
+        sharedPrefManager = SharedPrefManager.getInstance(requireActivity());
         new Thread(() -> {
             NetworkConnectivityCheck.checkConnection(requireContext());
         }).start();
@@ -56,21 +59,21 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         switchAutoGps.setTitle("Enable auto getting GPS point");
         switchAutoGps.setWidgetLayoutResource(R.layout.preference_widget_material_switch);
         switchAutoGps.setKey("switch_enable_auto_gps");
-        switchAutoGps.setChecked(AppSettings.getAutoGps());
+        switchAutoGps.setChecked(sharedPrefManager.getBool("AutoGps"));
         switchAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
-            settings.setAutoGps(Boolean.parseBoolean(newValue.toString()));
+            settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
             if (LocationService.isServiceRunning && !Boolean.parseBoolean(newValue.toString())) {
                 Intent intent = new Intent(getContext(), LocationService.class);
                 intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
                 requireContext().startService(intent);
             }
-            if (!LocationService.isServiceRunning && AppSettings.getTravelling() && Boolean.parseBoolean(newValue.toString())) {
+            if (!LocationService.isServiceRunning && sharedPrefManager.getBool("Travelling") && Boolean.parseBoolean(newValue.toString())) {
                 if (!PermissionsHelper.hasPermission(requireContext(), Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
                     PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
                 }
                 Intent intent = new Intent(requireContext(), LocationService.class);
                 intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-                intent.putExtra("timeBetweenUpdate", AppSettings.getTimeBetweenAutoGps());
+                intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
                 requireContext().startService(intent);
             }
             return true;
@@ -82,11 +85,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         timeBetweenAutoGps.setDialogTitle("Time between each");
         timeBetweenAutoGps.setOnBindEditTextListener(editText -> editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED));
         timeBetweenAutoGps.setKey("edittext_time_between_auto");
-        timeBetweenAutoGps.setText(AppSettings.getTimeBetweenAutoGps().toString());
+        timeBetweenAutoGps.setText(String.valueOf(sharedPrefManager.getLong("TimeBetweenAutoGps")));
         timeBetweenAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
-            if (newValue != AppSettings.getTimeBetweenAutoGps()) {
-                settings.setTimeBetweenAutoGps(Long.parseLong(newValue.toString()));
-                AppSettings.setTimeBetweenAutoGps(Long.parseLong(newValue.toString()));
+            if (!newValue.toString().equals(String.valueOf(sharedPrefManager.getLong("TimeBetweenAutoGps")))) {
+                settings.setTimeBetweenAutoGps(requireContext(), Long.parseLong(newValue.toString()));
+                sharedPrefManager.updateLong("TimeBetweenAutoGps", Long.parseLong(newValue.toString()));
                 Intent intentStop = new Intent(getContext(), LocationService.class);
                 intentStop.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
                 requireContext().startService(intentStop);
@@ -95,7 +98,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 }
                 Intent intentStart = new Intent(requireContext(), LocationService.class);
                 intentStart.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-                intentStart.putExtra("timeBetweenUpdate", AppSettings.getTimeBetweenAutoGps());
+                intentStart.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
                 requireContext().startService(intentStart);
             }
             return true;

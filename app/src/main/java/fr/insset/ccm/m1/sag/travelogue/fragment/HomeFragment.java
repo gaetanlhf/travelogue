@@ -1,17 +1,5 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
-import static androidx.core.content.ContextCompat.registerReceiver;
-
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_COARSE_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_FINE_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.BACKGROUND_LOCATION_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.FOREGROUND_SERVICE_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.LOCATION_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.PERMISSION_SETTINGS_CODE;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -67,11 +55,10 @@ import fr.insset.ccm.m1.sag.travelogue.activity.NewTravelActivity;
 import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
-import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
-import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
@@ -97,6 +84,8 @@ public class HomeFragment extends Fragment implements
     };
     private View noCurrentTravel;
 
+    private SharedPrefManager sharedPrefManager;
+
     public HomeFragment() {
     }
 
@@ -115,6 +104,7 @@ public class HomeFragment extends Fragment implements
         setHasOptionsMenu(false);
         spinner = view.findViewById(R.id.fragment_home_spinner);
         spinner.setVisibility(View.VISIBLE);
+        sharedPrefManager = SharedPrefManager.getInstance(requireActivity());
         new Thread(() -> {
             NetworkConnectivityCheck.checkConnection(requireContext());
         }).start();
@@ -127,14 +117,14 @@ public class HomeFragment extends Fragment implements
         map.setVisibility(View.GONE);
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fragment_home_map);
         requireActivity().registerReceiver(updateReceiver, new IntentFilter("updateHomeFragment"));
-        Log.d("test", String.valueOf(AppSettings.getTravelling()));
-        if (AppSettings.getTravelling()) {
+        Log.d("test", String.valueOf(sharedPrefManager.getBool("Travelling")));
+        if (sharedPrefManager.getBool("Travelling")) {
             travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
             travelHelper.getTravel(data -> {
                 travel = data.get();
                 assert mapFragment != null;
                 mapFragment.getMapAsync(this);
-            }, AppSettings.getTravel());
+            }, sharedPrefManager.getString("CurrentTravel"));
             spinner.setVisibility(View.GONE);
             map.setVisibility(View.VISIBLE);
             setHasOptionsMenu(true);
@@ -238,7 +228,7 @@ public class HomeFragment extends Fragment implements
                                                 GpsPoint gpsPoint = new GpsPoint(0, 0);
                                                 gpsPoint.setLongitude(longitude);
                                                 gpsPoint.setLatitude(latitude);
-                                                locationDb.addPoint(gpsPoint, AppSettings.getTravel());
+                                                locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
                                                 spinner.setVisibility(View.GONE);
                                                 mapFragment.getMapAsync(this);
 
@@ -259,10 +249,10 @@ public class HomeFragment extends Fragment implements
                 return true;
             case R.id.topbar_home_fragment_stop:
                 stopLocationService();
-                state.setTravelling(false);
+                state.setTravelling(requireContext(), false);
                 travelHelper.finishTravel(travel.getID());
-                AppSettings.setTravelling(false);
-                AppSettings.setTravel(null);
+                sharedPrefManager.updateBool("Travelling", false);
+                sharedPrefManager.updateString("CurrentTravel", null);
                 setHasOptionsMenu(false);
                 map.setVisibility(View.GONE);
                 noCurrentTravel.setVisibility(View.VISIBLE);

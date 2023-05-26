@@ -26,7 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
-import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 
@@ -35,6 +35,8 @@ public class LocationService extends Service {
     public static boolean isServiceRunning = false;
     private final GpsPoint gpsPoint = new GpsPoint(0, 0, "0");
     private FirebaseAuth mAuth;
+    private SharedPrefManager sharedPrefManager;
+
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -46,7 +48,8 @@ public class LocationService extends Service {
             gpsPoint.setLatitude(latitude);
             Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
             Location location = new Location(mAuth.getCurrentUser().getUid());
-            location.addPoint(gpsPoint, AppSettings.getTravel());
+            sharedPrefManager = SharedPrefManager.getInstance(getApplicationContext());
+            location.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
         }
     };
 

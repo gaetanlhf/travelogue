@@ -1,5 +1,6 @@
 package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -16,10 +17,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 
 public class State {
     private final String id;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private SharedPrefManager sharedPrefManager;
 
     public State(String id) {
         this.id = id;
@@ -53,7 +56,7 @@ public class State {
                 });
     }
 
-    public void setTravelling(Boolean value) {
+    public void setTravelling(Context context, Boolean value) {
         Map<String, Object> updateState = new HashMap<>();
         updateState.put("isTravelling", value);
         if (!value) {
@@ -64,7 +67,8 @@ public class State {
                 .document("state")
                 .set(updateState, SetOptions.merge());
 
-        AppSettings.setTravelling(value);
+        sharedPrefManager = SharedPrefManager.getInstance(context);
+        sharedPrefManager.updateBool("Travelling", value);
     }
 
     public interface Callback {

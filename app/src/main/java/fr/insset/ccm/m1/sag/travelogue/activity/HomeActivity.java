@@ -78,6 +78,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         if (getFragmentRefreshListener() != null) {
             getFragmentRefreshListener().onRefresh();
         }
+        PermissionHelper.verifyPermissions(this);
     }
 
     @Override
