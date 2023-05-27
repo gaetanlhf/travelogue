@@ -43,20 +43,6 @@ public class LoginActivity extends AppCompatActivity {
         if (currentUser != null) {
             finish();
         }
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(this);
-        }).start();
-        networkCheckThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Thread.sleep(5000);
-                    NetworkConnectivityCheck.checkConnection(this);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        networkCheckThread.start();
     }
 
     @Override

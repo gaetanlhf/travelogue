@@ -74,7 +74,7 @@ public class TravelHelper {
                         AtomicReferenceArray<GpsPoint> points = new AtomicReferenceArray<>(task.getResult().size());
 
                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                            points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString()), documentSnapshot.getId()));
+                                points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString()), documentSnapshot.getData().get("linkedDataType").toString(), documentSnapshot.getData().get("linkedData").toString()));
                             i++;
                             //Log.d("POINTS", documentSnapshot.getId() + " => " + documentSnapshot.getData().get("latitude"));
                         }

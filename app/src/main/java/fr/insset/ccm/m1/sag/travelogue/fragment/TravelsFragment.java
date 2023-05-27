@@ -1,5 +1,6 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
+import fr.insset.ccm.m1.sag.travelogue.activity.NoConnection;
 import fr.insset.ccm.m1.sag.travelogue.adapter.TravelAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
@@ -91,9 +93,6 @@ public class TravelsFragment extends Fragment {
         tripContent.setVisibility(View.GONE);
         spinner = view.findViewById(R.id.travels_fragment_spinner);
         spinner.setVisibility(View.VISIBLE);
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(requireContext());
-        }).start();
         TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
         travelHelper.getTravels(data -> {
             if (data.length() > 0) {
@@ -103,16 +102,22 @@ public class TravelsFragment extends Fragment {
                         ids.add(String.valueOf(data.get(i).getID()));
                     }
                 }
-                travelAdapter = new TravelAdapter(requireActivity(), ids, titles);
+                if (titles.size() == 0) {
+                    spinner.setVisibility(View.GONE);
+                    noTripContent.setVisibility(View.VISIBLE);
+                    setHasOptionsMenu(false);
+                } else {
+                    travelAdapter = new TravelAdapter(requireActivity(), ids, titles);
+                    RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireActivity());
+                    recyclerView.setLayoutManager(layoutManager);
+                    recyclerView.setAdapter(travelAdapter);
+                    recyclerView.addItemDecoration(new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL));
+                    spinner.setVisibility(View.GONE);
+                    tripContent.setVisibility(View.VISIBLE);
+                    setHasOptionsMenu(true);
+                }
 
-                RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireActivity());
-                recyclerView.setLayoutManager(layoutManager);
-                recyclerView.setAdapter(travelAdapter);
-                recyclerView.addItemDecoration(new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL));
-                spinner.setVisibility(View.GONE);
-                tripContent.setVisibility(View.VISIBLE);
-                setHasOptionsMenu(true);
             } else {
                 spinner.setVisibility(View.GONE);
                 noTripContent.setVisibility(View.VISIBLE);

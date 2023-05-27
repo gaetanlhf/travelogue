@@ -1,5 +1,6 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,8 +21,15 @@ public class NoConnection extends AppCompatActivity {
         networkCheckThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
+                    NetworkConnectivityCheck.checkConnection(isConnected -> {
+                        if (isConnected.get()) {
+                            Intent intent = new Intent(this, MainActivity.class);
+                            overridePendingTransition(0, 0);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
                     Thread.sleep(1000);
-                    NetworkConnectivityCheck.checkConnection(this);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

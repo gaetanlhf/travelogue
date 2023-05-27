@@ -56,7 +56,7 @@ public class PermissionHelper {
     public static void showAlertAndOpenAppSettings(Activity activity) {
         new MaterialAlertDialogBuilder(activity)
                 .setTitle("Background Location Permission Needed")
-                .setMessage("This app requires the Background Location permission to do its job. Please grant this permission in app settings.")
+                .setMessage("This app requires the Background Location permission to do its job. Please grant this permission in app settings by selecting 'Allow all the time'.")
                 .setPositiveButton("Open Settings", (dialog, which) -> {
                     Intent intent = new Intent();
                     intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);

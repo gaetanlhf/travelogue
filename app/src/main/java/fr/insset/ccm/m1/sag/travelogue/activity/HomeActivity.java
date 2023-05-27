@@ -13,6 +13,7 @@ import static fr.insset.ccm.m1.sag.travelogue.Constants.PERMISSION_SETTINGS_CODE
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -47,22 +48,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         super.onCreate(savedInstanceState);
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(this);
-        }).start();
-        networkCheckThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Thread.sleep(5000);
-                    NetworkConnectivityCheck.checkConnection(this);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        networkCheckThread.start();
-
-
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_home);
         PermissionHelper.verifyPermissions(this);
@@ -135,13 +120,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         this.fragmentRefreshListener = fragmentRefreshListener;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (networkCheckThread != null) {
-            networkCheckThread.interrupt();
-        }
-    }
+
 
     public interface FragmentRefreshListener {
         void onRefresh();

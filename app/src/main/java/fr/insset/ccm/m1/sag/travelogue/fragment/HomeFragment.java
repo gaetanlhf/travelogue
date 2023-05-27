@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -52,6 +54,7 @@ import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.NewTravelActivity;
+import fr.insset.ccm.m1.sag.travelogue.activity.NoConnection;
 import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
@@ -74,6 +77,7 @@ public class HomeFragment extends Fragment implements
     private View map;
     private State state;
     private Location locationDb;
+    private EditText textField;
     private SupportMapFragment mapFragment;
     private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
 
@@ -105,9 +109,6 @@ public class HomeFragment extends Fragment implements
         spinner = view.findViewById(R.id.fragment_home_spinner);
         spinner.setVisibility(View.VISIBLE);
         sharedPrefManager = SharedPrefManager.getInstance(requireActivity());
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(requireContext());
-        }).start();
         state = new State(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
         locationDb = new Location(mAuth.getCurrentUser().getUid());
         Button newTravelBtn = view.findViewById(R.id.home_fragment_start_new_travel_btn);
@@ -225,9 +226,11 @@ public class HomeFragment extends Fragment implements
                                                 spinner.setVisibility(View.VISIBLE);
                                                 double latitude = location.getLatitude();
                                                 double longitude = location.getLongitude();
-                                                GpsPoint gpsPoint = new GpsPoint(0, 0);
+                                                GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
                                                 gpsPoint.setLongitude(longitude);
                                                 gpsPoint.setLatitude(latitude);
+                                                gpsPoint.setLinkedDataType("none");
+                                                gpsPoint.setLinkedData("none");
                                                 locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
                                                 spinner.setVisibility(View.GONE);
                                                 mapFragment.getMapAsync(this);
@@ -239,8 +242,9 @@ public class HomeFragment extends Fragment implements
                                             e.printStackTrace();
                                         });
 
-                            } else if (which == 1) {
-
+                            } else if (which == 2) {
+                                dialog.dismiss();
+                                addTextPoint();
                             }
                             dialog.dismiss();
                         })
@@ -290,24 +294,38 @@ public class HomeFragment extends Fragment implements
                     LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
                     listLatLng.add(position);
                     pointsList.add(data.get(i));
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(position)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    if (Objects.equals(data.get(i).getLinkedDataType(), "none")) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(position)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    } else if (Objects.equals(data.get(i).getLinkedDataType(), "text")) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(position)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                        int finalI = i;
+                        googleMap.setOnMarkerClickListener(marker -> {
+                            MaterialAlertDialogBuilder textDialog = new MaterialAlertDialogBuilder(requireContext());
+                            textDialog.setTitle("Text point");
+                            textDialog.setMessage(data.get(finalI).getLinkedData());
+                            textDialog.setNeutralButton(android.R.string.ok, null);
+                            textDialog.show();
+                            marker.hideInfoWindow();
+                            return false;
+                        });
+                    } else if (Objects.equals(data.get(i).getLinkedDataType(), "photo")) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(position)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                    }
+
                 }
-                googleMap.setInfoWindowAdapter(new CustomInfoWindowMarkerAdapter(requireActivity().getApplicationContext()));
-                googleMap.setOnMarkerClickListener(marker -> {
-                    Toast.makeText(requireContext().getApplicationContext(), "Click on marker " + marker.getPosition(), Toast.LENGTH_SHORT).show();
-                    marker.setTitle("Test");
-                    marker.showInfoWindow();
-                    return false;
-                });
+
 
                 polyline.setPoints(listLatLng);
 
                 stylePolyline(polyline);
 
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
-                Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
             }
 
 
@@ -323,6 +341,53 @@ public class HomeFragment extends Fragment implements
         polyline.setColor(SurfaceColors.SURFACE_2.getColor(requireContext()));
         polyline.setJointType(JointType.ROUND);
         polyline.setWidth(20);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void addTextPoint() {
+        FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
+        locationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    // GPS location can be null if GPS is switched off
+                    if (location != null) {
+                        spinner.setVisibility(View.VISIBLE);
+                        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+
+
+                        textField = new EditText(requireContext());
+
+                        builder.setView(textField)
+                                .setTitle("Add a text point")
+                                .setMessage("Enter your text:")
+                                .setPositiveButton("OK", (dialog, which) -> {
+                                    String enteredText = textField.getText().toString();
+                                    double latitude = location.getLatitude();
+                                    double longitude = location.getLongitude();
+                                    GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
+                                    gpsPoint.setLongitude(longitude);
+                                    gpsPoint.setLatitude(latitude);
+                                    gpsPoint.setLinkedDataType("text");
+                                    gpsPoint.setLinkedData(enteredText);
+                                    locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+                                    spinner.setVisibility(View.GONE);
+                                    mapFragment.getMapAsync(this);
+                                })
+                                .setNegativeButton("Cancel", (dialog, which) -> {
+                                    spinner.setVisibility(View.GONE);
+                                });
+
+                        builder.show();
+
+
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                    e.printStackTrace();
+                });
+
+
     }
 
     @Override

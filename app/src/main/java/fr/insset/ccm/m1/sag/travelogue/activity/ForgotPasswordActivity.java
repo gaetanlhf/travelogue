@@ -1,5 +1,6 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -35,20 +36,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         spinner = findViewById(R.id.forgot_password_activity_spinner);
         spinner.setVisibility(View.GONE);
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(this);
-        }).start();
-        networkCheckThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Thread.sleep(5000);
-                    NetworkConnectivityCheck.checkConnection(this);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        networkCheckThread.start();
     }
 
     @Override

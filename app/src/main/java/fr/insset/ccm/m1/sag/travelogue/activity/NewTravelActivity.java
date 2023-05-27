@@ -50,21 +50,7 @@ public class NewTravelActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(this);
-        }).start();
         sharedPrefManager = SharedPrefManager.getInstance(this);
-        networkCheckThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Thread.sleep(5000);
-                    NetworkConnectivityCheck.checkConnection(this);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        networkCheckThread.start();
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getResources().getString(R.string.create_new_travel));

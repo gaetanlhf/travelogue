@@ -62,20 +62,6 @@ public class TravelActivity extends AppCompatActivity implements
         travel = new Travel(intent.getStringExtra("travelName"));
 
         super.onCreate(savedInstanceState);
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(this);
-        }).start();
-        networkCheckThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Thread.sleep(5000);
-                    NetworkConnectivityCheck.checkConnection(this);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        networkCheckThread.start();
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         setContentView(R.layout.activity_travel);
         mAuth = FirebaseAuth.getInstance();

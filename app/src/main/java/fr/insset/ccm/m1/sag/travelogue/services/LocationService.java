@@ -46,7 +46,8 @@ public class LocationService extends Service {
             double longitude = locationResult.getLastLocation().getLongitude();
             gpsPoint.setLongitude(longitude);
             gpsPoint.setLatitude(latitude);
-            Log.d("LOCATION_UPDATE", latitude + " , " + longitude);
+            gpsPoint.setLinkedDataType("none");
+            gpsPoint.setLinkedData("none");
             Location location = new Location(mAuth.getCurrentUser().getUid());
             sharedPrefManager = SharedPrefManager.getInstance(getApplicationContext());
             location.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));

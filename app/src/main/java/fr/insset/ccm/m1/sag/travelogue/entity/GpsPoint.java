@@ -7,6 +7,25 @@ import com.google.gson.Gson;
 public class GpsPoint {
     private double longitude;
     private double latitude;
+
+    public String getLinkedData() {
+        return linkedData;
+    }
+
+    public void setLinkedData(String linkedData) {
+        this.linkedData = linkedData;
+    }
+
+    public String getLinkedDataType() {
+        return linkedDataType;
+    }
+
+    public void setLinkedDataType(String linkedDataType) {
+        this.linkedDataType = linkedDataType;
+    }
+
+    private String linkedData;
+    private String linkedDataType;
     private String timestamp;
 
 
@@ -24,6 +43,21 @@ public class GpsPoint {
     public GpsPoint(double longitude, double latitude) {
         this.longitude = longitude;
         this.latitude = latitude;
+    }
+
+    public GpsPoint(double longitude, double latitude, String linkedDataType, String linkedData) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.linkedData = linkedData;
+        this.linkedDataType = linkedDataType;
+    }
+
+    public GpsPoint(double longitude, double latitude, String linkedDataType, String linkedData, String timestamp) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.linkedData = linkedData;
+        this.linkedDataType = linkedDataType;
+        this.timestamp = timestamp;
     }
 
     public double getLongitude() {

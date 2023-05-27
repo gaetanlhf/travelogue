@@ -22,6 +22,7 @@ import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
+import fr.insset.ccm.m1.sag.travelogue.activity.NoConnection;
 import fr.insset.ccm.m1.sag.travelogue.helper.MaterialEditTextPreference;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
@@ -40,9 +41,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         mAuth = FirebaseAuth.getInstance();
         Settings settings = new Settings(mAuth.getCurrentUser().getUid());
         sharedPrefManager = SharedPrefManager.getInstance(requireActivity());
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(requireContext());
-        }).start();
         ((HomeActivity) requireActivity()).setFragmentRefreshListener(() -> {
             FragmentTransaction tr = getParentFragmentManager().beginTransaction();
             tr.replace(R.id.home_activity_relative_layout, new SettingsFragment());

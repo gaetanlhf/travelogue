@@ -1,5 +1,6 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -37,20 +38,6 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         spinner = findViewById(R.id.sign_up_activity_spinner);
         spinner.setVisibility(View.GONE);
-        new Thread(() -> {
-            NetworkConnectivityCheck.checkConnection(this);
-        }).start();
-        networkCheckThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Thread.sleep(5000);
-                    NetworkConnectivityCheck.checkConnection(this);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        networkCheckThread.start();
     }
 
     @Override
