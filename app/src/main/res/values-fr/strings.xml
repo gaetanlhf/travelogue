@@ -85,4 +85,5 @@
     <string name="unable_to_sign_in_with_google_error_text">Impossible de se connecter avec Google</string>
     <string name="successful_sign_in_with_google">Connexion réussie</string>
     <string name="error_getting_last_gps_point">Erreur lors de l\'enregistrement du denier point gps</string>
+    <string name="take_picture">Prendre une photo</string>
 </resources>
