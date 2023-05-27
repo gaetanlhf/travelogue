@@ -16,7 +16,10 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreferenceCompat;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.concurrent.Executor;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
@@ -33,6 +36,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     private FirebaseAuth mAuth;
     private SharedPrefManager sharedPrefManager;
+
+    private GoogleSignInClient mGoogleSignInClient;
 
 
     @Override
@@ -113,10 +118,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         logOut.setTitle("Logout");
         logOut.setSummary("Click here to log out from your account");
         logOut.setOnPreferenceClickListener(preference -> {
-            mAuth.signOut();
-            requireActivity().finish();
-            Intent mainActivity = new Intent(getActivity(), MainActivity.class);
-            startActivity(mainActivity);
+            mGoogleSignInClient.signOut()
+                .addOnCompleteListener(requireActivity(), task -> {
+//                    mAuth.signOut();
+                    requireActivity().finish();
+                    Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+                    startActivity(mainActivity);
+                });
             return true;
         });
         screen.addPreference(logOut);
