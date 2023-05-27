@@ -78,4 +78,8 @@
     <string name="sign_in_with_google_button_text">Se connecter avec Google</string>
     <string name="sign_up_with_google_button_text">S\'inscrire avec Google</string>
     <string name="time_between_each_gps_point_save">Temps entre deux sauvegarde de points gps (en secondes)</string>
+    <string name="travel_information_icon_title">Information</string>
+    <string name="travel_share_icon_title">Partager</string>
+    <string name="travel_add_icon_title">Ajouter</string>
+    <string name="travel_stop_icon_title">Terminer</string>
 </resources>

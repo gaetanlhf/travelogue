@@ -84,4 +84,8 @@
     <string name="sign_up_with_google_button_text">Sign up with Google</string>
     <string name="server_client_id" translatable="false">251810910551-pdrila58l9hncv6asvl9n2p182eehgka.apps.googleusercontent.com</string>
     <string name="time_between_each_gps_point_save">Time between two gps point save (in seconds)</string>
+    <string name="travel_information_icon_title">Information</string>
+    <string name="travel_share_icon_title">Share</string>
+    <string name="travel_add_icon_title">Add</string>
+    <string name="travel_stop_icon_title">Stop</string>
 </resources>
