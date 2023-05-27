@@ -54,7 +54,7 @@
     <string name="sign_up_activity_text_view_2">pour créer votre compte Travelogue</string>
     <string name="welcome_activity_next_button">Suivant</string>
     <string name="welcome_activity_skip_button">Passer</string>
-    <string name="travels_fragment_text_view_1">C\'est complément vide...</string>
+    <string name="travels_fragment_text_view_1">C\'est complément vide…</string>
     <string name="travels_fragment_text_view_2">Vous retrouverez vos précédents voyages ici</string>
     <string name="welcome_slide_1_text_view_1">Bienvenue à Travelogue</string>
     <string name="welcome_slide_1_text_view_2">votre nouvelle façon de garder une trace de vos voyages</string>

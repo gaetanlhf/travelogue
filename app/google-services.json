@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "251810910551-ct5aqs0s4q2k1bpgtqei8j43hs3r4s7i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.insset.ccm.m1.sag.travelogue",
+            "certificate_hash": "867a73155cbf3d79d578518dd37c1579dde6e2aa"
+          }
+        },
+        {
+          "client_id": "251810910551-fvng2dftje7gbsjo0ufrneco3rjo1fjk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.insset.ccm.m1.sag.travelogue",
+            "certificate_hash": "593ec10aea6ef2d7e7c436ef9c5cf0bd6e6509d4"
+          }
+        },
+        {
           "client_id": "251810910551-olfi8trnuturvi3t2ug4qkdeg0ovad7d.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

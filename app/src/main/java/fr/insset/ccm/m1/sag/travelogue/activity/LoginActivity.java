@@ -45,8 +45,6 @@ import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private TextView email;
-    private TextView password;
     private ProgressBar spinner;
     private Thread networkCheckThread;
 
@@ -146,44 +144,6 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_create_account) {
-            Intent signUpActivity = new Intent(this, SignUpActivity.class);
-            startActivity(signUpActivity);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void onClickLogin(View view) {
-        email = findViewById(R.id.login_activity_edittext_email);
-        password = findViewById(R.id.login_activity_edittext_password);
-        if (!TextUtils.isEmpty(email.getText().toString()) && !TextUtils.isEmpty(password.getText().toString())) {
-            spinner.setVisibility(View.VISIBLE);
-            mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.log_in_success_toast),
-                                    Toast.LENGTH_SHORT).show();
-                            Intent mainActivity = new Intent(this, MainActivity.class);
-                            startActivity(mainActivity);
-                            finish();
-                        } else {
-                            spinner.setVisibility(View.GONE);
-                            Toast.makeText(LoginActivity.this, getResources().getString(R.string.log_in_fail_toast),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-    }
-
-    public void onClickForgotPassword(View view) {
-        Intent forgotPasswordActivity = new Intent(this, ForgotPasswordActivity.class);
-        startActivity(forgotPasswordActivity);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -228,7 +188,7 @@ public class LoginActivity extends AppCompatActivity {
                     FirebaseUser user = mAuth.getCurrentUser();
                     if(user != null) {
                         // When task is successful redirect to profile activity display Toast
-                        startActivity(new Intent(LoginActivity.this, HomeActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                         displayToast("Firebase authentication successful");
                         finish();
                     }

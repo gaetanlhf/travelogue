@@ -59,7 +59,7 @@
     <string name="sign_up_activity_text_view_2">to create your Travelogue account</string>
     <string name="welcome_activity_next_button">Next</string>
     <string name="welcome_activity_skip_button">Skip</string>
-    <string name="travels_fragment_text_view_1">It is completely empty...</string>
+    <string name="travels_fragment_text_view_1">It is completely empty…</string>
     <string name="travels_fragment_text_view_2">You will find your previous completed travels here</string>
     <string name="welcome_slide_1_text_view_1">Welcome to Travelogue</string>
     <string name="welcome_slide_1_text_view_2">your new way to keep track of your travels</string>
