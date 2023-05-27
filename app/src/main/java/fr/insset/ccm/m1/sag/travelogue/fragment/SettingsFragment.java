@@ -118,13 +118,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         logOut.setTitle("Logout");
         logOut.setSummary("Click here to log out from your account");
         logOut.setOnPreferenceClickListener(preference -> {
-            mGoogleSignInClient.signOut()
-                .addOnCompleteListener(requireActivity(), task -> {
-//                    mAuth.signOut();
-                    requireActivity().finish();
-                    Intent mainActivity = new Intent(getActivity(), MainActivity.class);
-                    startActivity(mainActivity);
-                });
+            mAuth.signOut();
+            requireActivity().finish();
+            Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+            startActivity(mainActivity);
+//            mGoogleSignInClient.signOut()
+//                .addOnCompleteListener(requireActivity(), task -> {
+////                    mAuth.signOut();
+//                    requireActivity().finish();
+//                    Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+//                    startActivity(mainActivity);
+//                });
             return true;
         });
         screen.addPreference(logOut);

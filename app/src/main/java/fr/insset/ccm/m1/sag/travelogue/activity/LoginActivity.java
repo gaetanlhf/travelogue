@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -96,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
                 .requestScopes(
                         new Scope(writingPhotoScope),
                         new Scope(readingOnlyPhotosCreatedPhotoByTravelogueScope),
-                        new Scope(sharingPhotoScope))
+                        new Scope(editingOnlyPhotosCreatedPhotoByTravelogueScope))
                 .requestServerAuthCode(server_client_id)
                 .requestEmail()
                 .build();
@@ -209,7 +210,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             this.authCode = account.getServerAuthCode();
-            displayToast("Google sign in successful");
+            displayToast("Google sign is successful");
 
             // When sign in account is not equal to null initialize auth credential
             AuthCredential authCredential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
@@ -246,13 +247,16 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signInWithGoogle(){
-        displayToast("Click on sign in button");
+//        displayToast("Click on sign in button");
 
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         activityResultLaunch.launch(signInIntent);
     }
 
     public void onClickSignInWithGoogle(View view){
+        displayToast("Click on sign in button");
         this.signInWithGoogle();
+
+//        Log.d("Tag_click", "Click on sign in button");
     }
 }

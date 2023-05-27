@@ -83,5 +83,6 @@
     <string name="no_connection_activity_textview_2">Travelogue is a cloud application and requires an internet connection. Don\'t worry, we will reconnect you when the connection is restored</string>
     <string name="require_location_permission">Please grant permission to access the location</string>
     <string name="sign_in_with_google_button_text">Sign in with Google</string>
+    <string name="sign_up_with_google_button_text">Sign up with Google</string>
     <string name="server_client_id" translatable="false">251810910551-pdrila58l9hncv6asvl9n2p182eehgka.apps.googleusercontent.com</string>
 </resources>

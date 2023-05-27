@@ -69,4 +69,5 @@
     <string name="no_connection_activity_textview_1">Pas de connexion Internet</string>
     <string name="no_connection_activity_textview_2">Travelogue est une application en nuage et nécessite une connexion internet. Ne vous inquiétez pas, nous vous reconnecterons dès que la connexion sera rétablie</string>
     <string name="sign_in_with_google_button_text">Se connecter avec Google</string>
+    <string name="sign_up_with_google_button_text">S\'inscrire avec Google</string>
 </resources>
