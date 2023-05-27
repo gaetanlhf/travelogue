@@ -14,7 +14,6 @@
     <string name="log_in_fail_toast">Log in failed</string>
     <string name="sign_up_fail_toast">Account creation failed</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="home_text">In progress</string>
     <string name="travels_text">Previous travels</string>
     <string name="settings_text">Settings</string>
