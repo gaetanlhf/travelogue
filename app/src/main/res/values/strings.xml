@@ -88,4 +88,7 @@
     <string name="travel_share_icon_title">Share</string>
     <string name="travel_add_icon_title">Add</string>
     <string name="travel_stop_icon_title">Stop</string>
+    <string name="unable_to_sign_in_with_google_error_text">Unable to sign in with Google</string>
+    <string name="successful_sign_in_with_google">Successfully signed in</string>
+    <string name="error_getting_last_gps_point">Error trying to get last GPS location</string>
 </resources>

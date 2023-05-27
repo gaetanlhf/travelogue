@@ -5,18 +5,24 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CaptureRequest;
+import android.media.ImageReader;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -43,28 +49,32 @@ import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.NewTravelActivity;
-import fr.insset.ccm.m1.sag.travelogue.activity.NoConnection;
-import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
-import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.Users;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 public class HomeFragment extends Fragment implements
@@ -89,6 +99,8 @@ public class HomeFragment extends Fragment implements
     private View noCurrentTravel;
 
     private SharedPrefManager sharedPrefManager;
+
+    private Users users = new Users();
 
     public HomeFragment() {
     }
@@ -242,6 +254,9 @@ public class HomeFragment extends Fragment implements
                                             e.printStackTrace();
                                         });
 
+                            } else if (which == 1) {
+                                dialog.dismiss();
+                                addImagePoint();
                             } else if (which == 2) {
                                 dialog.dismiss();
                                 addTextPoint();
@@ -385,10 +400,87 @@ public class HomeFragment extends Fragment implements
                 .addOnFailureListener(e -> {
                     Log.d("MapDemoActivity", "Error trying to get last GPS location");
                     e.printStackTrace();
+                    SharedMethods.displayToast(requireActivity(), getString(R.string.error_getting_last_gps_point));
                 });
-
-
     }
+
+    @SuppressLint("MissingPermission")
+    private void addImagePoint() {
+        FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        locationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    // GPS location can be null if GPS is switched off
+                    if (location != null) {
+                        spinner.setVisibility(View.VISIBLE);
+
+                        SharedMethods.displayToast(requireActivity(), "Take photo");
+                        String mediaItemId;
+
+//                        Surface surfaceView = findViewById<SurfaceView>(R.);
+//                        ImageReader imageReader = ImageReader.newInstance(...);
+//
+//                        // Remember to call this only *after* SurfaceHolder.Callback.surfaceCreated()
+//                        Surface previewSurface = surfaceView.getHolder().getSurface();
+
+//                        CameraCaptureSession session = CameraCaptureSession.StateCallback;  // from CameraCaptureSession.StateCallback
+//                        CaptureRequest.Builder captureRequest =
+//                                session.getDevice().createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+//                        captureRequest.addTarget(previewSurface);
+
+
+
+//                        double latitude = location.getLatitude();
+//                        double longitude = location.getLongitude();
+//                        GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
+//                        gpsPoint.setLongitude(longitude);
+//                        gpsPoint.setLatitude(latitude);
+//                        // linkedDataType = photo et linkedData
+//                        gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
+//                        gpsPoint.setLinkedData("the media item's id");
+//                        locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+
+                        spinner.setVisibility(View.GONE);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                    e.printStackTrace();
+                    SharedMethods.displayToast(requireActivity(), getString(R.string.error_getting_last_gps_point));
+                });
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private Map<String, List<Object>> createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File storageDir = requireActivity().getFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".png",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        String photoPath = image.getAbsolutePath();
+        List<Object> imageData = new ArrayList<>();
+        imageData.add(photoPath);
+        imageData.add(image);
+
+        Map<String, List<Object>> map = new HashMap<>();
+        map.put(Constants.GPS_POINT_IMAGE_LINKED_TYPE, imageData);
+        return map;
+    }
+
+    private void galleryAddPic(String currentPhotoPath) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        requireActivity().sendBroadcast(mediaScanIntent);
+    }
+
 
     @Override
     public void onResume() {

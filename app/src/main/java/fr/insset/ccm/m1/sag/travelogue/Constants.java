@@ -13,4 +13,6 @@ public class Constants {
     public static final String ACCESS_FINE_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_FINE_LOCATION;
     public static final String ACCESS_BACKGROUND_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_BACKGROUND_LOCATION;
     public static final String FOREGROUND_SERVICE_PERMISSION = android.Manifest.permission.FOREGROUND_SERVICE;
+    public static final String GPS_POINT_TEXT_LINKED_TYPE = "text";
+    public static final String GPS_POINT_IMAGE_LINKED_TYPE = "photo";
 }

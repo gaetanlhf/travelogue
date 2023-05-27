@@ -1,18 +1,13 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -40,13 +35,13 @@ import java.io.InputStreamReader;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.Users;
 
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private ProgressBar spinner;
-    private Thread networkCheckThread;
 
     private SignInButton signInButton;
     private GoogleSignInClient mGoogleSignInClient;
@@ -54,21 +49,21 @@ public class LoginActivity extends AppCompatActivity {
     private String authCode;
 
     private final ActivityResultLauncher<Intent> activityResultLaunch = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                    handleSignInResult(task);
-                } else {
-                    int tt = result.getResultCode();
-                    displayToast(String.valueOf(tt));
-                }
-            });
+        new ActivityResultContracts.StartActivityForResult(),
+        result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                handleSignInResult(task);
+            } else {
+                SharedMethods.displayToast(getApplicationContext(), getString(R.string.unable_to_sign_in_with_google_error_text));
+            }
+        });
 
     private static final String writingPhotoScope = "https://www.googleapis.com/auth/photoslibrary.appendonly";
     private static final String readingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata";
     private static final String editingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata";
     private static final String sharingPhotoScope = "https://www.googleapis.com/auth/photoslibrary.sharing";
+    private Users users = new Users();
 
 
     @Override
@@ -132,19 +127,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (networkCheckThread != null) {
-            networkCheckThread.interrupt();
-        }
-    }
-
-    private GoogleClientSecrets getClientSecrets() throws IOException {
-        InputStream inputStream = getResources().openRawResource(R.raw.server_client_secret);
-        return GoogleClientSecrets.load(
-                GsonFactory.getDefaultInstance(), new InputStreamReader(inputStream));
-    }
-
-    private void displayToast(String s) {
-        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
     }
 
     public void customizeGooglePlusButton(SignInButton signInButton) {
@@ -163,7 +145,6 @@ public class LoginActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             this.authCode = account.getServerAuthCode();
-            displayToast("Google sign is successful");
 
             // When sign in account is not equal to null initialize auth credential
             AuthCredential authCredential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
@@ -172,24 +153,31 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
                     if(user != null) {
+                        if(!users.getUserData(user.getEmail())) {
+                            users.addUsersData(user.getEmail(), this.authCode, false);
+                        } else {
+                            users.setAuthCode(user.getEmail(), this.authCode);
+                        }
+
                         // When task is successful redirect to profile activity display Toast
                         startActivity(new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                        displayToast("Firebase authentication successful");
+                        SharedMethods.displayToast(getApplicationContext(), getString(R.string.successful_sign_in_with_google));
                         finish();
                     }
                 } else {
                     // When task is unsuccessful display Toast
-                    displayToast("Authentication Failed :" + Objects.requireNonNull(task.getException()).getMessage());
+                    SharedMethods.displayToast(
+                            getApplicationContext(),
+                            "Authentication Failed :" + Objects.requireNonNull(task.getException()).getMessage()
+                    );
                 }
             });
-
-            // Signed in successfully, show authenticated UI.
-//            updateUI(account);
-
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
-            String s = "signInResult:failed code=" + e.getStatusCode();
-            displayToast(s);
+            SharedMethods.displayToast(
+                    getApplicationContext(),
+                    "signInResult:failed code=" + e.getStatusCode()
+            );
         }
     }
 }
