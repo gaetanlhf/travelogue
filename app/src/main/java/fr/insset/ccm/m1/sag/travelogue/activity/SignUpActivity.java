@@ -47,7 +47,7 @@ public class SignUpActivity extends AppCompatActivity {
     private ProgressBar spinner;
     private Thread networkCheckThread;
 
-    private SignInButton signInButton;
+    private SignInButton signUpGoogleButton;
     private GoogleSignInClient mGoogleSignInClient;
     private String server_client_id;
     private String authCode;
@@ -75,15 +75,12 @@ public class SignUpActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         getSupportActionBar().setTitle(R.string.sign_up_activity_title);
         setContentView(R.layout.activity_sign_up);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        mAuth = FirebaseAuth.getInstance();
-        spinner = findViewById(R.id.sign_up_activity_spinner);
-        spinner.setVisibility(View.GONE);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        signInButton = findViewById(R.id.sign_in_with_google_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setColorScheme(SignInButton.COLOR_DARK);
-        customizeGooglePlusButton(signInButton);
+        signUpGoogleButton = findViewById(R.id.sign_in_with_google_button);
+        signUpGoogleButton.setSize(SignInButton.SIZE_STANDARD);
+        signUpGoogleButton.setColorScheme(SignInButton.COLOR_DARK);
+        customizeGooglePlusButton(signUpGoogleButton);
 
         server_client_id = getString(R.string.server_client_id);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -92,11 +89,22 @@ public class SignUpActivity extends AppCompatActivity {
                         new Scope(readingOnlyPhotosCreatedPhotoByTravelogueScope),
                         new Scope(editingOnlyPhotosCreatedPhotoByTravelogueScope))
                 .requestServerAuthCode(server_client_id)
+                .requestIdToken(server_client_id)
                 .requestEmail()
                 .build();
 
-//                .requestIdToken(server_client_id)
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        signUpGoogleButton.setOnClickListener((View.OnClickListener) view -> {
+            // Initialize sign in intent
+            Intent intent = mGoogleSignInClient.getSignInIntent();
+            // Start activity for result
+            activityResultLaunch.launch(intent);
+        });
+
+        mAuth = FirebaseAuth.getInstance();
+        spinner = findViewById(R.id.sign_up_activity_spinner);
+        spinner.setVisibility(View.GONE);
 
         new Thread(() -> {
             NetworkConnectivityCheck.checkConnection(this);
@@ -209,28 +217,11 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             });
 
-            // Signed in successfully, show authenticated UI.
-//            updateUI(account);
-
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             String s = "signInResult:failed code=" + e.getStatusCode();
             displayToast(s);
         }
-    }
-
-    private void signInWithGoogle(){
-//        displayToast("Click on sign in button");
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        activityResultLaunch.launch(signInIntent);
-    }
-
-    public void onClickSignInWithGoogle(View view){
-        displayToast("Click on sign in button");
-        this.signInWithGoogle();
-
-//        Log.d("Tag_click", "Click on sign in button");
     }
 }
 

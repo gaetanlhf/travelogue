@@ -79,13 +79,6 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         getSupportActionBar().setTitle(R.string.login_activity_title);
         setContentView(R.layout.activity_login);
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        spinner = findViewById(R.id.login_activity_spinner);
-        spinner.setVisibility(View.GONE);
-        if (currentUser != null) {
-            finish();
-        }
 
         signInButton = findViewById(R.id.sign_in_with_google_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -99,11 +92,26 @@ public class LoginActivity extends AppCompatActivity {
                         new Scope(readingOnlyPhotosCreatedPhotoByTravelogueScope),
                         new Scope(editingOnlyPhotosCreatedPhotoByTravelogueScope))
                 .requestServerAuthCode(server_client_id)
+                .requestIdToken(server_client_id)
                 .requestEmail()
                 .build();
 
-//                .requestIdToken(server_client_id)
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        signInButton.setOnClickListener((View.OnClickListener) view -> {
+            // Initialize sign in intent
+            Intent intent = mGoogleSignInClient.getSignInIntent();
+            // Start activity for result
+            activityResultLaunch.launch(intent);
+        });
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        spinner = findViewById(R.id.login_activity_spinner);
+        spinner.setVisibility(View.GONE);
+        if (currentUser != null) {
+            finish();
+        }
 
         new Thread(() -> {
             NetworkConnectivityCheck.checkConnection(this);
@@ -215,12 +223,6 @@ public class LoginActivity extends AppCompatActivity {
             // When sign in account is not equal to null initialize auth credential
             AuthCredential authCredential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
             // Check credential
-
-//            SignInCredential googleCredential = GoogleAuthCredential.
-//            String idToken = googleCredential.getGoogleIdToken();
-//            String username = googleCredential.getId();
-//            String password = googleCredential.getPassword();
-
             mAuth.signInWithCredential(authCredential).addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
@@ -244,19 +246,5 @@ public class LoginActivity extends AppCompatActivity {
             String s = "signInResult:failed code=" + e.getStatusCode();
             displayToast(s);
         }
-    }
-
-    private void signInWithGoogle(){
-//        displayToast("Click on sign in button");
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        activityResultLaunch.launch(signInIntent);
-    }
-
-    public void onClickSignInWithGoogle(View view){
-        displayToast("Click on sign in button");
-        this.signInWithGoogle();
-
-//        Log.d("Tag_click", "Click on sign in button");
     }
 }

@@ -70,8 +70,7 @@
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_with_google_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onClickSignInWithGoogle" />
+        android:layout_height="wrap_content" />
 
     <ProgressBar
         android:id="@+id/login_activity_spinner"
