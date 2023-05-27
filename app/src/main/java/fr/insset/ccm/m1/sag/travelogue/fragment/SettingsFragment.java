@@ -16,7 +16,13 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreferenceCompat;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.concurrent.Executor;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
@@ -35,9 +41,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private FirebaseAuth mAuth;
     private SharedPrefManager sharedPrefManager;
 
+    private GoogleSignInClient mGoogleSignInClient;
+
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        String server_client_id = getString(R.string.server_client_id);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(server_client_id)
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
+
         mAuth = FirebaseAuth.getInstance();
         Settings settings = new Settings(mAuth.getCurrentUser().getUid());
         sharedPrefManager = SharedPrefManager.getInstance(requireActivity());
@@ -79,8 +95,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         localisationCat.addPreference(switchAutoGps);
 
         EditTextPreference timeBetweenAutoGps = new EditTextPreference(requireActivity());
-        timeBetweenAutoGps.setTitle("Time between each");
-        timeBetweenAutoGps.setDialogTitle("Time between each");
+        timeBetweenAutoGps.setTitle(getString(R.string.time_between_each_gps_point_save));
+        timeBetweenAutoGps.setDialogTitle(getString(R.string.time_between_each_gps_point_save));
         timeBetweenAutoGps.setOnBindEditTextListener(editText -> editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED));
         timeBetweenAutoGps.setKey("edittext_time_between_auto");
         timeBetweenAutoGps.setText(String.valueOf(sharedPrefManager.getLong("TimeBetweenAutoGps")));
@@ -112,9 +128,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         logOut.setSummary("Click here to log out from your account");
         logOut.setOnPreferenceClickListener(preference -> {
             mAuth.signOut();
-            requireActivity().finish();
-            Intent mainActivity = new Intent(getActivity(), MainActivity.class);
-            startActivity(mainActivity);
+            mGoogleSignInClient.signOut()
+                .addOnCompleteListener(requireActivity(), task -> {
+                    requireActivity().finish();
+                    Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+                    startActivity(mainActivity);
+                });
             return true;
         });
         screen.addPreference(logOut);

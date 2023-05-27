@@ -4,14 +4,23 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.identity.Identity;
+import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.material.elevation.SurfaceColors;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
@@ -37,6 +46,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         sharedPrefManager = SharedPrefManager.getInstance(this);
         mAuth = FirebaseAuth.getInstance();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             InitDatabase initDatabase = new InitDatabase(mAuth.getCurrentUser().getUid());
@@ -74,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 File folder = new File(getCacheDir(), "/export/");
                 if (!folder.exists()) {
                     if (folder.mkdir()) {
-                        folder.mkdirs();
+                        Boolean isCreated = folder.mkdirs();
                     }
                 }
                 Intent homeActivity = new Intent(this, HomeActivity.class);
@@ -88,6 +103,5 @@ public class MainActivity extends AppCompatActivity {
             startActivity(welcomeActivity);
             finish();
         }
-
     }
 }

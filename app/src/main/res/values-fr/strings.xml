@@ -29,7 +29,20 @@
     <string name="activity_new_travel_text_view">Entrez le nom de votre nouveau voyage</string>
     <string name="activity_new_travel_edit_text_hint">Une balade à Paris</string>
     <string name="btn_save">Enregistrer</string>
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Synchronisation</string>
+    <string name="signature_title">Votre signature</string>
+    <string name="reply_title">Action de réponse par défaut</string>
+    <string name="sync_title">Synchroniser périodiquement les emails</string>
+    <string name="attachment_title">Télécharger les pièces jointes entrantes</string>
+    <string name="attachment_summary_on">Télécharger automatiquement les pièces jointes des emails entrants</string>
+    <string name="attachment_summary_off">Ne télécharger les pièces jointes que sur demande</string>
+    <string name="back">Retour</string>
+    <string name="travel">Voyage:</string>
+    <string name="start_of_the_travel">Debut du voyage:</string>
+    <string name="end_of_the_travel">Fin du voyage:</string>
     <string name="no_travels_textview">Aucun voyage précédent enregistré</string>
+    <string name="stop_travel_btn">Terminer le voyage</string>
     <string name="forgot_password_activity_textview_1">Réinitialiser votre mot de passe</string>
     <string name="login_activity_textview_1">Se connecter</string>
     <string name="login_activity_textview_2">à votre compte Travelogue</string>
@@ -41,7 +54,7 @@
     <string name="sign_up_activity_text_view_2">pour créer votre compte Travelogue</string>
     <string name="welcome_activity_next_button">Suivant</string>
     <string name="welcome_activity_skip_button">Passer</string>
-    <string name="travels_fragment_text_view_1">C\'est complément vide...</string>
+    <string name="travels_fragment_text_view_1">C\'est complément vide…</string>
     <string name="travels_fragment_text_view_2">Vous retrouverez vos précédents voyages ici</string>
     <string name="welcome_slide_1_text_view_1">Bienvenue à Travelogue</string>
     <string name="welcome_slide_1_text_view_2">votre nouvelle façon de garder une trace de vos voyages</string>
@@ -61,4 +74,12 @@
     <string name="home_fragment_text_view_2">en commançant un nouveau voyage avec Travelogue</string>
     <string name="no_connection_activity_textview_1">Pas de connexion Internet</string>
     <string name="no_connection_activity_textview_2">Travelogue est une application en nuage et nécessite une connexion internet. Ne vous inquiétez pas, nous vous reconnecterons dès que la connexion sera rétablie</string>
+    <string name="require_location_permission">Veuillez autoriser l\'accès à la localisation</string>
+    <string name="sign_in_with_google_button_text">Se connecter avec Google</string>
+    <string name="sign_up_with_google_button_text">S\'inscrire avec Google</string>
+    <string name="time_between_each_gps_point_save">Temps entre deux sauvegarde de points gps (en secondes)</string>
+    <string name="travel_information_icon_title">Information</string>
+    <string name="travel_share_icon_title">Partager</string>
+    <string name="travel_add_icon_title">Ajouter</string>
+    <string name="travel_stop_icon_title">Terminer</string>
 </resources>
