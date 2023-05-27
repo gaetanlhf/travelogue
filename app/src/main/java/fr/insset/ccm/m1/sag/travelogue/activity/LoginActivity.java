@@ -41,7 +41,7 @@ import java.util.Objects;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private TextView email;
@@ -252,10 +252,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         activityResultLaunch.launch(signInIntent);
     }
 
-    @Override
-    public void onClick(View view){
-        if (view.getId() == R.id.sign_in_with_google_button) {
-            this.signInWithGoogle();
-        }
+    public void onClickSignInWithGoogle(View view){
+        this.signInWithGoogle();
     }
 }
