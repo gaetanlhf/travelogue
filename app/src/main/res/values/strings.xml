@@ -41,8 +41,7 @@
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="back">Back</string>
     <string name="travel">Travel :</string>
@@ -85,4 +84,5 @@
     <string name="sign_in_with_google_button_text">Sign in with Google</string>
     <string name="sign_up_with_google_button_text">Sign up with Google</string>
     <string name="server_client_id" translatable="false">251810910551-pdrila58l9hncv6asvl9n2p182eehgka.apps.googleusercontent.com</string>
+    <string name="time_between_each_gps_point_save">Time between two gps point save (in seconds)</string>
 </resources>

@@ -97,8 +97,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         localisationCat.addPreference(switchAutoGps);
 
         EditTextPreference timeBetweenAutoGps = new EditTextPreference(requireActivity());
-        timeBetweenAutoGps.setTitle("Time between each");
-        timeBetweenAutoGps.setDialogTitle("Time between each");
+        timeBetweenAutoGps.setTitle(getString(R.string.time_between_each_gps_point_save));
+        timeBetweenAutoGps.setDialogTitle(getString(R.string.time_between_each_gps_point_save));
         timeBetweenAutoGps.setOnBindEditTextListener(editText -> editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED));
         timeBetweenAutoGps.setKey("edittext_time_between_auto");
         timeBetweenAutoGps.setText(String.valueOf(sharedPrefManager.getLong("TimeBetweenAutoGps")));
