@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
@@ -40,6 +41,8 @@ public class LocationService extends Service {
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null) {
             super.onLocationResult(locationResult);
             locationResult.getLastLocation();
             double latitude = locationResult.getLastLocation().getLatitude();
@@ -48,9 +51,10 @@ public class LocationService extends Service {
             gpsPoint.setLatitude(latitude);
             gpsPoint.setLinkedDataType("none");
             gpsPoint.setLinkedData("none");
-            Location location = new Location(mAuth.getCurrentUser().getUid());
+            Location location = new Location(currentUser.getUid());
             sharedPrefManager = SharedPrefManager.getInstance(getApplicationContext());
             location.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+        }
         }
     };
 

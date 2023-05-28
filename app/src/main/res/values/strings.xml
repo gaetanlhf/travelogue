@@ -80,7 +80,7 @@
     <string name="no_connection_activity_textview_1">No Internet connection</string>
     <string name="no_connection_activity_textview_2">Travelogue is a cloud application and requires an internet connection. Don\'t worry, we will reconnect you when the connection is restored</string>
     <string name="require_location_permission">Please grant permission to access the location</string>
-    <string name="sign_in_with_google_button_text">Sign in with Google</string>
+    <string name="sign_in_with_google_button_text">Continue with Google</string>
     <string name="sign_up_with_google_button_text">Sign up with Google</string>
     <string name="server_client_id" translatable="false">251810910551-pdrila58l9hncv6asvl9n2p182eehgka.apps.googleusercontent.com</string>
     <string name="time_between_each_gps_point_save">Time between two gps point save (in seconds)</string>
@@ -92,4 +92,5 @@
     <string name="successful_sign_in_with_google">Successfully signed in</string>
     <string name="error_getting_last_gps_point">Error trying to get last GPS location</string>
     <string name="take_picture">Take photo</string>
+    <string name="unable_to_launch_camera_error_text">Unable to lauch camera</string>
 </resources>

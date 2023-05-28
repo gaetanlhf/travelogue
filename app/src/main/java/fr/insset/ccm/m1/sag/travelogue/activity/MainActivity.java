@@ -1,30 +1,19 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
-import com.google.android.gms.auth.api.identity.Identity;
-import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.material.elevation.SurfaceColors;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
@@ -54,17 +43,17 @@ public class MainActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            InitDatabase initDatabase = new InitDatabase(mAuth.getCurrentUser().getUid());
+            InitDatabase initDatabase = new InitDatabase(currentUser.getUid());
             initDatabase.isInit(init -> {
                 if (!init.get()) {
                     initDatabase.initDb();
                 }
-                Settings settings = new Settings(mAuth.getCurrentUser().getUid());
+                Settings settings = new Settings(currentUser.getUid());
                 settings.getSettings(atomicReferenceArray -> {
                     sharedPrefManager.saveLong("TimeBetweenAutoGps", Long.parseLong(atomicReferenceArray.get(1).toString()));
                     sharedPrefManager.saveBool("AutoGps", Boolean.parseBoolean(atomicReferenceArray.get(0).toString()));
                 });
-                State state = new State(mAuth.getCurrentUser().getUid());
+                State state = new State(currentUser.getUid());
                 state.isTravelling(travelling -> {
                     if (travelling.get()) {
                         sharedPrefManager.saveBool("Travelling", travelling.get());

@@ -22,16 +22,11 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.elevation.SurfaceColors;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
@@ -40,31 +35,27 @@ import fr.insset.ccm.m1.sag.travelogue.helper.db.Users;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
-    private ProgressBar spinner;
-
-    private SignInButton signInButton;
-    private GoogleSignInClient mGoogleSignInClient;
-    private String server_client_id;
-    private String authCode;
-
-    private final ActivityResultLauncher<Intent> activityResultLaunch = registerForActivityResult(
-        new ActivityResultContracts.StartActivityForResult(),
-        result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                handleSignInResult(task);
-            } else {
-                SharedMethods.displayToast(getApplicationContext(), getString(R.string.unable_to_sign_in_with_google_error_text));
-            }
-        });
-
     private static final String writingPhotoScope = "https://www.googleapis.com/auth/photoslibrary.appendonly";
     private static final String readingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata";
     private static final String editingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata";
     private static final String sharingPhotoScope = "https://www.googleapis.com/auth/photoslibrary.sharing";
-    private Users users = new Users();
-
+    private FirebaseAuth mAuth;
+    private ProgressBar spinner;
+    private SignInButton signInButton;
+    private GoogleSignInClient mGoogleSignInClient;
+    private String server_client_id;
+    private String authCode;
+    private final Users users = new Users();
+    private final ActivityResultLauncher<Intent> activityResultLaunch = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                    handleSignInResult(task);
+                } else {
+                    SharedMethods.displayToast(getApplicationContext(), getString(R.string.unable_to_sign_in_with_google_error_text));
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        signInButton.setOnClickListener((View.OnClickListener) view -> {
+        signInButton.setOnClickListener(view -> {
             // Initialize sign in intent
             Intent intent = mGoogleSignInClient.getSignInIntent();
             // Start activity for result
@@ -152,8 +143,8 @@ public class LoginActivity extends AppCompatActivity {
             mAuth.signInWithCredential(authCredential).addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
-                    if(user != null) {
-                        if(!users.getUserData(user.getEmail())) {
+                    if (user != null) {
+                        if (!users.getUserData(user.getEmail())) {
                             users.addUsersData(user.getEmail(), this.authCode, false);
                         } else {
                             users.setAuthCode(user.getEmail(), this.authCode);

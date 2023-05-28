@@ -86,4 +86,5 @@
     <string name="successful_sign_in_with_google">Connexion réussie</string>
     <string name="error_getting_last_gps_point">Erreur lors de l\'enregistrement du denier point gps</string>
     <string name="take_picture">Prendre une photo</string>
+    <string name="unable_to_launch_camera_error_text">Imposible d\'accéder à la camera</string>
 </resources>

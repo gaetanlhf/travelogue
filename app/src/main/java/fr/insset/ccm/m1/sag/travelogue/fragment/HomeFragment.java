@@ -1,14 +1,13 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CaptureRequest;
-import android.media.ImageReader;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,6 +24,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
@@ -49,18 +49,16 @@ import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
+import fr.insset.ccm.m1.sag.travelogue.BuildConfig;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
@@ -101,6 +99,8 @@ public class HomeFragment extends Fragment implements
     private SharedPrefManager sharedPrefManager;
 
     private Users users = new Users();
+
+    private File currentImageFile;
 
     public HomeFragment() {
     }
@@ -332,21 +332,13 @@ public class HomeFragment extends Fragment implements
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                     }
-
                 }
 
-
                 polyline.setPoints(listLatLng);
-
                 stylePolyline(polyline);
-
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
             }
-
-
         }, travel.getID());
-
-
     }
 
     private void stylePolyline(Polyline polyline) {
@@ -404,6 +396,16 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
+    private final ActivityResultLauncher<Intent> takePictureLaunch = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                        handleTakePictureResult(result.getData());
+                } else {
+                    SharedMethods.displayToast(requireActivity(), getString(R.string.unable_to_launch_camera_error_text));
+                }
+            });
+
     @SuppressLint("MissingPermission")
     private void addImagePoint() {
         FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -412,22 +414,15 @@ public class HomeFragment extends Fragment implements
                     // GPS location can be null if GPS is switched off
                     if (location != null) {
                         spinner.setVisibility(View.VISIBLE);
-
-                        SharedMethods.displayToast(requireActivity(), "Take photo");
                         String mediaItemId;
 
-//                        Surface surfaceView = findViewById<SurfaceView>(R.);
-//                        ImageReader imageReader = ImageReader.newInstance(...);
-//
-//                        // Remember to call this only *after* SurfaceHolder.Callback.surfaceCreated()
-//                        Surface previewSurface = surfaceView.getHolder().getSurface();
-
-//                        CameraCaptureSession session = CameraCaptureSession.StateCallback;  // from CameraCaptureSession.StateCallback
-//                        CaptureRequest.Builder captureRequest =
-//                                session.getDevice().createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-//                        captureRequest.addTarget(previewSurface);
-
-
+                        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        String filePath = createTempImageFilePath();
+                        currentImageFile = new File(filePath);
+                        Uri imageUri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider",currentImageFile);
+                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                        cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        takePictureLaunch.launch(cameraIntent);
 
 //                        double latitude = location.getLatitude();
 //                        double longitude = location.getLongitude();
@@ -449,38 +444,33 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
+    private void handleTakePictureResult(Intent intent) {
+
+        Bitmap imageBitmap = BitmapFactory.decodeFile(currentImageFile.getAbsolutePath());
+        if(imageBitmap != null) {
+            SharedMethods.displayToast(requireActivity(), imageBitmap.toString());
+        }
+
+        // Deletes it
+//        boolean isDeleted = currentImageFile.delete();
+//        Log.d("Image_deleted", String.valueOf(isDeleted));
+    }
+
     @SuppressLint("SimpleDateFormat")
-    private Map<String, List<Object>> createImageFile() throws IOException {
-        // Create an image file name
+    private String createTempImageFilePath() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File storageDir = requireActivity().getFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".png",         /* suffix */
-                storageDir      /* directory */
-        );
+        // Put it in the cache directory ? => getCacheDir()
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 
-        // Save a file: path for use with ACTION_VIEW intents
-        String photoPath = image.getAbsolutePath();
-        List<Object> imageData = new ArrayList<>();
-        imageData.add(photoPath);
-        imageData.add(image);
+        if (!storageDir.exists()) {
+            if (storageDir.mkdir()) {
+                boolean isCreated = storageDir.mkdirs();
+            }
+        }
 
-        Map<String, List<Object>> map = new HashMap<>();
-        map.put(Constants.GPS_POINT_IMAGE_LINKED_TYPE, imageData);
-        return map;
+        return storageDir.getAbsolutePath() + File.separator + imageFileName + ".jpeg";
     }
-
-    private void galleryAddPic(String currentPhotoPath) {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(currentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        requireActivity().sendBroadcast(mediaScanIntent);
-    }
-
 
     @Override
     public void onResume() {
