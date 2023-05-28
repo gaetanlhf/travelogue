@@ -15,4 +15,5 @@ public class Constants {
     public static final String FOREGROUND_SERVICE_PERMISSION = android.Manifest.permission.FOREGROUND_SERVICE;
     public static final String GPS_POINT_TEXT_LINKED_TYPE = "text";
     public static final String GPS_POINT_IMAGE_LINKED_TYPE = "photo";
+    public static final String ALBUM_CREATION_LOG_TAG = "album_creation";
 }

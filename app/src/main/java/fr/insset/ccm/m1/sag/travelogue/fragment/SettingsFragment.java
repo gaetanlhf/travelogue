@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
+import fr.insset.ccm.m1.sag.travelogue.activity.LoginActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
 import fr.insset.ccm.m1.sag.travelogue.helper.MaterialEditTextPreference;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
@@ -125,6 +126,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             mAuth.signOut();
             mGoogleSignInClient.signOut()
                 .addOnCompleteListener(requireActivity(), task -> {
+                    if(LoginActivity.googlePhotosClientThread != null) {
+                        LoginActivity.googlePhotosClientThread.interrupt();
+                    }
                     requireActivity().finish();
                     Intent mainActivity = new Intent(getActivity(), MainActivity.class);
                     startActivity(mainActivity);

@@ -3,6 +3,7 @@ package fr.insset.ccm.m1.sag.travelogue.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -22,16 +23,26 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.elevation.SurfaceColors;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.photos.library.v1.PhotosLibraryClient;
 
+import java.io.IOException;
 import java.util.Objects;
 
+import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.factory.PhotosLibraryClientFactory;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Users;
+import fr.insset.ccm.m1.sag.travelogue.helper.google_apis.photos.ManagePhotos;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -46,6 +57,12 @@ public class LoginActivity extends AppCompatActivity {
     private String server_client_id;
     private String authCode;
     private final Users users = new Users();
+
+    public static Thread googlePhotosClientThread;
+
+    private String accessToken;
+    private String refreshToken;
+    private Long expiresInSeconds;
     private final ActivityResultLauncher<Intent> activityResultLaunch = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -144,11 +161,19 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
                     if (user != null) {
-                        if (!users.getUserData(user.getEmail())) {
-                            users.addUsersData(user.getEmail(), this.authCode, false);
+                        String userEmail = user.getEmail();
+                        if (!users.getUserData(userEmail)) {
+                            users.addUsersData(userEmail, this.authCode, false);
                         } else {
-                            users.setAuthCode(user.getEmail(), this.authCode);
+                            users.setAuthCode(userEmail, this.authCode);
                         }
+
+                        googlePhotosClientThread = startGooglePhotosClient(user, this.authCode);
+                        googlePhotosClientThread.start();
+
+                        users.setTokens(userEmail, this.accessToken, this.refreshToken);
+
+                        this.createTravelogueAlbum(user, this.accessToken);
 
                         // When task is successful redirect to profile activity display Toast
                         startActivity(new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
@@ -169,6 +194,71 @@ public class LoginActivity extends AppCompatActivity {
                     getApplicationContext(),
                     "signInResult:failed code=" + e.getStatusCode()
             );
+        }
+    }
+
+    /*
+    InputStream inputStream = ctx.getResources().openRawResource(resId); For the 1st album
+
+    import org.apache.commons.io.FileUtils;
+
+    // given you have a stream, e.g.
+    InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+
+    // you can now write it to a file with
+    FileUtils.copyToFile(inputStream, new File("myfile.txt"));
+     */
+
+    private Thread startGooglePhotosClient(FirebaseUser user, String userAuthCode) {
+        if (user != null) {
+            if (!users.getAlbumCreated(user.getEmail())) {
+                if(!userAuthCode.equals("")) {
+                    return new Thread(() -> {
+                        // do background stuff here
+                        String REDIRECT_URI = "";  // "/path/to/web_app_redirect" - Can be empty if you don’t use web redirects
+                        // Exchange auth code for access token
+                        GoogleClientSecrets clientSecrets = null;
+                        try {
+                            clientSecrets = SharedMethods.getClientSecrets(getResources());
+                            GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
+                                    new NetHttpTransport(),
+                                    GsonFactory.getDefaultInstance(),
+                                    "https://www.googleapis.com/oauth2/v4/token",
+                                    clientSecrets.getDetails().getClientId(),
+                                    clientSecrets.getDetails().getClientSecret(),
+                                    userAuthCode,
+                                    REDIRECT_URI)
+                                    .execute();
+                            accessToken = tokenResponse.getAccessToken();
+                            refreshToken = tokenResponse.getRefreshToken();
+                            expiresInSeconds = tokenResponse.getExpiresInSeconds();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        runOnUiThread(() -> {
+                            // OnPostExecute stuff here
+                        });
+                    });
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private void createTravelogueAlbum(FirebaseUser user, String accessToken) {
+        if(user != null) {
+            if (!users.getAlbumCreated(user.getEmail())) {
+                // Create album
+                String albumTitle = getString(R.string.app_name);
+                String travelogueAlbumId = ManagePhotos.createAlbum(albumTitle, accessToken, getResources(), this);
+                if(!travelogueAlbumId.equals("")) {
+                    users.setTravelogueAlbumId(user.getEmail(), travelogueAlbumId);
+
+                    // Add Travelogue logo to it
+                }
+            }
         }
     }
 }
