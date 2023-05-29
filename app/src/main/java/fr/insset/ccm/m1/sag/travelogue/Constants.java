@@ -15,5 +15,12 @@ public class Constants {
     public static final String FOREGROUND_SERVICE_PERMISSION = android.Manifest.permission.FOREGROUND_SERVICE;
     public static final String GPS_POINT_TEXT_LINKED_TYPE = "text";
     public static final String GPS_POINT_IMAGE_LINKED_TYPE = "photo";
-    public static final String ALBUM_CREATION_LOG_TAG = "album_creation";
+    public static final String IMAGES_MANAGEMENT_LOG_TAG = "images_management";
+    public static final String IMAGES_CONTENT_TYPE = "image/jpg";
+    public static final String UNABLE_TO_INITIALIZE_ROOT_STORAGE = "Unable to initialize root storage.";
+    public static final String UNABLE_TO_INITIALIZE_TRAVEL_REFERENCE = "Unable to initialize travel reference.";
+    public static final String UNABLE_TO_ADD_IMAGE_TO_REFERENCE = "Unable to add image to reference.";
+    public static final String UNABLE_TO_GET_IMAGE_FROM_REFERENCE = "Unable to get image from reference.";
+    public static final String UNABLE_TO_DELETE_IMAGE_FROM_REFERENCE = "Unable to delete image from reference.";
+    public static final String UNABLE_TO_DELETE_TRAVEL_REFERENCE = "Unable to delete the reference of travel.";
 }

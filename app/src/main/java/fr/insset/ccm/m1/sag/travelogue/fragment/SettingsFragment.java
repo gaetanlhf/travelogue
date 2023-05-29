@@ -126,8 +126,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             mAuth.signOut();
             mGoogleSignInClient.signOut()
                 .addOnCompleteListener(requireActivity(), task -> {
-                    if(LoginActivity.googlePhotosClientThread != null) {
-                        LoginActivity.googlePhotosClientThread.interrupt();
+                    if(LoginActivity.googleApiClientThread != null) {
+                        LoginActivity.googleApiClientThread.interrupt();
                     }
                     requireActivity().finish();
                     Intent mainActivity = new Intent(getActivity(), MainActivity.class);
