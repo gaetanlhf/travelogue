@@ -112,11 +112,11 @@ public class TravelActivity extends AppCompatActivity implements
                 finish();
                 return true;
             case R.id.action_info:
-                String alertString1 = "Name of the travel: " + travel.getTitle();
-                String alertString2 = "Start time: " + travel.getStartDatetime();
-                String alertString3 = "End time: " + travel.getEndDatetime();
+                String alertString1 = getString(R.string.info_name_travel) + travel.getTitle();
+                String alertString2 = getString(R.string.info_start_time_travel) + travel.getStartDatetime();
+                String alertString3 = getString(R.string.info_end_time_travel) + travel.getEndDatetime();
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("Information about this trip")
+                        .setTitle(R.string.info_travel_title)
                         .setMessage(alertString1 + "\n" + alertString2 + "\n" + alertString3)
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
@@ -125,41 +125,39 @@ public class TravelActivity extends AppCompatActivity implements
                 final int[] defaultItem = {-1};
                 final String[] listItems = new String[]{"GPX", "KML"};
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("Share this travel as:")
+                        .setTitle(R.string.alert_share_title)
                         .setItems(listItems, (dialog, which) -> {
                             if (which == 0) {
                                 File shareGpxFile = new File(getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".gpx");
                                 try {
                                     GenerateGpx.generate(shareGpxFile, travel.getTitle(), pointsList);
-                                    Log.d("test", this.getPackageName() + ".provider");
                                     Uri uri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", shareGpxFile);
                                     Intent intent = new ShareCompat.IntentBuilder(this)
                                             .setType("application/gpx+xml")
-                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setSubject(R.string.share_subject + travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle("Sharing of GPS data")
+                                            .setChooserTitle(R.string.sharing_gps_data)
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
                                 } catch (IOException e) {
-                                    Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, R.string.error_occured, Toast.LENGTH_SHORT).show();
                                 }
                             } else if (which == 1) {
                                 File shareKmlFile = new File(getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".kml");
                                 try {
                                     GenerateKml.generate(shareKmlFile, travel.getTitle(), pointsList);
-                                    Log.d("test", this.getPackageName() + ".provider");
                                     Uri uri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", shareKmlFile);
                                     Intent intent = new ShareCompat.IntentBuilder(this)
                                             .setType("application/vnd.google-earth.kml+xml")
-                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setSubject(R.string.share_subject + travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle("Sharing of GPS data")
+                                            .setChooserTitle(R.string.sharing_gps_data)
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
                                 } catch (IOException e) {
-                                    Toast.makeText(this, "An error occurred...", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, R.string.error_occured, Toast.LENGTH_SHORT).show();
                                 }
                             }
                             dialog.dismiss();
@@ -170,8 +168,8 @@ public class TravelActivity extends AppCompatActivity implements
                 return true;
             case R.id.action_delete:
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("Delete this trip")
-                        .setMessage("Are you sure you want to delete this trip?")
+                        .setTitle(R.string.alert_delete_travel)
+                        .setMessage(R.string.alert_delete_travel_message)
                         .setNegativeButton(android.R.string.no, null)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override

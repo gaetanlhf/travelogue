@@ -98,7 +98,7 @@ public class LocationService extends Service {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        LocationRequest locationRequest = new LocationRequest.Builder(timeBetweenUpdateLocation*1000)
+        LocationRequest locationRequest = new LocationRequest.Builder(timeBetweenUpdateLocation*60000)
                 .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
                 .setMinUpdateIntervalMillis(timeBetweenUpdateLocation*1000)
                 .setGranularity(Granularity.GRANULARITY_FINE)

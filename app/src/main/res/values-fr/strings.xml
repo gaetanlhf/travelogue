@@ -77,7 +77,7 @@
     <string name="require_location_permission">Veuillez autoriser l\'accès à la localisation</string>
     <string name="sign_in_with_google_button_text">Se connecter avec Google</string>
     <string name="sign_up_with_google_button_text">S\'inscrire avec Google</string>
-    <string name="time_between_each_gps_point_save">Temps entre deux sauvegarde de points gps (en secondes)</string>
+    <string name="time_between_each_gps_point_save">Temps entre deux sauvegarde de points GPS (en minutes)</string>
     <string name="travel_information_icon_title">Information</string>
     <string name="travel_share_icon_title">Partager</string>
     <string name="travel_add_icon_title">Ajouter</string>
@@ -111,4 +111,12 @@
     <string name="add_item_map_title">Ajouter un élément à la carte</string>
     <string name="alert_add_text_point_title">Ajouter un point GPS avec texte</string>
     <string name="alert_add_text_point_message">Entrez votre texte :</string>
+    <string name="info_end_time_travel">"Date de fin : "</string>
+    <string name="alert_delete_travel">Supprimer ce voyage</string>
+    <string name="alert_delete_travel_message">Êtes-vous sûr de vouloir supprimer ce voyage ?</string>
+    <string name="settings_fragment_location">Localisation</string>
+    <string name="settings_fragment_autogps">Activer la prise automatique de points GPS</string>
+    <string name="fragment_settings_account">Compte</string>
+    <string name="settings_fragment_logout">Déconnexion</string>
+    <string name="settings_fragment_logout_summary">Cliquez-ici pour vous déconnecter de votre compte</string>
 </resources>
