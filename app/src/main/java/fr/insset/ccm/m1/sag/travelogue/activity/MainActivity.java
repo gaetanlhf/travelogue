@@ -14,6 +14,7 @@ import java.io.File;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;

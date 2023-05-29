@@ -106,7 +106,6 @@ public class HomeFragment extends Fragment implements
     private View noCurrentTravel;
 
     private SharedPrefManager sharedPrefManager;
-    private NetworkConnectivityCheck networkConnectivityCheck;
 
     private final Users users = new Users();
 

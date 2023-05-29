@@ -44,6 +44,7 @@ import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
 
