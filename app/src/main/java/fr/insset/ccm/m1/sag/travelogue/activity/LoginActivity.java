@@ -115,12 +115,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.topbar_login, menu);
-        return true;
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

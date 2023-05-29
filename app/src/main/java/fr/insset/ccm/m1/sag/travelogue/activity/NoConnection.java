@@ -11,39 +11,41 @@ import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 
 public class NoConnection extends AppCompatActivity {
-    private Thread networkCheckThread;
+    private Thread connectivityCheckThread;
+    private volatile boolean threadRunning = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         super.onCreate(savedInstanceState);
-        networkCheckThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
+        setContentView(R.layout.activity_no_connection);
+        threadRunning = true;
+        connectivityCheckThread = new Thread(() -> {
+            while (threadRunning) {
+                if (NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                    Intent intent = new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    finish();
+                    break;
+                }
+
                 try {
-                    NetworkConnectivityCheck.checkConnection(isConnected -> {
-                        if (isConnected.get()) {
-                            Intent intent = new Intent(this, MainActivity.class);
-                            overridePendingTransition(0, 0);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
-                    Thread.sleep(1000);
+                    Thread.sleep(1000); // Check every 2 seconds
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    threadRunning = false;
                 }
             }
         });
-        networkCheckThread.start();
-        setContentView(R.layout.activity_no_connection);
+        connectivityCheckThread.start();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (networkCheckThread != null) {
-            networkCheckThread.interrupt();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
         }
     }
 }

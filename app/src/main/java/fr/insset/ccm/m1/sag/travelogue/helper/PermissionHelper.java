@@ -15,6 +15,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Arrays;
 
+import fr.insset.ccm.m1.sag.travelogue.R;
+
 public class PermissionHelper {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -55,16 +57,16 @@ public class PermissionHelper {
 
     public static void showAlertAndOpenAppSettings(Activity activity) {
         new MaterialAlertDialogBuilder(activity)
-                .setTitle("Background Location Permission Needed")
-                .setMessage("This app requires the Background Location permission to do its job. Please grant this permission in app settings by selecting 'Allow all the time'.")
-                .setPositiveButton("Open Settings", (dialog, which) -> {
+                .setTitle(R.string.background_location_permission_alert_title)
+                .setMessage(R.string.background_location_permission_alert_desc)
+                .setPositiveButton(R.string.background_location_permission_alert_open_settings, (dialog, which) -> {
                     Intent intent = new Intent();
                     intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                     Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
                     intent.setData(uri);
                     activity.startActivity(intent);
                 })
-                .setNegativeButton("Cancel", (dialog, which) -> {
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
                     activity.finish();
                 })
                 .create()

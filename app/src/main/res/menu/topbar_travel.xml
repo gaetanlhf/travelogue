@@ -5,20 +5,20 @@
         android:id="@+id/action_info"
         android:icon="@drawable/baseline_info"
         android:orderInCategory="100"
-        android:title="Information"
+        android:title="@string/topbar_travel_information"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/baseline_share"
         android:orderInCategory="100"
-        android:title="Share"
+        android:title="@string/topbar_travel_share"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/baseline_delete"
         android:orderInCategory="100"
-        android:title="Share"
+        android:title="@string/topbar_travel_delete"
         app:showAsAction="always" />
 </menu>

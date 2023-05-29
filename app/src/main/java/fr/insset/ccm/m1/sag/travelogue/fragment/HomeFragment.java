@@ -42,6 +42,7 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -57,8 +58,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.BuildConfig;
@@ -91,6 +94,8 @@ public class HomeFragment extends Fragment implements
     private Location locationDb;
     private EditText textField;
     private SupportMapFragment mapFragment;
+    private Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
+
     private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
 
         @Override
@@ -137,6 +142,7 @@ public class HomeFragment extends Fragment implements
         spinner = view.findViewById(R.id.fragment_home_spinner);
         spinner.setVisibility(View.VISIBLE);
         sharedPrefManager = SharedPrefManager.getInstance(requireActivity());
+        //networkConnectivityCheck = new NetworkConnectivityCheck(requireActivity(), view);
         state = new State(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
         locationDb = new Location(mAuth.getCurrentUser().getUid());
         Button newTravelBtn = view.findViewById(R.id.home_fragment_start_new_travel_btn);
@@ -186,10 +192,10 @@ public class HomeFragment extends Fragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.topbar_home_fragment_info:
-                String alertString1 = "Name of the travel: " + travel.getTitle();
-                String alertString2 = "Start time: " + travel.getStartDatetime();
+                String alertString1 = getString(R.string.info_name_travel) + travel.getTitle();
+                String alertString2 = getString(R.string.info_start_time_travel) + travel.getStartDatetime();
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Information about this trip")
+                        .setTitle(R.string.info_travel_title)
                         .setMessage(alertString1 + "\n" + alertString2)
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
@@ -197,41 +203,39 @@ public class HomeFragment extends Fragment implements
             case R.id.topbar_home_fragment_share:
                 final String[] listItems = new String[]{"GPX", "KML"};
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Share this travel as:")
+                        .setTitle(R.string.alert_share_title)
                         .setItems(listItems, (dialog, which) -> {
                             if (which == 0) {
                                 File shareGpxFile = new File(requireContext().getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".gpx");
                                 try {
                                     GenerateGpx.generate(shareGpxFile, travel.getTitle(), pointsList);
-                                    Log.d("test", requireContext().getPackageName() + ".provider");
                                     Uri uri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", shareGpxFile);
                                     Intent intent = new ShareCompat.IntentBuilder(requireContext())
                                             .setType("application/gpx+xml")
-                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setSubject(R.string.share_subject + travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle("Sharing of GPS data")
+                                            .setChooserTitle(R.string.sharing_gps_data)
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
                                 } catch (IOException e) {
-                                    Toast.makeText(requireContext(), "An error occurred...", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(requireContext(), R.string.error_occured, Toast.LENGTH_SHORT).show();
                                 }
                             } else if (which == 1) {
                                 File shareKmlFile = new File(requireContext().getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".kml");
                                 try {
                                     GenerateKml.generate(shareKmlFile, travel.getTitle(), pointsList);
-                                    Log.d("test", requireContext().getPackageName() + ".provider");
                                     Uri uri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", shareKmlFile);
                                     Intent intent = new ShareCompat.IntentBuilder(requireContext())
                                             .setType("application/vnd.google-earth.kml+xml")
-                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setSubject(R.string.share_subject + travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle("Sharing of GPS data")
+                                            .setChooserTitle(R.string.sharing_gps_data)
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
                                 } catch (IOException e) {
-                                    Toast.makeText(requireContext(), "An error occurred...", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(requireContext(), R.string.error_occured, Toast.LENGTH_SHORT).show();
                                 }
                             }
                             dialog.dismiss();
@@ -240,16 +244,15 @@ public class HomeFragment extends Fragment implements
                         .show();
                 return true;
             case R.id.topbar_home_fragment_add:
-                final String[] listAddItem = new String[]{"GPS point", "Photo", "Text"};
+                final String[] listAddItem = new String[]{getString(R.string.gps_point_in_menu), getString(R.string.photo_gps_point_in_menu), getString(R.string.text_gps_point_in_menu)};
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Add an item to the map:")
+                        .setTitle(R.string.add_item_map_title)
                         .setItems(listAddItem, (dialog, which) -> {
                             if (which == 0) {
                                 FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
                                 locationClient.getLastLocation()
                                         .addOnSuccessListener(location -> {
-                                            // GPS location can be null if GPS is switched off
                                             if (location != null) {
                                                 spinner.setVisibility(View.VISIBLE);
                                                 double latitude = location.getLatitude();
@@ -301,7 +304,6 @@ public class HomeFragment extends Fragment implements
             Intent intent = new Intent(getContext(), LocationService.class);
             intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
             requireContext().startService(intent); //remplacé par startService car stopService ne fonctionne pas (wtf)
-            Toast.makeText(getContext(), "Location service stopped", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -318,44 +320,54 @@ public class HomeFragment extends Fragment implements
 
         List<LatLng> listLatLng = new ArrayList<>();
         TravelHelper travelHelper = new TravelHelper(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-
+        markerDataMap.clear();
+        googleMap.clear();
         travelHelper.getPoints(data -> {
+            googleMap.setOnMarkerClickListener(null);
             if (data.length() > 0) {
                 for (int i = 0; i < data.length(); i++) {
+                    Log.d("test", String.valueOf(data.length()));
                     LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
                     listLatLng.add(position);
                     pointsList.add(data.get(i));
                     if (Objects.equals(data.get(i).getLinkedDataType(), "none")) {
-                        googleMap.addMarker(new MarkerOptions()
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        markerDataMap.put(marker, data.get(i));
                     } else if (Objects.equals(data.get(i).getLinkedDataType(), "text")) {
-                        googleMap.addMarker(new MarkerOptions()
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-                        int finalI = i;
-                        googleMap.setOnMarkerClickListener(marker -> {
-                            MaterialAlertDialogBuilder textDialog = new MaterialAlertDialogBuilder(requireContext());
-                            textDialog.setTitle("Text point");
-                            textDialog.setMessage(data.get(finalI).getLinkedData());
-                            textDialog.setNeutralButton(android.R.string.ok, null);
-                            textDialog.show();
-                            marker.hideInfoWindow();
-                            return false;
-                        });
+                        markerDataMap.put(marker, data.get(i));
+
                     } else if (Objects.equals(data.get(i).getLinkedDataType(), "photo")) {
                         googleMap.addMarker(new MarkerOptions()
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                     }
                 }
+                Log.d("test", markerDataMap.toString());
+
+
+
 
                 polyline.setPoints(listLatLng);
                 stylePolyline(polyline);
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
             }
+
+            googleMap.setOnMarkerClickListener(marker -> {
+                GpsPoint gpsPointListen = markerDataMap.get(marker);
+                BottomSheetPoint bottomSheetPoint = BottomSheetPoint.newInstance(gpsPointListen.getLinkedDataType(), gpsPointListen.getLinkedData(), gpsPointListen.getLongitude(), gpsPointListen.getLatitude(), gpsPointListen.getTimestamp());
+                bottomSheetPoint.show(getChildFragmentManager(), "bottomSheetPointListen");
+                marker.hideInfoWindow();
+                return false;
+            });
+
         }, travel.getID());
     }
+
 
     private void stylePolyline(Polyline polyline) {
         polyline.setStartCap(new RoundCap());
@@ -380,9 +392,9 @@ public class HomeFragment extends Fragment implements
                         textField = new EditText(requireContext());
 
                         builder.setView(textField)
-                                .setTitle("Add a text point")
-                                .setMessage("Enter your text:")
-                                .setPositiveButton("OK", (dialog, which) -> {
+                                .setTitle(R.string.alert_add_text_point_title)
+                                .setMessage(R.string.alert_add_text_point_message)
+                                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                                     String enteredText = textField.getText().toString();
                                     double latitude = location.getLatitude();
                                     double longitude = location.getLongitude();
@@ -511,8 +523,13 @@ public class HomeFragment extends Fragment implements
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
     }
-
 }
