@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Travelogue</string>
     <string name="start_btn">Commencer</string>
     <string name="no_account_textview">N\'avez-vous pas de compte ?</string>
     <string name="create_account_btn">Créer un compte</string>
@@ -119,4 +118,11 @@
     <string name="fragment_settings_account">Compte</string>
     <string name="settings_fragment_logout">Déconnexion</string>
     <string name="settings_fragment_logout_summary">Cliquez-ici pour vous déconnecter de votre compte</string>
+    <string name="unable_to_sign_in_with_google_error_text">Impossible de se connecter avec Google</string>
+    <string name="successful_sign_in_with_google">Connexion réussie</string>
+    <string name="error_getting_last_gps_point">Erreur lors de l\'enregistrement du denier point gps</string>
+    <string name="unable_to_launch_camera_error_text">Imposible d\'accéder à la camera</string>
+    <string name="unable_to_create_travelogue_album">Impossible de créer l\'album Travelogue</string>
+    <string name="delete_trip_modal_title">Supprimer ce voyage</string>
+    <string name="delete_trip_modal_text">Êtes-vous certain(e) de vouloir supprimer ce voyage ?</string>
 </resources>

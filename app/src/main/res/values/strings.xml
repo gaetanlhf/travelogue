@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Travelogue</string>
+    <string name="app_name" translatable="false">Travelogue</string>
     <string name="start_btn">Start</string>
     <string name="no_account_textview">Did not have an account?</string>
     <string name="create_account_btn">Create an account</string>
@@ -80,7 +80,7 @@
     <string name="no_connection_activity_textview_1">No Internet connection</string>
     <string name="no_connection_activity_textview_2">Travelogue is a cloud application and requires an internet connection. Don\'t worry, we will reconnect you when the connection is restored</string>
     <string name="require_location_permission">Please grant permission to access the location</string>
-    <string name="sign_in_with_google_button_text">Sign in with Google</string>
+    <string name="sign_in_with_google_button_text">Continue with Google</string>
     <string name="sign_up_with_google_button_text">Sign up with Google</string>
     <string name="server_client_id" translatable="false">251810910551-pdrila58l9hncv6asvl9n2p182eehgka.apps.googleusercontent.com</string>
     <string name="time_between_each_gps_point_save">Time between two GPS point save (in minutes)</string>
@@ -125,4 +125,11 @@
     <string name="fragment_settings_account">Account</string>
     <string name="settings_fragment_logout">Logout</string>
     <string name="settings_fragment_logout_summary">Click here to log out from your account</string>
+    <string name="unable_to_sign_in_with_google_error_text">Unable to sign in with Google</string>
+    <string name="successful_sign_in_with_google">Successfully signed in</string>
+    <string name="error_getting_last_gps_point">Error trying to get last GPS location</string>
+    <string name="unable_to_launch_camera_error_text">Unable to lauch camera</string>
+    <string name="unable_to_create_travelogue_album">Unable to create travelogue album</string>
+    <string name="delete_trip_modal_title">Delete this trip</string>
+    <string name="delete_trip_modal_text">Are you sure you want to delete this trip?</string>
 </resources>
