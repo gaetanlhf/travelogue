@@ -40,11 +40,6 @@ public class GpsPoint {
         this.timestamp = timestamp;
     }
 
-    public GpsPoint(double longitude, double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
-    }
-
     public GpsPoint(double longitude, double latitude, String linkedDataType, String linkedData) {
         this.longitude = longitude;
         this.latitude = latitude;

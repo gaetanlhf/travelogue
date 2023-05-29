@@ -78,15 +78,16 @@ public class LocationService extends Service {
                 resultIntent,
                 PendingIntent.FLAG_IMMUTABLE
         );
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 getApplicationContext(),
                 channelId
         );
 
         builder.setSmallIcon(R.mipmap.ic_launcher);
-        builder.setContentTitle("Location service");
+        builder.setContentTitle(getString(R.string.travelogue_service_name));
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-        builder.setContentText("Running");
+        builder.setContentText(getString(R.string.travelogue_service_running));
         builder.setContentIntent(pendingIntent);
         builder.setAutoCancel(false);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
@@ -94,14 +95,14 @@ public class LocationService extends Service {
         if (notificationManager != null && notificationManager.getNotificationChannel(channelId) == null) {
             NotificationChannel notificationChannel = new NotificationChannel(
                     channelId,
-                    "Location Service",
+                    getString(R.string.travelogue_service_name),
                     NotificationManager.IMPORTANCE_HIGH
             );
             notificationChannel.setDescription("This channel is used by location service");
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        LocationRequest locationRequest = new LocationRequest.Builder(timeBetweenUpdateLocation*1000)
+        LocationRequest locationRequest = new LocationRequest.Builder(timeBetweenUpdateLocation*60000)
                 .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
                 .setMinUpdateIntervalMillis(timeBetweenUpdateLocation*1000)
                 .setGranularity(Granularity.GRANULARITY_FINE)

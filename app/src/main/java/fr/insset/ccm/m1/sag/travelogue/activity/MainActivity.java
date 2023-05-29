@@ -14,11 +14,14 @@ import java.io.File;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
+import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 
@@ -26,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private SharedPrefManager sharedPrefManager;
+    private Thread connectivityCheckThread;
+    private volatile boolean threadRunning = false;
 
 
     @Override
@@ -33,7 +38,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         setContentView(R.layout.activity_main);
+        threadRunning = true;
+        connectivityCheckThread = new Thread(() -> {
+            while (threadRunning) {
+                if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                    Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    finish();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(2000); // Check every 2 seconds
+                } catch (InterruptedException e) {
+                    threadRunning = false;
+                }
+            }
+        });
+        connectivityCheckThread.start();
         sharedPrefManager = SharedPrefManager.getInstance(this);
+        sharedPrefManager.saveBool("PermissionsRequested", false);
         mAuth = FirebaseAuth.getInstance();
     }
 
@@ -47,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
             initDatabase.isInit(init -> {
                 if (!init.get()) {
                     initDatabase.initDb();
+                    boolean ok = ManageImages.initializeStorage(currentUser.getEmail());
+                    if(!ok) {
+                        SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_ROOT_STORAGE);
+                    }
                 }
                 Settings settings = new Settings(currentUser.getUid());
                 settings.getSettings(atomicReferenceArray -> {
@@ -81,16 +109,23 @@ public class MainActivity extends AppCompatActivity {
                         Boolean isCreated = folder.mkdirs();
                     }
                 }
-                Intent homeActivity = new Intent(this, HomeActivity.class);
-                overridePendingTransition(0, 0);
+                Intent homeActivity = new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(homeActivity);
                 finish();
             });
         } else {
-            Intent welcomeActivity = new Intent(this, WelcomeActivity.class);
-            overridePendingTransition(0, 0);
+            Intent welcomeActivity = new Intent(this, WelcomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(welcomeActivity);
             finish();
         }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
+        }
+        sharedPrefManager.updateBool("PermissionsRequested", false);
     }
 }

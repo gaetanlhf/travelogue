@@ -6,8 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -44,6 +42,7 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -59,8 +58,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.BuildConfig;
@@ -93,6 +94,8 @@ public class HomeFragment extends Fragment implements
     private Location locationDb;
     private EditText textField;
     private SupportMapFragment mapFragment;
+    private Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
+
     private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
 
         @Override
@@ -104,10 +107,20 @@ public class HomeFragment extends Fragment implements
 
     private SharedPrefManager sharedPrefManager;
 
-    private Users users = new Users();
+    private final Users users = new Users();
 
     private File currentImageFile;
-    private String currentImageRefPath = null;
+    private final ActivityResultLauncher<Intent> takePictureLaunch = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    handleTakePictureResult(result.getData());
+                } else {
+                    if (result.getResultCode() != Activity.RESULT_CANCELED)
+                        SharedMethods.displayToast(requireActivity(), getString(R.string.unable_to_launch_camera_error_text));
+                }
+            });
+    private String currentImageRefPath;
     private ImageView imageView;
 
     public HomeFragment() {
@@ -129,6 +142,7 @@ public class HomeFragment extends Fragment implements
         spinner = view.findViewById(R.id.fragment_home_spinner);
         spinner.setVisibility(View.VISIBLE);
         sharedPrefManager = SharedPrefManager.getInstance(requireActivity());
+        //networkConnectivityCheck = new NetworkConnectivityCheck(requireActivity(), view);
         state = new State(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
         locationDb = new Location(mAuth.getCurrentUser().getUid());
         Button newTravelBtn = view.findViewById(R.id.home_fragment_start_new_travel_btn);
@@ -178,10 +192,10 @@ public class HomeFragment extends Fragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.topbar_home_fragment_info:
-                String alertString1 = "Name of the travel: " + travel.getTitle();
-                String alertString2 = "Start time: " + travel.getStartDatetime();
+                String alertString1 = getString(R.string.info_name_travel) + travel.getTitle();
+                String alertString2 = getString(R.string.info_start_time_travel) + travel.getStartDatetime();
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Information about this trip")
+                        .setTitle(R.string.info_travel_title)
                         .setMessage(alertString1 + "\n" + alertString2)
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
@@ -189,41 +203,39 @@ public class HomeFragment extends Fragment implements
             case R.id.topbar_home_fragment_share:
                 final String[] listItems = new String[]{"GPX", "KML"};
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Share this travel as:")
+                        .setTitle(R.string.alert_share_title)
                         .setItems(listItems, (dialog, which) -> {
                             if (which == 0) {
                                 File shareGpxFile = new File(requireContext().getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".gpx");
                                 try {
                                     GenerateGpx.generate(shareGpxFile, travel.getTitle(), pointsList);
-                                    Log.d("test", requireContext().getPackageName() + ".provider");
                                     Uri uri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", shareGpxFile);
                                     Intent intent = new ShareCompat.IntentBuilder(requireContext())
                                             .setType("application/gpx+xml")
-                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setSubject(R.string.share_subject + travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle("Sharing of GPS data")
+                                            .setChooserTitle(R.string.sharing_gps_data)
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
                                 } catch (IOException e) {
-                                    Toast.makeText(requireContext(), "An error occurred...", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(requireContext(), R.string.error_occured, Toast.LENGTH_SHORT).show();
                                 }
                             } else if (which == 1) {
                                 File shareKmlFile = new File(requireContext().getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".kml");
                                 try {
                                     GenerateKml.generate(shareKmlFile, travel.getTitle(), pointsList);
-                                    Log.d("test", requireContext().getPackageName() + ".provider");
                                     Uri uri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", shareKmlFile);
                                     Intent intent = new ShareCompat.IntentBuilder(requireContext())
                                             .setType("application/vnd.google-earth.kml+xml")
-                                            .setSubject("Sharing of GPS data of the travel entitled " + travel.getTitle())
+                                            .setSubject(R.string.share_subject + travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle("Sharing of GPS data")
+                                            .setChooserTitle(R.string.sharing_gps_data)
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
                                 } catch (IOException e) {
-                                    Toast.makeText(requireContext(), "An error occurred...", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(requireContext(), R.string.error_occured, Toast.LENGTH_SHORT).show();
                                 }
                             }
                             dialog.dismiss();
@@ -232,16 +244,15 @@ public class HomeFragment extends Fragment implements
                         .show();
                 return true;
             case R.id.topbar_home_fragment_add:
-                final String[] listAddItem = new String[]{"GPS point", "Photo", "Text"};
+                final String[] listAddItem = new String[]{getString(R.string.gps_point_in_menu), getString(R.string.photo_gps_point_in_menu), getString(R.string.text_gps_point_in_menu)};
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Add an item to the map:")
+                        .setTitle(R.string.add_item_map_title)
                         .setItems(listAddItem, (dialog, which) -> {
                             if (which == 0) {
                                 FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
                                 locationClient.getLastLocation()
                                         .addOnSuccessListener(location -> {
-                                            // GPS location can be null if GPS is switched off
                                             if (location != null) {
                                                 spinner.setVisibility(View.VISIBLE);
                                                 double latitude = location.getLatitude();
@@ -293,7 +304,6 @@ public class HomeFragment extends Fragment implements
             Intent intent = new Intent(getContext(), LocationService.class);
             intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
             requireContext().startService(intent); //remplacé par startService car stopService ne fonctionne pas (wtf)
-            Toast.makeText(getContext(), "Location service stopped", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -310,44 +320,54 @@ public class HomeFragment extends Fragment implements
 
         List<LatLng> listLatLng = new ArrayList<>();
         TravelHelper travelHelper = new TravelHelper(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-
+        markerDataMap.clear();
+        googleMap.clear();
         travelHelper.getPoints(data -> {
+            googleMap.setOnMarkerClickListener(null);
             if (data.length() > 0) {
                 for (int i = 0; i < data.length(); i++) {
+                    Log.d("test", String.valueOf(data.length()));
                     LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
                     listLatLng.add(position);
                     pointsList.add(data.get(i));
                     if (Objects.equals(data.get(i).getLinkedDataType(), "none")) {
-                        googleMap.addMarker(new MarkerOptions()
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        markerDataMap.put(marker, data.get(i));
                     } else if (Objects.equals(data.get(i).getLinkedDataType(), "text")) {
-                        googleMap.addMarker(new MarkerOptions()
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-                        int finalI = i;
-                        googleMap.setOnMarkerClickListener(marker -> {
-                            MaterialAlertDialogBuilder textDialog = new MaterialAlertDialogBuilder(requireContext());
-                            textDialog.setTitle("Text point");
-                            textDialog.setMessage(data.get(finalI).getLinkedData());
-                            textDialog.setNeutralButton(android.R.string.ok, null);
-                            textDialog.show();
-                            marker.hideInfoWindow();
-                            return false;
-                        });
+                        markerDataMap.put(marker, data.get(i));
+
                     } else if (Objects.equals(data.get(i).getLinkedDataType(), "photo")) {
                         googleMap.addMarker(new MarkerOptions()
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                     }
                 }
+                Log.d("test", markerDataMap.toString());
+
+
+
 
                 polyline.setPoints(listLatLng);
                 stylePolyline(polyline);
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
             }
+
+            googleMap.setOnMarkerClickListener(marker -> {
+                GpsPoint gpsPointListen = markerDataMap.get(marker);
+                BottomSheetPoint bottomSheetPoint = BottomSheetPoint.newInstance(gpsPointListen.getLinkedDataType(), gpsPointListen.getLinkedData(), gpsPointListen.getLongitude(), gpsPointListen.getLatitude(), gpsPointListen.getTimestamp());
+                bottomSheetPoint.show(getChildFragmentManager(), "bottomSheetPointListen");
+                marker.hideInfoWindow();
+                return false;
+            });
+
         }, travel.getID());
     }
+
 
     private void stylePolyline(Polyline polyline) {
         polyline.setStartCap(new RoundCap());
@@ -372,9 +392,9 @@ public class HomeFragment extends Fragment implements
                         textField = new EditText(requireContext());
 
                         builder.setView(textField)
-                                .setTitle("Add a text point")
-                                .setMessage("Enter your text:")
-                                .setPositiveButton("OK", (dialog, which) -> {
+                                .setTitle(R.string.alert_add_text_point_title)
+                                .setMessage(R.string.alert_add_text_point_message)
+                                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                                     String enteredText = textField.getText().toString();
                                     double latitude = location.getLatitude();
                                     double longitude = location.getLongitude();
@@ -401,17 +421,6 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
-    private final ActivityResultLauncher<Intent> takePictureLaunch = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                        handleTakePictureResult(result.getData());
-                } else {
-                    if (result.getResultCode() != Activity.RESULT_CANCELED)
-                        SharedMethods.displayToast(requireActivity(), getString(R.string.unable_to_launch_camera_error_text));
-                }
-            });
-
     @SuppressLint("MissingPermission")
     private void addImagePoint() {
         FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -420,27 +429,13 @@ public class HomeFragment extends Fragment implements
                     // GPS location can be null if GPS is switched off
                     if (location != null) {
                         spinner.setVisibility(View.VISIBLE);
-
                         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         String filePath = createTempImageFilePath();
                         currentImageFile = new File(filePath);
-                        Uri imageUri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider",currentImageFile);
+                        Uri imageUri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider", currentImageFile);
                         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                         cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         takePictureLaunch.launch(cameraIntent);
-
-                        if(currentImageRefPath != null && !currentImageRefPath.equals("")) {
-                            double latitude = location.getLatitude();
-                            double longitude = location.getLongitude();
-                            GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
-                            gpsPoint.setLongitude(longitude);
-                            gpsPoint.setLatitude(latitude);
-                            // linkedDataType = photo et linkedData = currentImageRefPath
-                            gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
-                            gpsPoint.setLinkedData(currentImageRefPath);
-                            locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
-                        }
-
                         spinner.setVisibility(View.GONE);
                     }
                 })
@@ -451,42 +446,47 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
+    @SuppressLint("MissingPermission")
     private void handleTakePictureResult(Intent intent) {
-
-//        Bitmap imageBitmap = BitmapFactory.decodeFile(currentImageFile.getAbsolutePath());
-//        if(imageBitmap != null) {
-//            SharedMethods.displayToast(requireActivity(), imageBitmap.toString());
-//        }
         FirebaseUser user = mAuth.getCurrentUser();
-        if(user != null) {
+        if (user != null) {
             String userEmail = user.getEmail();
-            if(users.getUserData(userEmail)) {
-                if(!users.getAlbumCreated(userEmail)) {
-                    boolean ok = ManageImages.initializeStorage(userEmail);
-                    if(!ok) {
-                        SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_ROOT_STORAGE);
-                    } else {
-                        boolean canSetAlbumCreated = users.setAlbumCreated(userEmail);
-                        if(!canSetAlbumCreated) {
-                            SharedMethods.displayDebugLogMessage("", "");
-                        }
-                    }
-                }
+            boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
+            if (ok) {
+                // Add to storage
+                String imagePath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile, currentImageFile.getName());
+                // https://firebasestorage.googleapis.com/v0/b/travelogue-51926.appspot.com/o/images%2F2405kurami%40gmail.com%2F1685367664%2FJPEG_20230529_154115_.jpeg?alt=media&token=9eff4d63-6bae-4234-8711-f938765b09be
+                if (imagePath != null) {
+                    FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+                    locationClient.getLastLocation()
+                            .addOnSuccessListener(location -> {
+                                // GPS location can be null if GPS is switched off
+                                if (location != null) {
+                                    double latitude = location.getLatitude();
+                                    double longitude = location.getLongitude();
+                                    GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
+                                    gpsPoint.setLongitude(longitude);
+                                    gpsPoint.setLatitude(latitude);
+                                    // linkedDataType = photo et linkedData = currentImageRefPath
+                                    gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
+                                    gpsPoint.setLinkedData(imagePath);
+                                    locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                                e.printStackTrace();
+                                SharedMethods.displayToast(requireActivity(), getString(R.string.error_getting_last_gps_point));
+                            });
 
-                boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
-                if(ok){
-                    // Add to storage
-                    currentImageRefPath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile, currentImageFile.getName());
-                    if(currentImageRefPath != null && !currentImageRefPath.equals("")) {
-                        // Deletes local image
-                        boolean isDeleted = currentImageFile.delete();
-                        SharedMethods.displayDebugLogMessage("Image_deleted", String.valueOf(isDeleted));
-                    } else {
-                        SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_ADD_IMAGE_TO_REFERENCE);
-                    }
+                    // Deletes local image
+                    boolean isDeleted = currentImageFile.delete();
+                    SharedMethods.displayDebugLogMessage("Image_deleted", String.valueOf(isDeleted));
                 } else {
-                    SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_TRAVEL_REFERENCE);
+                    SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_ADD_IMAGE_TO_REFERENCE);
                 }
+            } else {
+                SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_TRAVEL_REFERENCE);
             }
         }
     }
@@ -509,34 +509,27 @@ public class HomeFragment extends Fragment implements
 
     // Use in the homeFragment
     public void displayImage(String imageReferencePath) {
-        if(!imageReferencePath.equals("")) {
+        if (!imageReferencePath.equals("")) {
             // Reference to an image file in Cloud Storage
             StorageReference imageReference = FirebaseStorage.getInstance().getReference().child(imageReferencePath);
-
-            spinner.setVisibility(View.VISIBLE);
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
-
+            ImageView imageView;
             imageView = new ImageView(requireContext());
             // Download directly from StorageReference using Glide
             // (See MyAppGlideModule for Loader registration)
             Glide.with(requireActivity())
                     .load(imageReference)
                     .into(imageView);
-
-            builder.setView(imageView)
-                    .setTitle("Image")
-                    .setPositiveButton("OK", (dialog, which) -> {
-                        spinner.setVisibility(View.GONE);
-                        mapFragment.getMapAsync(this);
-                    });
-
-            builder.show();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
     }
-
 }

@@ -22,13 +22,11 @@ public class Location {
         Long timestampLong = System.currentTimeMillis() / 1000;
         String timestamp = timestampLong.toString();
 
-        Map<String, Double> point = new HashMap<>();
-        point.put("latitude", gpsPoint.getLatitude());
-        point.put("longitude", gpsPoint.getLongitude());
-
-        Map<String, String> data = new HashMap<>();
-        data.put("linkedDataType", gpsPoint.getLinkedDataType());
-        data.put("linkedData", gpsPoint.getLinkedData());
+        Map<String, String> point = new HashMap<>();
+        point.put("latitude", String.valueOf(gpsPoint.getLatitude()));
+        point.put("longitude", String.valueOf(gpsPoint.getLongitude()));
+        point.put("linkedDataType", gpsPoint.getLinkedDataType());
+        point.put("linkedData", gpsPoint.getLinkedData());
 
         db.collection(id)
                 .document("data")
@@ -37,14 +35,5 @@ public class Location {
                 .collection("points")
                 .document(timestamp)
                 .set(point);
-
-        db.collection(id)
-                .document("data")
-                .collection("travels")
-                .document(currentTravel)
-                .collection("points")
-                .document(timestamp)
-                .set(data, SetOptions.merge());
-
     }
 }

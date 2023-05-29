@@ -62,11 +62,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(requireActivity());
 
         PreferenceCategory localisationCat = new PreferenceCategory(requireActivity());
-        localisationCat.setTitle("Localisation");
+        localisationCat.setTitle(R.string.settings_fragment_location);
+        localisationCat.setIcon(R.drawable.baseline_location_on);
         screen.addPreference(localisationCat);
 
         SwitchPreferenceCompat switchAutoGps = new SwitchPreferenceCompat(requireActivity());
-        switchAutoGps.setTitle("Enable auto getting GPS point");
+        switchAutoGps.setTitle(R.string.settings_fragment_autogps);
+        switchAutoGps.setIcon(R.drawable.baseline_gps_fixed);
         switchAutoGps.setWidgetLayoutResource(R.layout.preference_widget_material_switch);
         switchAutoGps.setKey("switch_enable_auto_gps");
         switchAutoGps.setChecked(sharedPrefManager.getBool("AutoGps"));
@@ -93,6 +95,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         EditTextPreference timeBetweenAutoGps = new EditTextPreference(requireActivity());
         timeBetweenAutoGps.setTitle(getString(R.string.time_between_each_gps_point_save));
         timeBetweenAutoGps.setDialogTitle(getString(R.string.time_between_each_gps_point_save));
+        timeBetweenAutoGps.setIcon(R.drawable.baseline_timer);
         timeBetweenAutoGps.setOnBindEditTextListener(editText -> editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED));
         timeBetweenAutoGps.setKey("edittext_time_between_auto");
         timeBetweenAutoGps.setText(String.valueOf(sharedPrefManager.getLong("TimeBetweenAutoGps")));
@@ -116,12 +119,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         screen.addPreference(timeBetweenAutoGps);
 
         PreferenceCategory accountCat = new PreferenceCategory(requireActivity());
-        accountCat.setTitle("Account");
+        accountCat.setTitle(R.string.fragment_settings_account);
+        accountCat.setIcon(R.drawable.baseline_person);
         screen.addPreference(accountCat);
 
         Preference logOut = new Preference(requireActivity());
-        logOut.setTitle("Logout");
-        logOut.setSummary("Click here to log out from your account");
+        logOut.setTitle(R.string.settings_fragment_logout);
+        logOut.setIcon(R.drawable.baseline_logout);
+        logOut.setSummary(R.string.settings_fragment_logout_summary);
         logOut.setOnPreferenceClickListener(preference -> {
             mAuth.signOut();
             mGoogleSignInClient.signOut()
