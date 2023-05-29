@@ -123,8 +123,8 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (!PermissionHelper.arePermissionsGranted(requestCode, permissions, grantResults)) {
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
-                    .setTitle("Nosdq")
-                    .setMessage("qsdsdq")
+                    .setTitle(R.string.alert_not_all_permissions_granted_title)
+                    .setMessage(R.string.alert_not_all_permissions_granted_desc)
                     .setCancelable(false)
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                         dialogInterface.dismiss();

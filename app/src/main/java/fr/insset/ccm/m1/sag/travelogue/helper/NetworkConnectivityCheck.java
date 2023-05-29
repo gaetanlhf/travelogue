@@ -1,44 +1,40 @@
 package fr.insset.ccm.m1.sag.travelogue.helper;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
-import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
-import fr.insset.ccm.m1.sag.travelogue.activity.NoConnection;
 
 public class NetworkConnectivityCheck {
 
-    private static boolean wasConnect;
+    private static final String IP_ADDRESS = "8.8.8.8";
+    private static final int PORT = 53;
+    private static final int TIMEOUT_MS = 1500;
 
-    public static boolean isOnline() {
-        try {
-            int timeoutMs = 5000;
-            Socket sock = new Socket();
-            SocketAddress sockAddr = new InetSocketAddress("8.8.8.8", 53);
+    public static boolean isNetworkAvailableAndConnected(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-            sock.connect(sockAddr, timeoutMs);
-            sock.close();
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
 
+        return isConnected && isServerReachable();
+    }
+
+    private static boolean isServerReachable() {
+        try (Socket socket = new Socket()) {
+            SocketAddress socketAddress = new InetSocketAddress(IP_ADDRESS, PORT);
+            socket.connect(socketAddress, TIMEOUT_MS);
             return true;
-        } catch (IOException e) { return false; }
-    }
-
-    public static void checkConnection(Callback callback){
-        AtomicBoolean isConnected = new AtomicBoolean(false);
-        isConnected.set(isOnline());
-        callback.onCallback(isConnected);
-    }
-
-    public interface Callback {
-        void onCallback(AtomicBoolean isConnected);
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
+
+

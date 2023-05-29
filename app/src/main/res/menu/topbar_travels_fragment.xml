@@ -4,7 +4,7 @@
     <item
         android:id="@+id/actionSearchTravels"
         android:icon="@drawable/baseline_search"
-        android:title="Search"
+        android:title="@string/topbar_travel_fragment"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />
 </menu>

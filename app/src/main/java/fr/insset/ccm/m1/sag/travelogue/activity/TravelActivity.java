@@ -54,7 +54,9 @@ public class TravelActivity extends AppCompatActivity implements
     private Travel travel;
     private FirebaseAuth mAuth;
     private TravelHelper travelHelper;
-    private Thread networkCheckThread;
+    private Thread connectivityCheckThread;
+    private volatile boolean threadRunning = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,24 @@ public class TravelActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         setContentView(R.layout.activity_travel);
+        threadRunning = true;
+        connectivityCheckThread = new Thread(() -> {
+            while (threadRunning) {
+                if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                    Intent noConnection = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(noConnection);
+                    finish();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(2000); // Check every 2 seconds
+                } catch (InterruptedException e) {
+                    threadRunning = false;
+                }
+            }
+        });
+        connectivityCheckThread.start();
         mAuth = FirebaseAuth.getInstance();
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -233,8 +253,9 @@ public class TravelActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (networkCheckThread != null) {
-            networkCheckThread.interrupt();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
         }
     }
 }

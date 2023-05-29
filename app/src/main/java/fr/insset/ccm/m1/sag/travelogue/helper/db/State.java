@@ -1,13 +1,7 @@
 package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
 import android.content.Context;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -16,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import fr.insset.ccm.m1.sag.travelogue.helper.AppSettings;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 
 public class State {

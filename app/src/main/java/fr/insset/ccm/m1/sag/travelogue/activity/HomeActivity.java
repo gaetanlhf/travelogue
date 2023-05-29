@@ -33,6 +33,7 @@ import fr.insset.ccm.m1.sag.travelogue.fragment.TravelsFragment;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 
 
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -42,7 +43,10 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     private Fragment fragment = null;
     private Fragment oldFragment = null;
     private FragmentRefreshListener fragmentRefreshListener;
-    private Thread networkCheckThread;
+    private SharedPrefManager sharedPrefManager;
+    private Thread connectivityCheckThread;
+    private volatile boolean threadRunning = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,25 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_home);
+        threadRunning = true;
+        connectivityCheckThread = new Thread(() -> {
+            while (threadRunning) {
+                if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                    Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    finish();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(2000); // Check every 2 seconds
+                } catch (InterruptedException e) {
+                    threadRunning = false;
+                }
+            }
+        });
+        connectivityCheckThread.start();
+        sharedPrefManager = SharedPrefManager.getInstance(this);
         PermissionHelper.verifyPermissions(this);
         bottomNavigationView = findViewById(R.id.home_activity_bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
@@ -63,8 +86,10 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         if (getFragmentRefreshListener() != null) {
             getFragmentRefreshListener().onRefresh();
         }
-        PermissionHelper.verifyPermissions(this);
-    }
+        if (!sharedPrefManager.getBool("PermissionsRequested")) {
+            PermissionHelper.verifyPermissions(this);
+        }
+            }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -129,21 +154,38 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (!PermissionHelper.arePermissionsGranted(requestCode, permissions, grantResults)) {
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
-                    .setTitle("Nosdq")
-                    .setMessage("qsdsdq")
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                        PermissionHelper.verifyPermissions(this);
-                    })
-                    .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                        finish();
-                    });
-            builder.show();
+            if (!sharedPrefManager.getBool("PermissionsRequested")) {
+                sharedPrefManager.updateBool("PermissionsRequested", true);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.alert_not_all_permissions_granted_title)
+                        .setMessage(R.string.alert_not_all_permissions_granted_desc)
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            PermissionHelper.verifyPermissions(this);
+                            sharedPrefManager.updateBool("PermissionsRequested", false);
+                        })
+                        .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            finish();
+                        });
+                builder.show();
+            }
         } else {
             // Les permissions ont été accordées.
+            sharedPrefManager.updateBool("PermissionsRequested", false);
         }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
+        }
+        sharedPrefManager.updateBool("PermissionsRequested", false);
+
     }
 }

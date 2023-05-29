@@ -1,6 +1,5 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,10 +23,8 @@ import java.util.List;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
-import fr.insset.ccm.m1.sag.travelogue.activity.NoConnection;
 import fr.insset.ccm.m1.sag.travelogue.adapter.TravelAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
-import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 
 /**
