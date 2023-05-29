@@ -111,7 +111,7 @@ public class PermissionHelper {
         return true;
     }
 
-    private static String[] concatAll(String[] first, String[]... rest) {
+    public static String[] concatAll(String[] first, String[]... rest) {
         int totalLength = first.length;
         for (String[] array : rest) {
             totalLength += array.length;

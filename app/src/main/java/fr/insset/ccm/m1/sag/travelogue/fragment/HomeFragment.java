@@ -1,12 +1,15 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,16 +19,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -43,28 +49,34 @@ import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import fr.insset.ccm.m1.sag.travelogue.BuildConfig;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.NewTravelActivity;
-import fr.insset.ccm.m1.sag.travelogue.activity.NoConnection;
-import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
-import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.Users;
+import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 public class HomeFragment extends Fragment implements
@@ -89,6 +101,22 @@ public class HomeFragment extends Fragment implements
     private View noCurrentTravel;
 
     private SharedPrefManager sharedPrefManager;
+
+    private final Users users = new Users();
+
+    private File currentImageFile;
+    private final ActivityResultLauncher<Intent> takePictureLaunch = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    handleTakePictureResult(result.getData());
+                } else {
+                    if (result.getResultCode() != Activity.RESULT_CANCELED)
+                        SharedMethods.displayToast(requireActivity(), getString(R.string.unable_to_launch_camera_error_text));
+                }
+            });
+    private String currentImageRefPath;
+    private ImageView imageView;
 
     public HomeFragment() {
     }
@@ -242,6 +270,9 @@ public class HomeFragment extends Fragment implements
                                             e.printStackTrace();
                                         });
 
+                            } else if (which == 1) {
+                                dialog.dismiss();
+                                addImagePoint();
                             } else if (which == 2) {
                                 dialog.dismiss();
                                 addTextPoint();
@@ -317,21 +348,13 @@ public class HomeFragment extends Fragment implements
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                     }
-
                 }
 
-
                 polyline.setPoints(listLatLng);
-
                 stylePolyline(polyline);
-
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
             }
-
-
         }, travel.getID());
-
-
     }
 
     private void stylePolyline(Polyline polyline) {
@@ -353,7 +376,6 @@ public class HomeFragment extends Fragment implements
                     if (location != null) {
                         spinner.setVisibility(View.VISIBLE);
                         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
-
 
                         textField = new EditText(requireContext());
 
@@ -378,16 +400,114 @@ public class HomeFragment extends Fragment implements
                                 });
 
                         builder.show();
-
-
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.d("MapDemoActivity", "Error trying to get last GPS location");
                     e.printStackTrace();
+                    SharedMethods.displayToast(requireActivity(), getString(R.string.error_getting_last_gps_point));
                 });
+    }
 
+    @SuppressLint("MissingPermission")
+    private void addImagePoint() {
+        FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        locationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    // GPS location can be null if GPS is switched off
+                    if (location != null) {
+                        spinner.setVisibility(View.VISIBLE);
+                        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        String filePath = createTempImageFilePath();
+                        currentImageFile = new File(filePath);
+                        Uri imageUri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider", currentImageFile);
+                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                        cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        takePictureLaunch.launch(cameraIntent);
+                        spinner.setVisibility(View.GONE);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                    e.printStackTrace();
+                    SharedMethods.displayToast(requireActivity(), getString(R.string.error_getting_last_gps_point));
+                });
+    }
 
+    @SuppressLint("MissingPermission")
+    private void handleTakePictureResult(Intent intent) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            String userEmail = user.getEmail();
+            boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
+            if (ok) {
+                // Add to storage
+                String imagePath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile, currentImageFile.getName());
+                // https://firebasestorage.googleapis.com/v0/b/travelogue-51926.appspot.com/o/images%2F2405kurami%40gmail.com%2F1685367664%2FJPEG_20230529_154115_.jpeg?alt=media&token=9eff4d63-6bae-4234-8711-f938765b09be
+                if (imagePath != null) {
+                    FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+                    locationClient.getLastLocation()
+                            .addOnSuccessListener(location -> {
+                                // GPS location can be null if GPS is switched off
+                                if (location != null) {
+                                    double latitude = location.getLatitude();
+                                    double longitude = location.getLongitude();
+                                    GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
+                                    gpsPoint.setLongitude(longitude);
+                                    gpsPoint.setLatitude(latitude);
+                                    // linkedDataType = photo et linkedData = currentImageRefPath
+                                    gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
+                                    gpsPoint.setLinkedData(imagePath);
+                                    locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                                e.printStackTrace();
+                                SharedMethods.displayToast(requireActivity(), getString(R.string.error_getting_last_gps_point));
+                            });
+
+                    // Deletes local image
+                    boolean isDeleted = currentImageFile.delete();
+                    SharedMethods.displayDebugLogMessage("Image_deleted", String.valueOf(isDeleted));
+                } else {
+                    SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_ADD_IMAGE_TO_REFERENCE);
+                }
+            } else {
+                SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_TRAVEL_REFERENCE);
+            }
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private String createTempImageFilePath() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        // Put it in the cache directory ? => getCacheDir()
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        if (!storageDir.exists()) {
+            if (storageDir.mkdir()) {
+                boolean isCreated = storageDir.mkdirs();
+            }
+        }
+
+        return storageDir.getAbsolutePath() + File.separator + imageFileName + ".jpeg";
+    }
+
+    // Use in the homeFragment
+    public void displayImage(String imageReferencePath) {
+        if (!imageReferencePath.equals("")) {
+            // Reference to an image file in Cloud Storage
+            StorageReference imageReference = FirebaseStorage.getInstance().getReference().child(imageReferencePath);
+            ImageView imageView;
+            imageView = new ImageView(requireContext());
+            // Download directly from StorageReference using Glide
+            // (See MyAppGlideModule for Loader registration)
+            Glide.with(requireActivity())
+                    .load(imageReference)
+                    .into(imageView);
+        }
     }
 
     @Override
