@@ -9,20 +9,12 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 
 public class ManageImages {
-
-    /*
-    match /{userId}/{documents=**} {
-       allow write: if request.auth.uid == userId
-       allow create: if request.auth.uid != null;
-       allow read: if request.auth.uid == userId;
-     }
-     */
-
     // Get a non-default Storage bucket
     // FirebaseStorage storage = FirebaseStorage.getInstance("gs://my-custom-bucket");
     private static final FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -56,7 +48,7 @@ public class ManageImages {
         if(userEmail != null && !userEmail.equals("")){
             // Check if it already exists
             StorageReference imageRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + imageName);
-            String imageRefPath = imageRef.getPath();
+            String imageRefPath = buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + imageName;
 
             if(image != null) {
                 // Create file metadata including the content type
@@ -65,7 +57,6 @@ public class ManageImages {
                         .setCustomMetadata(userEmailMetadataTitle, userEmail)
                         .build();
 
-                AtomicBoolean isSuccessFul = new AtomicBoolean(false);
                 try {
                     byte[] data = FileUtils.readFileToByteArray(image);
 
@@ -74,13 +65,8 @@ public class ManageImages {
                     uploadTask.addOnFailureListener(exception -> {
                         // Handle unsuccessful uploads
                         displayManageImageError(Constants.UNABLE_TO_ADD_IMAGE_TO_REFERENCE + " => " + imageRefPath);
-                    }).addOnSuccessListener(taskSnapshot -> {
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                        isSuccessFul.set(true);
                     });
-                    if (isSuccessFul.get()) {
-                        return imageRefPath;  // return the image reference path
-                    }
+                    return imageRefPath;
                 } catch (Exception e) {
                     displayManageImageError(e.getMessage());
                 }
@@ -90,26 +76,25 @@ public class ManageImages {
         return "";
     }
 
-//    public static String getImageFromTravelStorage(String imageReferencePath) {
-//        if(!imageReferencePath.equals("")){
-//            StorageReference imageRef = rootStorage.child(imageReferencePath);
-//            byte[] data = imageRef.getBytes();
-//
-//            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, byteArray.length);
-//            ImageView image = (ImageView) findViewById(R.id.imageView1);
-//            image.setImageBitmap(Bitmap.createScaledBitmap(bmp, image.getWidth(), image.getHeight(), false));
-//
-//            return "";  // return the id/name of the image
-//        }
-//
-//        return "";
-//    }
+    public static String getImageURI(String imageRefPath) {
+        if(imageRefPath != null && !imageRefPath.equals("")){
+            StorageReference imageRef = rootStorage.child(imageRefPath);
+            AtomicReference<String> imageUri = new AtomicReference<>("");
+
+            imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                imageUri.set(String.valueOf(uri));
+            }); // return the image reference uri
+
+            return imageUri.get();
+        }
+        return "";
+    }
 
     public static void deleteImage(String userEmail, String imageRefPath) {
         AtomicBoolean canDeleteImage = new AtomicBoolean(false);
-        if(userEmail != null && !userEmail.equals("")){
+        if(userEmail != null && !userEmail.equals("") && imageRefPath != null && !imageRefPath.equals("")){
             // Check if it already exists
-            StorageReference desertRef = storage.getReference().child(imageRefPath);
+            StorageReference desertRef = rootStorage.child(imageRefPath);
 
             // Delete the file
             desertRef.delete().addOnSuccessListener(aVoid -> {

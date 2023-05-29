@@ -6,8 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -430,6 +428,7 @@ public class HomeFragment extends Fragment implements
                         takePictureLaunch.launch(cameraIntent);
 
                         if(currentImageRefPath != null && !currentImageRefPath.equals("")) {
+                            String imageRefURI = ManageImages.getImageURI(currentImageRefPath);;
                             double latitude = location.getLatitude();
                             double longitude = location.getLongitude();
                             GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
@@ -437,7 +436,9 @@ public class HomeFragment extends Fragment implements
                             gpsPoint.setLatitude(latitude);
                             // linkedDataType = photo et linkedData = currentImageRefPath
                             gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
-                            gpsPoint.setLinkedData(currentImageRefPath);
+                            gpsPoint.setLinkedData(
+                                    currentImageRefPath
+                            );  // currentImageRefURI
                             locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
                         }
 
@@ -456,37 +457,25 @@ public class HomeFragment extends Fragment implements
 //        Bitmap imageBitmap = BitmapFactory.decodeFile(currentImageFile.getAbsolutePath());
 //        if(imageBitmap != null) {
 //            SharedMethods.displayToast(requireActivity(), imageBitmap.toString());
-//        }
+//            }
         FirebaseUser user = mAuth.getCurrentUser();
         if(user != null) {
             String userEmail = user.getEmail();
-            if(users.getUserData(userEmail)) {
-                if(!users.getAlbumCreated(userEmail)) {
-                    boolean ok = ManageImages.initializeStorage(userEmail);
-                    if(!ok) {
-                        SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_ROOT_STORAGE);
-                    } else {
-                        boolean canSetAlbumCreated = users.setAlbumCreated(userEmail);
-                        if(!canSetAlbumCreated) {
-                            SharedMethods.displayDebugLogMessage("", "");
-                        }
-                    }
-                }
-
-                boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
-                if(ok){
-                    // Add to storage
-                    currentImageRefPath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile, currentImageFile.getName());
-                    if(currentImageRefPath != null && !currentImageRefPath.equals("")) {
-                        // Deletes local image
-                        boolean isDeleted = currentImageFile.delete();
-                        SharedMethods.displayDebugLogMessage("Image_deleted", String.valueOf(isDeleted));
-                    } else {
-                        SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_ADD_IMAGE_TO_REFERENCE);
-                    }
+            boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
+            if(ok){
+                // Add to storage
+                currentImageRefPath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile, currentImageFile.getName());
+                // https://firebasestorage.googleapis.com/v0/b/travelogue-51926.appspot.com/o/images%2F2405kurami%40gmail.com%2F1685367664%2FJPEG_20230529_154115_.jpeg?alt=media&token=9eff4d63-6bae-4234-8711-f938765b09be
+                SharedMethods.displayToast(requireContext(), currentImageRefPath);
+                if(currentImageRefPath != null && !currentImageRefPath.equals("")) {
+                    // Deletes local image
+                    boolean isDeleted = currentImageFile.delete();
+                    SharedMethods.displayDebugLogMessage("Image_deleted", String.valueOf(isDeleted));
                 } else {
-                    SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_TRAVEL_REFERENCE);
+                    SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_ADD_IMAGE_TO_REFERENCE);
                 }
+            } else {
+                SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_TRAVEL_REFERENCE);
             }
         }
     }

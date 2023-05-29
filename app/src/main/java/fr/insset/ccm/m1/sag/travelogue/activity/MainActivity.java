@@ -15,10 +15,12 @@ import java.io.File;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
+import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 
@@ -47,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
             initDatabase.isInit(init -> {
                 if (!init.get()) {
                     initDatabase.initDb();
+                    boolean ok = ManageImages.initializeStorage(currentUser.getEmail());
+                    if(!ok) {
+                        SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_ROOT_STORAGE);
+                    }
                 }
                 Settings settings = new Settings(currentUser.getUid());
                 settings.getSettings(atomicReferenceArray -> {

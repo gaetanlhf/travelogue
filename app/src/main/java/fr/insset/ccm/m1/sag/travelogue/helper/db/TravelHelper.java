@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
+import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
 
 public class TravelHelper {
     private final String id;

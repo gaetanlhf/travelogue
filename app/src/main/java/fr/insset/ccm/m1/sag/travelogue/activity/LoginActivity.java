@@ -150,11 +150,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
                     if (user != null) {
-                        String userEmail = user.getEmail();
-                        if (!users.getUserData(userEmail)) {
-                            users.addUsersData(userEmail, false);
-                        }
-
                         // When task is successful redirect to profile activity display Toast
                         startActivity(new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                         SharedMethods.displayToast(getApplicationContext(), getString(R.string.successful_sign_in_with_google));

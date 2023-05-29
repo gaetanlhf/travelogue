@@ -44,8 +44,8 @@ import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
-import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
 
 public class TravelActivity extends AppCompatActivity implements
         OnMapReadyCallback {
@@ -150,12 +150,16 @@ public class TravelActivity extends AppCompatActivity implements
                 return true;
             case R.id.action_delete:
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("Delete this trip")
-                        .setMessage("Are you sure you want to delete this trip?")
+                        .setTitle(getString(R.string.delete_trip_modal_title))
+                        .setMessage(getString(R.string.delete_trip_modal_text))
                         .setNegativeButton(android.R.string.no, null)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                if(mAuth.getCurrentUser() != null) {
+                                    // Delete the storage
+                                    ManageImages.deleteTravelStorage(mAuth.getCurrentUser().getEmail(), travel.getID());
+                                }
                                 travelHelper.deleteTravel(state -> {
                                     if (state.get()) {
                                         finish();
