@@ -156,7 +156,7 @@ public class TravelActivity extends AppCompatActivity implements
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if(mAuth.getCurrentUser() != null) {
+                                if (mAuth.getCurrentUser() != null) {
                                     // Delete the storage
                                     ManageImages.deleteTravelStorage(mAuth.getCurrentUser().getEmail(), travel.getID());
                                 }
@@ -234,6 +234,7 @@ public class TravelActivity extends AppCompatActivity implements
         polyline.setJointType(JointType.ROUND);
         polyline.setWidth(20);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

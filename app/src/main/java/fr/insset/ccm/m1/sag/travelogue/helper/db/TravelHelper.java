@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
-import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
 
 public class TravelHelper {
     private final String id;
@@ -75,7 +74,7 @@ public class TravelHelper {
                         AtomicReferenceArray<GpsPoint> points = new AtomicReferenceArray<>(task.getResult().size());
 
                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString()), documentSnapshot.getData().get("linkedDataType").toString(), documentSnapshot.getData().get("linkedData").toString()));
+                            points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString()), documentSnapshot.getData().get("linkedDataType").toString(), documentSnapshot.getData().get("linkedData").toString()));
                             i++;
                             //Log.d("POINTS", documentSnapshot.getId() + " => " + documentSnapshot.getData().get("latitude"));
                         }

@@ -25,7 +25,7 @@ public class ManageImages {
     private static final String userEmailMetadataTitle = "ownerEmail";
 
     public static boolean initializeStorage(String userEmail) {
-        if(userEmail != null && !userEmail.equals("")){
+        if (userEmail != null && !userEmail.equals("")) {
             // Create user reference
             StorageReference userRef = rootStorage.child(buildReferencePath(userEmail));
             return true;
@@ -35,9 +35,9 @@ public class ManageImages {
     }
 
     public static boolean initializeTravelStorage(String userEmail, String travelId) {
-        if(userEmail != null && !userEmail.equals("")){
+        if (userEmail != null && !userEmail.equals("")) {
             // Check if it already exists
-             StorageReference travelRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId);
+            StorageReference travelRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId);
             return true;
         }
 
@@ -45,12 +45,12 @@ public class ManageImages {
     }
 
     public static String addImageToTravelStorage(String userEmail, String travelId, File image, String imageName) {
-        if(userEmail != null && !userEmail.equals("")){
+        if (userEmail != null && !userEmail.equals("")) {
             // Check if it already exists
             StorageReference imageRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + imageName);
             String imageRefPath = buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + imageName;
 
-            if(image != null) {
+            if (image != null) {
                 // Create file metadata including the content type
                 StorageMetadata metadata = new StorageMetadata.Builder()
                         .setContentType(Constants.IMAGES_CONTENT_TYPE)
@@ -76,8 +76,8 @@ public class ManageImages {
         return "";
     }
 
-    public static String getImageURI(String imageRefPath) {
-        if(imageRefPath != null && !imageRefPath.equals("")){
+    public static String getImageURIOriginal(String imageRefPath) {
+        if (imageRefPath != null && !imageRefPath.equals("")) {
             StorageReference imageRef = rootStorage.child(imageRefPath);
             AtomicReference<String> imageUri = new AtomicReference<>("");
 
@@ -90,9 +90,30 @@ public class ManageImages {
         return "";
     }
 
+//    public interface CallbackGetImageUri {
+//        void onCallbackGetImageUri(AtomicBoolean couldGetUri);
+//    }
+//
+//    public static void getImageURI(CallbackGetImageUri callback, String imageRefPath, Location locationDb, GpsPoint gpsPoint, String currentTravel) {
+//        AtomicBoolean couldGetUri = new AtomicBoolean(true);
+//        if(imageRefPath != null && !imageRefPath.equals("")){
+//            StorageReference imageRef = rootStorage.child(imageRefPath);
+//
+//            imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+//                // linkedDataType = photo et linkedData = currentImageRefPath
+//                gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
+//                gpsPoint.setLinkedData(String.valueOf(uri));
+//                locationDb.addPoint(gpsPoint, currentTravel);
+//                couldGetUri.set(false);
+//                callback.onCallbackGetImageUri(couldGetUri);
+//
+//            }); // return the image reference uri
+//        }
+//    }
+
     public static void deleteImage(String userEmail, String imageRefPath) {
         AtomicBoolean canDeleteImage = new AtomicBoolean(false);
-        if(userEmail != null && !userEmail.equals("") && imageRefPath != null && !imageRefPath.equals("")){
+        if (userEmail != null && !userEmail.equals("") && imageRefPath != null && !imageRefPath.equals("")) {
             // Check if it already exists
             StorageReference desertRef = rootStorage.child(imageRefPath);
 
@@ -110,7 +131,7 @@ public class ManageImages {
     }
 
     private static void deleteImageInList(String userEmail, String listRefPath) {
-        if(listRefPath != null && !listRefPath.equals("")){
+        if (listRefPath != null && !listRefPath.equals("")) {
             StorageReference listRef = storage.getReference().child(listRefPath);
             listRef.listAll()
                     .addOnSuccessListener(listResult -> {
@@ -133,8 +154,8 @@ public class ManageImages {
     }
 
     public static boolean deleteTravelStorage(String userEmail, String travelId) {
-        if(userEmail != null && !userEmail.equals("")){
-             StorageReference travelRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId);
+        if (userEmail != null && !userEmail.equals("")) {
+            StorageReference travelRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId);
             deleteImageInList(userEmail, travelRef.getPath());
             return true;  // return the id/name of the image
         }

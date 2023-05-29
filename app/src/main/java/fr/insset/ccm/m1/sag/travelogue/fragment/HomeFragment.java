@@ -102,10 +102,20 @@ public class HomeFragment extends Fragment implements
 
     private SharedPrefManager sharedPrefManager;
 
-    private Users users = new Users();
+    private final Users users = new Users();
 
     private File currentImageFile;
-    private String currentImageRefPath = null;
+    private final ActivityResultLauncher<Intent> takePictureLaunch = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    handleTakePictureResult(result.getData());
+                } else {
+                    if (result.getResultCode() != Activity.RESULT_CANCELED)
+                        SharedMethods.displayToast(requireActivity(), getString(R.string.unable_to_launch_camera_error_text));
+                }
+            });
+    private String currentImageRefPath;
     private ImageView imageView;
 
     public HomeFragment() {
@@ -399,17 +409,6 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
-    private final ActivityResultLauncher<Intent> takePictureLaunch = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                        handleTakePictureResult(result.getData());
-                } else {
-                    if (result.getResultCode() != Activity.RESULT_CANCELED)
-                        SharedMethods.displayToast(requireActivity(), getString(R.string.unable_to_launch_camera_error_text));
-                }
-            });
-
     @SuppressLint("MissingPermission")
     private void addImagePoint() {
         FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -418,30 +417,13 @@ public class HomeFragment extends Fragment implements
                     // GPS location can be null if GPS is switched off
                     if (location != null) {
                         spinner.setVisibility(View.VISIBLE);
-
                         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         String filePath = createTempImageFilePath();
                         currentImageFile = new File(filePath);
-                        Uri imageUri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider",currentImageFile);
+                        Uri imageUri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider", currentImageFile);
                         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                         cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         takePictureLaunch.launch(cameraIntent);
-
-                        if(currentImageRefPath != null && !currentImageRefPath.equals("")) {
-                            String imageRefURI = ManageImages.getImageURI(currentImageRefPath);;
-                            double latitude = location.getLatitude();
-                            double longitude = location.getLongitude();
-                            GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
-                            gpsPoint.setLongitude(longitude);
-                            gpsPoint.setLatitude(latitude);
-                            // linkedDataType = photo et linkedData = currentImageRefPath
-                            gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
-                            gpsPoint.setLinkedData(
-                                    currentImageRefPath
-                            );  // currentImageRefURI
-                            locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
-                        }
-
                         spinner.setVisibility(View.GONE);
                     }
                 })
@@ -452,22 +434,39 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
+    @SuppressLint("MissingPermission")
     private void handleTakePictureResult(Intent intent) {
-
-//        Bitmap imageBitmap = BitmapFactory.decodeFile(currentImageFile.getAbsolutePath());
-//        if(imageBitmap != null) {
-//            SharedMethods.displayToast(requireActivity(), imageBitmap.toString());
-//            }
         FirebaseUser user = mAuth.getCurrentUser();
-        if(user != null) {
+        if (user != null) {
             String userEmail = user.getEmail();
             boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
-            if(ok){
+            if (ok) {
                 // Add to storage
-                currentImageRefPath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile, currentImageFile.getName());
+                String imagePath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile, currentImageFile.getName());
                 // https://firebasestorage.googleapis.com/v0/b/travelogue-51926.appspot.com/o/images%2F2405kurami%40gmail.com%2F1685367664%2FJPEG_20230529_154115_.jpeg?alt=media&token=9eff4d63-6bae-4234-8711-f938765b09be
-                SharedMethods.displayToast(requireContext(), currentImageRefPath);
-                if(currentImageRefPath != null && !currentImageRefPath.equals("")) {
+                if (imagePath != null) {
+                    FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+                    locationClient.getLastLocation()
+                            .addOnSuccessListener(location -> {
+                                // GPS location can be null if GPS is switched off
+                                if (location != null) {
+                                    double latitude = location.getLatitude();
+                                    double longitude = location.getLongitude();
+                                    GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
+                                    gpsPoint.setLongitude(longitude);
+                                    gpsPoint.setLatitude(latitude);
+                                    // linkedDataType = photo et linkedData = currentImageRefPath
+                                    gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
+                                    gpsPoint.setLinkedData(imagePath);
+                                    locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                                e.printStackTrace();
+                                SharedMethods.displayToast(requireActivity(), getString(R.string.error_getting_last_gps_point));
+                            });
+
                     // Deletes local image
                     boolean isDeleted = currentImageFile.delete();
                     SharedMethods.displayDebugLogMessage("Image_deleted", String.valueOf(isDeleted));
@@ -498,28 +497,16 @@ public class HomeFragment extends Fragment implements
 
     // Use in the homeFragment
     public void displayImage(String imageReferencePath) {
-        if(!imageReferencePath.equals("")) {
+        if (!imageReferencePath.equals("")) {
             // Reference to an image file in Cloud Storage
             StorageReference imageReference = FirebaseStorage.getInstance().getReference().child(imageReferencePath);
-
-            spinner.setVisibility(View.VISIBLE);
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
-
+            ImageView imageView;
             imageView = new ImageView(requireContext());
             // Download directly from StorageReference using Glide
             // (See MyAppGlideModule for Loader registration)
             Glide.with(requireActivity())
                     .load(imageReference)
                     .into(imageView);
-
-            builder.setView(imageView)
-                    .setTitle("Image")
-                    .setPositiveButton("OK", (dialog, which) -> {
-                        spinner.setVisibility(View.GONE);
-                        mapFragment.getMapAsync(this);
-                    });
-
-            builder.show();
         }
     }
 
