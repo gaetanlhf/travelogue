@@ -39,6 +39,8 @@ public class LoginActivity extends AppCompatActivity {
     private static final String readingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata";
     private static final String editingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata";
     private static final String sharingPhotoScope = "https://www.googleapis.com/auth/photoslibrary.sharing";
+    private static final String viewAndManageOnlyDriveDataCreatedByTravelogueScope = "https://www.googleapis.com/auth/drive.file";
+    private static final String viewAndManageOnlyTravelogueDataInDriveAppsScope = "https://www.googleapis.com/auth/drive.appdata";
     private FirebaseAuth mAuth;
     private ProgressBar spinner;
     private SignInButton signInButton;
@@ -80,7 +82,9 @@ public class LoginActivity extends AppCompatActivity {
                 .requestScopes(
                         new Scope(writingPhotoScope),
                         new Scope(readingOnlyPhotosCreatedPhotoByTravelogueScope),
-                        new Scope(editingOnlyPhotosCreatedPhotoByTravelogueScope))
+                        new Scope(editingOnlyPhotosCreatedPhotoByTravelogueScope),
+                        new Scope(viewAndManageOnlyDriveDataCreatedByTravelogueScope),
+                        new Scope(viewAndManageOnlyTravelogueDataInDriveAppsScope))
                 .requestServerAuthCode(server_client_id)
                 .requestIdToken(server_client_id)
                 .requestEmail()
