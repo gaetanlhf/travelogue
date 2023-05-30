@@ -32,7 +32,7 @@ public class NoConnection extends AppCompatActivity {
                 }
 
                 try {
-                    Thread.sleep(Constants.TIME_CHECK_CONNECTION); // Check every 2 seconds
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION_RECONNECT);
                 } catch (InterruptedException e) {
                     threadRunning = false;
                 }

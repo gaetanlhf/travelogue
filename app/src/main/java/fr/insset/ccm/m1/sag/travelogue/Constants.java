@@ -23,5 +23,7 @@ public class Constants {
     public static final String UNABLE_TO_GET_IMAGE_FROM_REFERENCE = "Unable to get image from reference.";
     public static final String UNABLE_TO_DELETE_IMAGE_FROM_REFERENCE = "Unable to delete image from reference.";
     public static final String UNABLE_TO_DELETE_TRAVEL_REFERENCE = "Unable to delete the reference of travel.";
-    public static final Integer TIME_CHECK_CONNECTION = 2000;
+    public static final Integer TIME_CHECK_CONNECTION = 5000;
+    public static final Integer TIME_CHECK_CONNECTION_RECONNECT = 2000;
+
 }

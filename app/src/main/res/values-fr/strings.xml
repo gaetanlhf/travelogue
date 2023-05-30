@@ -129,5 +129,5 @@
     <string name="to_date">"au "</string>
     <string name="bottom_sheet_point_no_image">L\'image est en cours de téléversement ou ne peut être trouvée.</string>
     <string name="welcome_activity_permissions_alert_title">Avant de commencer</string>
-    <string name="welcome_activity_permissions_alert_message">Vous devez accorder des autorisations à l\'application pour que les fonctions décrites dans cet écran fonctionnent.\\nVous pouvez ensuite vous connecter.</string>
+    <string name="welcome_activity_permissions_alert_message">Vous devez accorder des autorisations à l\'application pour que les fonctions décrites dans cet écran fonctionnent. Vous pourrez ensuite vous connecter.</string>
 </resources>

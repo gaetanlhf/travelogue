@@ -76,7 +76,7 @@ public class TravelHelper {
 
     public void getTravels(Callback2 callback2) {
         db.collection(id)
-                .document("travels")
+                .document("data")
                 .collection("travels")
                 .get()
                 .addOnCompleteListener(task -> {
