@@ -79,11 +79,7 @@ public class LoginActivity extends AppCompatActivity {
 
         server_client_id = getString(R.string.server_client_id);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(
-                        new Scope(writingPhotoScope),
-                        new Scope(readingOnlyPhotosCreatedPhotoByTravelogueScope),
-                        new Scope(editingOnlyPhotosCreatedPhotoByTravelogueScope),
-                        new Scope(viewAndManageOnlyDriveDataCreatedByTravelogueScope),
+                .requestScopes(new Scope(viewAndManageOnlyDriveDataCreatedByTravelogueScope),
                         new Scope(viewAndManageOnlyTravelogueDataInDriveAppsScope))
                 .requestServerAuthCode(server_client_id)
                 .requestIdToken(server_client_id)
