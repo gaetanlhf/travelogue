@@ -1,23 +1,22 @@
 package fr.insset.ccm.m1.sag.travelogue.fragment;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.squareup.picasso.Picasso;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -25,7 +24,6 @@ import java.util.TimeZone;
 import fr.insset.ccm.m1.sag.travelogue.R;
 
 public class BottomSheetPoint extends BottomSheetDialogFragment {
-
     private static final String ARG_LINKEDDATATYPE = "linkeddatatype";
     private static final String ARG_LINKEDDATA = "linkeddata";
     private static final String ARG_LONGITUDE = "longitude";
@@ -37,6 +35,7 @@ public class BottomSheetPoint extends BottomSheetDialogFragment {
     private double longitude;
     private double latitude;
     private String timestamp;
+
 
     public static BottomSheetPoint newInstance(String linkedDataType, String linkedData, double longitude, double latitude, String timestamp) {
         final BottomSheetPoint fragment = new BottomSheetPoint();
@@ -80,24 +79,37 @@ public class BottomSheetPoint extends BottomSheetDialogFragment {
                 textViewText.setText(linkedData);
                 break;
             case "photo":
+                ProgressBar spinner = v.findViewById(R.id.fragment_bottom_sheet_spinner);
+                spinner.setVisibility(View.VISIBLE);
                 titleTextView.setText(R.string.image_gps_point);
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                ImageView imageView = v.findViewById((R.id.fragment_bottom_sheet_point_image));
+                StorageReference storageRef = storage.getReference().child(linkedData);
+
+
+                storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    spinner.setVisibility(View.GONE);
+                    Picasso.get().load(uri).into(imageView);
+                }).addOnFailureListener(exception -> {
+                    spinner.setVisibility(View.GONE);
+                    TextView textViewError = v.findViewById(R.id.fragment_bottom_sheet_point_text);
+                    textViewError.setVisibility(View.VISIBLE);
+                    textViewError.setText(R.string.bottom_sheet_point_no_image);
+                });
+                imageView.setVisibility(View.VISIBLE);
                 break;
         }
 
         TextView textViewPosition = v.findViewById(R.id.fragment_bottom_sheet_point_position);
-        textViewPosition.setVisibility(View.VISIBLE);
         textViewPosition.setText(R.string.longitude + " " + longitude + ", " + R.string.latitude + latitude);
 
         TextView textViewTime = v.findViewById(R.id.fragment_bottom_sheet_point_time);
-        textViewTime.setVisibility(View.VISIBLE);
         textViewTime.setText(getDate(timestamp));
-
-
-            //Picasso.get().load(imageUrl).into(imageView);
 
 
         return v;
     }
+
 
     public String getDate(String timestampStr) {
         long timestamp;
@@ -110,5 +122,6 @@ public class BottomSheetPoint extends BottomSheetDialogFragment {
         String dateString = dateFormat.format(date);
         return dateString;
     }
+
 
 }

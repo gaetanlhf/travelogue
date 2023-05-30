@@ -1,15 +1,5 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_COARSE_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_FINE_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.BACKGROUND_LOCATION_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.FOREGROUND_SERVICE_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.LOCATION_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.PERMISSION_SETTINGS_CODE;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,7 +10,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -33,7 +22,6 @@ import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionHelper;
-import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
@@ -43,7 +31,8 @@ public class NewTravelActivity extends AppCompatActivity {
     private TextView travelName;
 
     private FirebaseAuth mAuth;
-    private Thread networkCheckThread;
+    private Thread connectivityCheckThread;
+    private volatile boolean threadRunning = false;
     private SharedPrefManager sharedPrefManager;
 
 
@@ -56,15 +45,32 @@ public class NewTravelActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(getResources().getString(R.string.create_new_travel));
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_new_travel);
+        threadRunning = true;
+        connectivityCheckThread = new Thread(() -> {
+            while (threadRunning) {
+                if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                    Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    finish();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION);
+                } catch (InterruptedException e) {
+                    threadRunning = false;
+                }
+            }
+        });
+        connectivityCheckThread.start();
         PermissionHelper.verifyPermissions(this);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -91,9 +97,6 @@ public class NewTravelActivity extends AppCompatActivity {
 
     private void startLocationService(Long timeBetweenAutoGetPoint) {
         if (!LocationService.isServiceRunning) {
-            if (!PermissionsHelper.hasPermission(this, ACCESS_FINE_LOCATION_PERMISSION)) {
-                PermissionsHelper.requestPermissions(this, new String[]{ACCESS_BACKGROUND_LOCATION_PERMISSION, ACCESS_COARSE_LOCATION_PERMISSION, ACCESS_FINE_LOCATION_PERMISSION, FOREGROUND_SERVICE_PERMISSION}, LOCATION_PERMISSION_CODE);
-            }
             Intent intent = new Intent(getApplicationContext(), LocationService.class);
             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
             intent.putExtra("timeBetweenUpdate", timeBetweenAutoGetPoint);
@@ -149,6 +152,10 @@ public class NewTravelActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
+        }
         sharedPrefManager.updateBool("PermissionsRequested", false);
     }
 

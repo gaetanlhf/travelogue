@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.elevation.SurfaceColors;
 
+import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 
@@ -31,7 +32,7 @@ public class NoConnection extends AppCompatActivity {
                 }
 
                 try {
-                    Thread.sleep(1000); // Check every 2 seconds
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION_RECONNECT);
                 } catch (InterruptedException e) {
                     threadRunning = false;
                 }

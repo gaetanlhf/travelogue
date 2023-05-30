@@ -42,9 +42,21 @@ public class WelcomeActivity extends AppCompatActivity {
         skipBtn = findViewById(R.id.welcome_activity_skip_button);
 
         skipBtn.setOnClickListener(view -> {
-            Intent loginActivity = new Intent(WelcomeActivity.this, LoginActivity.class);
-            startActivity(loginActivity);
-            finish();
+            if (PermissionHelper.areAllBasicPermissionsGranted(this)) {
+                Intent loginActivity = new Intent(WelcomeActivity.this, LoginActivity.class);
+                startActivity(loginActivity);
+                finish();
+            } else {
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.welcome_activity_permissions_alert_title)
+                        .setMessage(R.string.welcome_activity_permissions_alert_message)
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            PermissionHelper.verifyPermissions(this);
+                        });
+                builder.show();
+            }
         });
 
         nextBtn.setOnClickListener(view -> {
@@ -52,15 +64,14 @@ public class WelcomeActivity extends AppCompatActivity {
             if (currentPage < layouts.length) {
                 viewPager.setCurrentItem(currentPage);
             } else {
-                if(PermissionHelper.areAllBasicPermissionsGranted(this)) {
+                if (PermissionHelper.areAllBasicPermissionsGranted(this)) {
                     Intent loginActivity = new Intent(WelcomeActivity.this, LoginActivity.class);
                     startActivity(loginActivity);
                     finish();
                 } else {
                     MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
-                            .setTitle("Before going on")
-                            .setMessage("You must grant permissions to the application for the features described in this screen to work.\n" +
-                                    "You can then log in.")
+                            .setTitle(R.string.welcome_activity_permissions_alert_title)
+                            .setMessage(R.string.welcome_activity_permissions_alert_message)
                             .setCancelable(false)
                             .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                                 dialogInterface.dismiss();

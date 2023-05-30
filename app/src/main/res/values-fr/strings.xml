@@ -62,7 +62,7 @@
     <string name="welcome_slide_3_text_view_1">Partagez les points GPS de votre voyage</string>
     <string name="welcome_slide_3_text_view_2">au format GPX ou KML</string>
     <string name="welcome_slide_4_text_view_1">Prenez des photos qui peuvent être localisées</string>
-    <string name="welcome_slide_4_text_view_2">avec un point GPS dans la carte et enregistrées automatiquement sur votre compte Google Photos</string>
+    <string name="welcome_slide_4_text_view_2">avec un point GPS dans la carte</string>
     <string name="welcome_slide_5_text_view_1">Vos données synchronisées et protégées</string>
     <string name="welcome_slide_5_text_view_2">dans le cloud avec votre compte Travelogue</string>
     <string name="login_activity_title">Connexion</string>
@@ -125,4 +125,9 @@
     <string name="unable_to_create_travelogue_album">Impossible de créer l\'album Travelogue</string>
     <string name="delete_trip_modal_title">Supprimer ce voyage</string>
     <string name="delete_trip_modal_text">Êtes-vous certain(e) de vouloir supprimer ce voyage ?</string>
+    <string name="from_date">"Du "</string>
+    <string name="to_date">"au "</string>
+    <string name="bottom_sheet_point_no_image">L\'image est en cours de téléversement ou ne peut être trouvée.</string>
+    <string name="welcome_activity_permissions_alert_title">Avant de commencer</string>
+    <string name="welcome_activity_permissions_alert_message">Vous devez accorder des autorisations à l\'application pour que les fonctions décrites dans cet écran fonctionnent. Vous pourrez ensuite vous connecter.</string>
 </resources>

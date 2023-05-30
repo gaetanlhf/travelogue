@@ -7,29 +7,9 @@ import com.google.gson.Gson;
 public class GpsPoint {
     private double longitude;
     private double latitude;
-
-    public String getLinkedData() {
-        return linkedData;
-    }
-
-    public void setLinkedData(String linkedData) {
-        this.linkedData = linkedData;
-    }
-
-    public String getLinkedDataType() {
-        return linkedDataType;
-    }
-
-    public void setLinkedDataType(String linkedDataType) {
-        this.linkedDataType = linkedDataType;
-    }
-
     private String linkedData;
     private String linkedDataType;
     private String timestamp;
-
-
-//    public GpsPoint()  Check with Augustin
 
     /**
      * GPS Point Constructor
@@ -46,13 +26,31 @@ public class GpsPoint {
         this.linkedData = linkedData;
         this.linkedDataType = linkedDataType;
     }
-
     public GpsPoint(double longitude, double latitude, String linkedDataType, String linkedData, String timestamp) {
         this.longitude = longitude;
         this.latitude = latitude;
         this.linkedData = linkedData;
         this.linkedDataType = linkedDataType;
         this.timestamp = timestamp;
+    }
+
+    public String getLinkedData() {
+        return linkedData;
+    }
+
+
+//    public GpsPoint()  Check with Augustin
+
+    public void setLinkedData(String linkedData) {
+        this.linkedData = linkedData;
+    }
+
+    public String getLinkedDataType() {
+        return linkedDataType;
+    }
+
+    public void setLinkedDataType(String linkedDataType) {
+        this.linkedDataType = linkedDataType;
     }
 
     public double getLongitude() {

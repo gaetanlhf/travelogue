@@ -27,7 +27,6 @@ import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.LoginActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
 import fr.insset.ccm.m1.sag.travelogue.helper.MaterialEditTextPreference;
-import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
@@ -80,9 +79,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 requireContext().startService(intent);
             }
             if (!LocationService.isServiceRunning && sharedPrefManager.getBool("Travelling") && Boolean.parseBoolean(newValue.toString())) {
-                if (!PermissionsHelper.hasPermission(requireContext(), Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
-                    PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
-                }
                 Intent intent = new Intent(requireContext(), LocationService.class);
                 intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
                 intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
@@ -106,9 +102,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 Intent intentStop = new Intent(getContext(), LocationService.class);
                 intentStop.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
                 requireContext().startService(intentStop);
-                if (!PermissionsHelper.hasPermission(requireContext(), Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
-                    PermissionsHelper.requestPermissions(this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
-                }
                 Intent intentStart = new Intent(requireContext(), LocationService.class);
                 intentStart.setAction(Constants.ACTION_START_LOCATION_SERVICE);
                 intentStart.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
@@ -129,15 +122,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         logOut.setSummary(R.string.settings_fragment_logout_summary);
         logOut.setOnPreferenceClickListener(preference -> {
             mAuth.signOut();
+            sharedPrefManager.clearPreferences();
             mGoogleSignInClient.signOut()
-                .addOnCompleteListener(requireActivity(), task -> {
-                    if(LoginActivity.googleApiClientThread != null) {
-                        LoginActivity.googleApiClientThread.interrupt();
-                    }
-                    requireActivity().finish();
-                    Intent mainActivity = new Intent(getActivity(), MainActivity.class);
-                    startActivity(mainActivity);
-                });
+                    .addOnCompleteListener(requireActivity(), task -> {
+                        if (LoginActivity.googleApiClientThread != null) {
+                            LoginActivity.googleApiClientThread.interrupt();
+                        }
+                        requireActivity().finish();
+                        Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+                        startActivity(mainActivity);
+                    });
             return true;
         });
         screen.addPreference(logOut);

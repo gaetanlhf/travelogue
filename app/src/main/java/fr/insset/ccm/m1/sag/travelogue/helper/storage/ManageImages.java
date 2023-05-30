@@ -1,4 +1,4 @@
-package fr.insset.ccm.m1.sag.travelogue.helper.stockage;
+package fr.insset.ccm.m1.sag.travelogue.helper.storage;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
@@ -9,7 +9,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
@@ -44,11 +43,11 @@ public class ManageImages {
         return false;
     }
 
-    public static String addImageToTravelStorage(String userEmail, String travelId, File image, String imageName) {
+    public static String addImageToTravelStorage(String userEmail, String travelId, File image) {
         if (userEmail != null && !userEmail.equals("")) {
             // Check if it already exists
-            StorageReference imageRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + imageName);
-            String imageRefPath = buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + imageName;
+            StorageReference imageRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + image.getName());
+            String imageRefPath = buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + image.getName();
 
             if (image != null) {
                 // Create file metadata including the content type
@@ -75,41 +74,6 @@ public class ManageImages {
 
         return "";
     }
-
-    public static String getImageURIOriginal(String imageRefPath) {
-        if (imageRefPath != null && !imageRefPath.equals("")) {
-            StorageReference imageRef = rootStorage.child(imageRefPath);
-            AtomicReference<String> imageUri = new AtomicReference<>("");
-
-            imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                imageUri.set(String.valueOf(uri));
-            }); // return the image reference uri
-
-            return imageUri.get();
-        }
-        return "";
-    }
-
-//    public interface CallbackGetImageUri {
-//        void onCallbackGetImageUri(AtomicBoolean couldGetUri);
-//    }
-//
-//    public static void getImageURI(CallbackGetImageUri callback, String imageRefPath, Location locationDb, GpsPoint gpsPoint, String currentTravel) {
-//        AtomicBoolean couldGetUri = new AtomicBoolean(true);
-//        if(imageRefPath != null && !imageRefPath.equals("")){
-//            StorageReference imageRef = rootStorage.child(imageRefPath);
-//
-//            imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-//                // linkedDataType = photo et linkedData = currentImageRefPath
-//                gpsPoint.setLinkedDataType(Constants.GPS_POINT_IMAGE_LINKED_TYPE);
-//                gpsPoint.setLinkedData(String.valueOf(uri));
-//                locationDb.addPoint(gpsPoint, currentTravel);
-//                couldGetUri.set(false);
-//                callback.onCallbackGetImageUri(couldGetUri);
-//
-//            }); // return the image reference uri
-//        }
-//    }
 
     public static void deleteImage(String userEmail, String imageRefPath) {
         AtomicBoolean canDeleteImage = new AtomicBoolean(false);
