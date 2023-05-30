@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.fragment.BottomSheetPoint;
@@ -57,13 +57,12 @@ public class TravelActivity extends AppCompatActivity implements
         OnMapReadyCallback {
 
     private final ArrayList<GpsPoint> pointsList = new ArrayList<>();
+    private final Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
     private Travel travel;
     private FirebaseAuth mAuth;
     private TravelHelper travelHelper;
     private Thread connectivityCheckThread;
     private volatile boolean threadRunning = false;
-    private Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +83,7 @@ public class TravelActivity extends AppCompatActivity implements
                 }
 
                 try {
-                    Thread.sleep(2000); // Check every 2 seconds
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION);
                 } catch (InterruptedException e) {
                     threadRunning = false;
                 }
@@ -248,8 +247,6 @@ public class TravelActivity extends AppCompatActivity implements
                     }
                 }
                 Log.d("test", markerDataMap.toString());
-
-
 
 
                 polyline.setPoints(listLatLng);

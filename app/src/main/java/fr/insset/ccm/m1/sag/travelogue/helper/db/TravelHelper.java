@@ -7,8 +7,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -67,7 +65,7 @@ public class TravelHelper {
                         AtomicReferenceArray<GpsPoint> points = new AtomicReferenceArray<>(task.getResult().size());
 
                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString()), documentSnapshot.getData().get("linkedDataType").toString(), documentSnapshot.getData().get("linkedData").toString(), documentSnapshot.getId()));
+                            points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString()), documentSnapshot.getData().get("linkedDataType").toString(), documentSnapshot.getData().get("linkedData").toString(), documentSnapshot.getId()));
                             i++;
                             //Log.d("POINTS", documentSnapshot.getId() + " => " + documentSnapshot.getData().get("latitude"));
                         }

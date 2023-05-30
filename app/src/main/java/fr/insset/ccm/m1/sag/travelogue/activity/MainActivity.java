@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 try {
-                    Thread.sleep(2000); // Check every 2 seconds
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION); // Check every 2 seconds
                 } catch (InterruptedException e) {
                     threadRunning = false;
                 }
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!init.get()) {
                     initDatabase.initDb();
                     boolean ok = ManageImages.initializeStorage(currentUser.getUid());
-                    if(!ok) {
+                    if (!ok) {
                         SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_ROOT_STORAGE);
                     }
                 }
@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

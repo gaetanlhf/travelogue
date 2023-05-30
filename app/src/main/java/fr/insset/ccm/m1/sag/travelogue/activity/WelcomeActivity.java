@@ -42,7 +42,7 @@ public class WelcomeActivity extends AppCompatActivity {
         skipBtn = findViewById(R.id.welcome_activity_skip_button);
 
         skipBtn.setOnClickListener(view -> {
-            if(PermissionHelper.areAllBasicPermissionsGranted(this)) {
+            if (PermissionHelper.areAllBasicPermissionsGranted(this)) {
                 Intent loginActivity = new Intent(WelcomeActivity.this, LoginActivity.class);
                 startActivity(loginActivity);
                 finish();
@@ -50,7 +50,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
                         .setTitle(R.string.welcome_activity_permissions_alert_title)
                         .setMessage(R.string.welcome_activity_permissions_alert_message)
-                  .setCancelable(false)
+                        .setCancelable(false)
                         .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                             dialogInterface.dismiss();
                             PermissionHelper.verifyPermissions(this);
@@ -64,7 +64,7 @@ public class WelcomeActivity extends AppCompatActivity {
             if (currentPage < layouts.length) {
                 viewPager.setCurrentItem(currentPage);
             } else {
-                if(PermissionHelper.areAllBasicPermissionsGranted(this)) {
+                if (PermissionHelper.areAllBasicPermissionsGranted(this)) {
                     Intent loginActivity = new Intent(WelcomeActivity.this, LoginActivity.class);
                     startActivity(loginActivity);
                     finish();

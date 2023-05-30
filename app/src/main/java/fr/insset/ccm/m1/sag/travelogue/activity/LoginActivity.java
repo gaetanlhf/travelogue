@@ -27,7 +27,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Objects;
 
+import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 
 public class LoginActivity extends AppCompatActivity {
@@ -36,19 +38,14 @@ public class LoginActivity extends AppCompatActivity {
     private static final String readingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata";
     private static final String editingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata";
     private static final String sharingPhotoScope = "https://www.googleapis.com/auth/photoslibrary.sharing";
+    public static Thread googleApiClientThread;
     private FirebaseAuth mAuth;
     private ProgressBar spinner;
     private SignInButton signInButton;
     private GoogleSignInClient mGoogleSignInClient;
     private String server_client_id;
-    private String authCode;
     //private final Users users = new Users();
-
-    public static Thread googleApiClientThread;
-
-    private String accessToken;
-    private String refreshToken;
-    private Long expiresInSeconds;
+    private String authCode;
     private final ActivityResultLauncher<Intent> activityResultLaunch = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -59,6 +56,11 @@ public class LoginActivity extends AppCompatActivity {
                     SharedMethods.displayToast(getApplicationContext(), getString(R.string.unable_to_sign_in_with_google_error_text));
                 }
             });
+    private String accessToken;
+    private String refreshToken;
+    private Long expiresInSeconds;
+    private Thread connectivityCheckThread;
+    private volatile boolean threadRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,24 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(SurfaceColors.SURFACE_2.getColor(this));
         getSupportActionBar().setTitle(R.string.login_activity_title);
         setContentView(R.layout.activity_login);
+        threadRunning = true;
+        connectivityCheckThread = new Thread(() -> {
+            while (threadRunning) {
+                if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                    Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    finish();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION);
+                } catch (InterruptedException e) {
+                    threadRunning = false;
+                }
+            }
+        });
+        connectivityCheckThread.start();
 
         signInButton = findViewById(R.id.sign_in_with_google_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -115,6 +135,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
+        }
     }
 
     public void customizeGooglePlusButton(SignInButton signInButton) {

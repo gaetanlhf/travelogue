@@ -13,6 +13,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
+import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.fragment.HomeFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.SettingsFragment;
@@ -51,7 +52,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                 }
 
                 try {
-                    Thread.sleep(2000); // Check every 2 seconds
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION);
                 } catch (InterruptedException e) {
                     threadRunning = false;
                 }
@@ -75,7 +76,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         if (!sharedPrefManager.getBool("PermissionsRequested")) {
             PermissionHelper.verifyPermissions(this);
         }
-            }
+    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -131,11 +132,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         this.fragmentRefreshListener = fragmentRefreshListener;
     }
 
-
-
-    public interface FragmentRefreshListener {
-        void onRefresh();
-    }
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -163,7 +159,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -173,5 +168,10 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         }
         sharedPrefManager.updateBool("PermissionsRequested", false);
 
+    }
+
+
+    public interface FragmentRefreshListener {
+        void onRefresh();
     }
 }

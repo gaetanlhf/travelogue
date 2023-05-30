@@ -124,14 +124,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             mAuth.signOut();
             sharedPrefManager.clearPreferences();
             mGoogleSignInClient.signOut()
-                .addOnCompleteListener(requireActivity(), task -> {
-                    if(LoginActivity.googleApiClientThread != null) {
-                        LoginActivity.googleApiClientThread.interrupt();
-                    }
-                    requireActivity().finish();
-                    Intent mainActivity = new Intent(getActivity(), MainActivity.class);
-                    startActivity(mainActivity);
-                });
+                    .addOnCompleteListener(requireActivity(), task -> {
+                        if (LoginActivity.googleApiClientThread != null) {
+                            LoginActivity.googleApiClientThread.interrupt();
+                        }
+                        requireActivity().finish();
+                        Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+                        startActivity(mainActivity);
+                    });
             return true;
         });
         screen.addPreference(logOut);

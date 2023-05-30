@@ -1,9 +1,5 @@
 package fr.insset.ccm.m1.sag.travelogue.entity;
 
-import androidx.annotation.NonNull;
-
-import com.google.gson.Gson;
-
 public class Travel {
 
     private String ID;
@@ -13,14 +9,6 @@ public class Travel {
 
     private boolean isFinish;
 
-    public String getEndTimestamp() {
-        return endTimestamp;
-    }
-
-    public void setEndTimestamp(String endTimestamp) {
-        this.endTimestamp = endTimestamp;
-    }
-
     /**
      *
      */
@@ -29,12 +17,6 @@ public class Travel {
         this.title = title;
         this.endTimestamp = endTimestamp;
         this.isFinish = isFinish;
-    }
-
-
-
-    public void setFinish(boolean finish) {
-        isFinish = finish;
     }
 
     public Travel(String id, String title, String endTimestamp) {
@@ -47,12 +29,21 @@ public class Travel {
         this.title = title;
     }
 
+    public String getEndTimestamp() {
+        return endTimestamp;
+    }
+
+    public void setEndTimestamp(String endTimestamp) {
+        this.endTimestamp = endTimestamp;
+    }
 
     public boolean isFinish() {
         return isFinish;
     }
 
-
+    public void setFinish(boolean finish) {
+        isFinish = finish;
+    }
 
     public String getID() {
         return this.ID;

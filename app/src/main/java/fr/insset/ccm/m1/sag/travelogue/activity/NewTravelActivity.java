@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
@@ -30,7 +31,8 @@ public class NewTravelActivity extends AppCompatActivity {
     private TextView travelName;
 
     private FirebaseAuth mAuth;
-    private Thread networkCheckThread;
+    private Thread connectivityCheckThread;
+    private volatile boolean threadRunning = false;
     private SharedPrefManager sharedPrefManager;
 
 
@@ -43,15 +45,32 @@ public class NewTravelActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(getResources().getString(R.string.create_new_travel));
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_new_travel);
+        threadRunning = true;
+        connectivityCheckThread = new Thread(() -> {
+            while (threadRunning) {
+                if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                    Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    finish();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION);
+                } catch (InterruptedException e) {
+                    threadRunning = false;
+                }
+            }
+        });
+        connectivityCheckThread.start();
         PermissionHelper.verifyPermissions(this);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -133,6 +152,10 @@ public class NewTravelActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
+        }
         sharedPrefManager.updateBool("PermissionsRequested", false);
     }
 

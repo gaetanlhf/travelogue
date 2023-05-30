@@ -14,7 +14,7 @@ import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 
 public class State {
     private final String id;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private SharedPrefManager sharedPrefManager;
 
     public State(String id) {

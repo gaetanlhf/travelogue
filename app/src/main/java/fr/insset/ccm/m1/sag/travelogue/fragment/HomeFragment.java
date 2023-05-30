@@ -57,8 +57,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -93,8 +93,6 @@ public class HomeFragment extends Fragment implements
     private Location locationDb;
     private EditText textField;
     private SupportMapFragment mapFragment;
-    private Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
-
     private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
 
         @Override
@@ -102,6 +100,7 @@ public class HomeFragment extends Fragment implements
             mapFragment.getMapAsync(HomeFragment.this);
         }
     };
+    private final Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
     private View noCurrentTravel;
 
     private SharedPrefManager sharedPrefManager;
@@ -327,8 +326,6 @@ public class HomeFragment extends Fragment implements
                     }
                 }
                 Log.d("test", markerDataMap.toString());
-
-
 
 
                 polyline.setPoints(listLatLng);

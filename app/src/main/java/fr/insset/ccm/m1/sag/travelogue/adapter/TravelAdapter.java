@@ -2,7 +2,6 @@ package fr.insset.ccm.m1.sag.travelogue.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,7 @@ public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     Map<String, String> travelToId = new HashMap<String, String>();
     private List<String> ids;
     private List<String> titles;
-    private List<String> endTimestamp;
+    private final List<String> endTimestamp;
 
     public TravelAdapter(Context context, List<String> ids, List<String> titles, List<String> endTimestamp) {
         this.context = context;
