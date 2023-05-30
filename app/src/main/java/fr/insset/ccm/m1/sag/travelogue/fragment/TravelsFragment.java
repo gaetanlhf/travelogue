@@ -40,6 +40,7 @@ public class TravelsFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     List<String> titles = new ArrayList<>();
     List<String> ids = new ArrayList<>();
+    List<String> endTimestamp = new ArrayList<>();
     private FirebaseAuth mAuth;
     private ProgressBar spinner;
     private TravelAdapter travelAdapter;
@@ -97,6 +98,7 @@ public class TravelsFragment extends Fragment {
                     if (data.get(i) != null) {
                         titles.add(String.valueOf(data.get(i).getTitle()));
                         ids.add(String.valueOf(data.get(i).getID()));
+                        endTimestamp.add(String.valueOf(data.get(i).getEndTimestamp()));
                     }
                 }
                 if (titles.size() == 0) {
@@ -104,7 +106,7 @@ public class TravelsFragment extends Fragment {
                     noTripContent.setVisibility(View.VISIBLE);
                     setHasOptionsMenu(false);
                 } else {
-                    travelAdapter = new TravelAdapter(requireActivity(), ids, titles);
+                    travelAdapter = new TravelAdapter(requireActivity(), ids, titles, endTimestamp);
                     RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireActivity());
                     recyclerView.setLayoutManager(layoutManager);

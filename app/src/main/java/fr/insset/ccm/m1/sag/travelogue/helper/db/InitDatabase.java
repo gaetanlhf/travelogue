@@ -32,7 +32,6 @@ public class InitDatabase {
         Map<String, Object> state = new HashMap<>();
         state.put("isTravelling", false);
         state.put("currentTravel", null);
-        state.put("startedSince", null);
 
         db.collection(id)
                 .document("settings")

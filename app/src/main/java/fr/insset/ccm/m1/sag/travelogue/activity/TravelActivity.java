@@ -24,6 +24,7 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -35,29 +36,33 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.adapter.CustomInfoWindowMarkerAdapter;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
+import fr.insset.ccm.m1.sag.travelogue.fragment.BottomSheetPoint;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
+import fr.insset.ccm.m1.sag.travelogue.helper.TimestampDate;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
-import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
+import fr.insset.ccm.m1.sag.travelogue.helper.storage.ManageImages;
 
 public class TravelActivity extends AppCompatActivity implements
         OnMapReadyCallback {
 
     private final ArrayList<GpsPoint> pointsList = new ArrayList<>();
+    private final Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
     private Travel travel;
     private FirebaseAuth mAuth;
     private TravelHelper travelHelper;
     private Thread connectivityCheckThread;
     private volatile boolean threadRunning = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +83,7 @@ public class TravelActivity extends AppCompatActivity implements
                 }
 
                 try {
-                    Thread.sleep(2000); // Check every 2 seconds
+                    Thread.sleep(Constants.TIME_CHECK_CONNECTION);
                 } catch (InterruptedException e) {
                     threadRunning = false;
                 }
@@ -114,8 +119,8 @@ public class TravelActivity extends AppCompatActivity implements
                 return true;
             case R.id.action_info:
                 String alertString1 = getString(R.string.info_name_travel) + travel.getTitle();
-                String alertString2 = getString(R.string.info_start_time_travel) + travel.getStartDatetime();
-                String alertString3 = getString(R.string.info_end_time_travel) + travel.getEndDatetime();
+                String alertString2 = getString(R.string.info_start_time_travel) + TimestampDate.getDate(travel.getID());
+                String alertString3 = getString(R.string.info_end_time_travel) + TimestampDate.getDate(travel.getEndTimestamp());
                 new MaterialAlertDialogBuilder(this)
                         .setTitle(R.string.info_travel_title)
                         .setMessage(alertString1 + "\n" + alertString2 + "\n" + alertString3)
@@ -201,7 +206,6 @@ public class TravelActivity extends AppCompatActivity implements
         return true;
     }
 
-    @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
@@ -213,37 +217,54 @@ public class TravelActivity extends AppCompatActivity implements
                 .clickable(true));
 
         List<LatLng> listLatLng = new ArrayList<>();
-        TravelHelper travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
-
+        TravelHelper travelHelper = new TravelHelper(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+        markerDataMap.clear();
+        googleMap.clear();
         travelHelper.getPoints(data -> {
+            googleMap.setOnMarkerClickListener(null);
             if (data.length() > 0) {
                 for (int i = 0; i < data.length(); i++) {
+                    Log.d("test", String.valueOf(data.length()));
                     LatLng position = new LatLng(data.get(i).getLatitude(), data.get(i).getLongitude());
                     listLatLng.add(position);
                     pointsList.add(data.get(i));
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(position)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    if (Objects.equals(data.get(i).getLinkedDataType(), "none")) {
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
+                                .position(position)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        markerDataMap.put(marker, data.get(i));
+                    } else if (Objects.equals(data.get(i).getLinkedDataType(), "text")) {
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
+                                .position(position)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                        markerDataMap.put(marker, data.get(i));
+
+                    } else if (Objects.equals(data.get(i).getLinkedDataType(), "photo")) {
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
+                                .position(position)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                        markerDataMap.put(marker, data.get(i));
+                    }
                 }
-                googleMap.setInfoWindowAdapter(new CustomInfoWindowMarkerAdapter(getApplicationContext()));
-                googleMap.setOnMarkerClickListener(marker -> {
-                    Toast.makeText(getApplicationContext(), "Click on marker " + marker.getPosition(), Toast.LENGTH_SHORT).show();
-                    marker.setTitle("Test");
-                    marker.showInfoWindow();
-                    return false;
-                });
+                Log.d("test", markerDataMap.toString());
+
 
                 polyline.setPoints(listLatLng);
-
                 stylePolyline(polyline);
-
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
-                Log.d("TRAVEL_ACTYIVITY", "MAP FINISH");
             }
 
-        }, travel.getID());
+            googleMap.setOnMarkerClickListener(marker -> {
+                GpsPoint gpsPointListen = markerDataMap.get(marker);
+                BottomSheetPoint bottomSheetPoint = BottomSheetPoint.newInstance(gpsPointListen.getLinkedDataType(), gpsPointListen.getLinkedData(), gpsPointListen.getLongitude(), gpsPointListen.getLatitude(), gpsPointListen.getTimestamp());
+                bottomSheetPoint.show(getSupportFragmentManager(), "bottomSheetPointListen");
+                marker.hideInfoWindow();
+                return false;
+            });
 
+        }, travel.getID());
     }
+
 
     private void stylePolyline(Polyline polyline) {
         polyline.setStartCap(new RoundCap());

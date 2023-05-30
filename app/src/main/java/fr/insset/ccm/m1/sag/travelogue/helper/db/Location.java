@@ -1,7 +1,6 @@
 package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;

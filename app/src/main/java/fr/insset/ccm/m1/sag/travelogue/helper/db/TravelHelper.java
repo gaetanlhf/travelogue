@@ -7,8 +7,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -28,19 +26,12 @@ public class TravelHelper {
     }
 
     public String createTravel(String travelName) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
-        String date = dateFormat.format(new Date());
-        String time = timeFormat.format(new Date());
         Long timestampLong = System.currentTimeMillis() / 1000;
         String timestamp = timestampLong.toString();
 
         Map<String, Object> travel = new HashMap<>();
-        travel.put("startDate", date);
-        travel.put("startTime", time);
         travel.put("travelName", travelName);
-        travel.put("endDate", "");
-        travel.put("endTime", "");
+        travel.put("endTimestamp", "");
         travel.put("isFinish", false);
 
         db.collection(id)
@@ -74,7 +65,7 @@ public class TravelHelper {
                         AtomicReferenceArray<GpsPoint> points = new AtomicReferenceArray<>(task.getResult().size());
 
                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
-                                points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString()), documentSnapshot.getData().get("linkedDataType").toString(), documentSnapshot.getData().get("linkedData").toString(), documentSnapshot.getId()));
+                            points.set(i, new GpsPoint(Double.parseDouble(documentSnapshot.getData().get("longitude").toString()), Double.parseDouble(documentSnapshot.getData().get("latitude").toString()), documentSnapshot.getData().get("linkedDataType").toString(), documentSnapshot.getData().get("linkedData").toString(), documentSnapshot.getId()));
                             i++;
                             //Log.d("POINTS", documentSnapshot.getId() + " => " + documentSnapshot.getData().get("latitude"));
                         }
@@ -84,7 +75,6 @@ public class TravelHelper {
     }
 
     public void getTravels(Callback2 callback2) {
-        Log.d("TRAVEL_HELPER", "get travels");
         db.collection(id)
                 .document("data")
                 .collection("travels")
@@ -95,8 +85,7 @@ public class TravelHelper {
                         int i = 0;
                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                             if (Boolean.parseBoolean(Objects.requireNonNull(documentSnapshot.getData().get("isFinish")).toString())) {
-                                Log.d("test", documentSnapshot.getData().get("travelName").toString());
-                                travels.set(i, new Travel(documentSnapshot.getId(), documentSnapshot.getData().get("travelName").toString()));
+                                travels.set(i, new Travel(documentSnapshot.getId(), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("endTimestamp").toString()));
                             }
                             i++;
                         }
@@ -117,7 +106,7 @@ public class TravelHelper {
                     if (task.isSuccessful()) {
                         DocumentSnapshot documentSnapshot = task.getResult();
                         AtomicReference<Travel> travelAtomicReference = new AtomicReference<>();
-                        travelAtomicReference.set(new Travel(documentSnapshot.getId(), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("startDate").toString(), documentSnapshot.getData().get("startTime").toString(), documentSnapshot.getData().get("endDate").toString(), documentSnapshot.getData().get("endTime").toString(), (Boolean) documentSnapshot.getData().get("isFinish")));
+                        travelAtomicReference.set(new Travel(documentSnapshot.getId(), documentSnapshot.getData().get("travelName").toString(), documentSnapshot.getData().get("endTimestamp").toString(), (Boolean) documentSnapshot.getData().get("isFinish")));
                         callback3.onCallback3(travelAtomicReference);
                     }
                 });
@@ -126,12 +115,9 @@ public class TravelHelper {
     public void finishTravel(String travel) {
         Map<String, Object> updateTravel = new HashMap<>();
         updateTravel.put("isFinish", true);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
-        String date = dateFormat.format(new Date());
-        String time = timeFormat.format(new Date());
-        updateTravel.put("endDate", date);
-        updateTravel.put("endTime", time);
+        Long timestampLong = System.currentTimeMillis() / 1000;
+        String timestamp = timestampLong.toString();
+        updateTravel.put("endTimestamp", timestamp);
         db.collection(id)
                 .document("data")
                 .collection("travels")
