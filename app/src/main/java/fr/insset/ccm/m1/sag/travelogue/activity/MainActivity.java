@@ -15,13 +15,12 @@ import java.io.File;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
-import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
-import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
+import fr.insset.ccm.m1.sag.travelogue.helper.storage.ManageImages;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             initDatabase.isInit(init -> {
                 if (!init.get()) {
                     initDatabase.initDb();
-                    boolean ok = ManageImages.initializeStorage(currentUser.getEmail());
+                    boolean ok = ManageImages.initializeStorage(currentUser.getUid());
                     if(!ok) {
                         SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_ROOT_STORAGE);
                     }
@@ -89,9 +88,6 @@ public class MainActivity extends AppCompatActivity {
                             sharedPrefManager.saveString("CurrentTravel", currentTravel.get());
                             Log.d("test", sharedPrefManager.getString("CurrentTravel"));
                             if (!LocationService.isServiceRunning && sharedPrefManager.getBool("Travelling") && sharedPrefManager.getBool("AutoGps")) {
-                                if (!PermissionsHelper.hasPermission(MainActivity.this, Constants.ACCESS_FINE_LOCATION_PERMISSION)) {
-                                    PermissionsHelper.requestPermissions(MainActivity.this, new String[]{Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION, Constants.ACCESS_COARSE_LOCATION_PERMISSION, Constants.ACCESS_FINE_LOCATION_PERMISSION, Constants.FOREGROUND_SERVICE_PERMISSION}, Constants.LOCATION_PERMISSION_CODE);
-                                }
                                 Intent intent = new Intent(MainActivity.this, LocationService.class);
                                 intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
                                 intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
@@ -103,10 +99,16 @@ public class MainActivity extends AppCompatActivity {
                         sharedPrefManager.saveString("CurrentTravel", null);
                     }
                 });
-                File folder = new File(getCacheDir(), "/export/");
-                if (!folder.exists()) {
-                    if (folder.mkdir()) {
-                        Boolean isCreated = folder.mkdirs();
+                File cacheExportFolder = new File(getCacheDir(), "/export/");
+                if (!cacheExportFolder.exists()) {
+                    if (cacheExportFolder.mkdir()) {
+                        Boolean isCreated = cacheExportFolder.mkdirs();
+                    }
+                }
+                File cacheImagesFolder = new File(getCacheDir(), "/images/");
+                if (!cacheImagesFolder.exists()) {
+                    if (cacheImagesFolder.mkdir()) {
+                        Boolean isCreated = cacheImagesFolder.mkdirs();
                     }
                 }
                 Intent homeActivity = new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

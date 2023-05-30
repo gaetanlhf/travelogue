@@ -132,4 +132,9 @@
     <string name="unable_to_create_travelogue_album">Unable to create travelogue album</string>
     <string name="delete_trip_modal_title">Delete this trip</string>
     <string name="delete_trip_modal_text">Are you sure you want to delete this trip?</string>
+    <string name="bottom_sheet_point_no_image">The image is being uploaded or cannot be found.</string>
+    <string name="from_date">"From "</string>
+    <string name="to_date">"to "</string>
+    <string name="welcome_activity_permissions_alert_title">Before going on</string>
+    <string name="welcome_activity_permissions_alert_message">You must grant permissions to the application for the features described in this screen to work.\\n\" +                                     \"You can then log in.</string>
 </resources>

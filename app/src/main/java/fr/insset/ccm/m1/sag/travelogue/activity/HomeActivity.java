@@ -1,19 +1,7 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_COARSE_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_FINE_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.BACKGROUND_LOCATION_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.FOREGROUND_SERVICE_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.LOCATION_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.PERMISSION_SETTINGS_CODE;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -25,14 +13,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
-import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.fragment.HomeFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.SettingsFragment;
 import fr.insset.ccm.m1.sag.travelogue.fragment.TravelsFragment;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionHelper;
-import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 
 

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -75,11 +74,11 @@ import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
+import fr.insset.ccm.m1.sag.travelogue.helper.TimestampDate;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
-import fr.insset.ccm.m1.sag.travelogue.helper.db.Users;
-import fr.insset.ccm.m1.sag.travelogue.helper.stockage.ManageImages;
+import fr.insset.ccm.m1.sag.travelogue.helper.storage.ManageImages;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
 public class HomeFragment extends Fragment implements
@@ -107,7 +106,7 @@ public class HomeFragment extends Fragment implements
 
     private SharedPrefManager sharedPrefManager;
 
-    private final Users users = new Users();
+//    private final Users users = new Users();
 
     private File currentImageFile;
     private final ActivityResultLauncher<Intent> takePictureLaunch = registerForActivityResult(
@@ -153,6 +152,7 @@ public class HomeFragment extends Fragment implements
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fragment_home_map);
         requireActivity().registerReceiver(updateReceiver, new IntentFilter("updateHomeFragment"));
         Log.d("test", String.valueOf(sharedPrefManager.getBool("Travelling")));
+        Log.d("test", "CurrentTravel " + sharedPrefManager.getString("CurrentTravel"));
         if (sharedPrefManager.getBool("Travelling")) {
             travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
             travelHelper.getTravel(data -> {
@@ -193,7 +193,7 @@ public class HomeFragment extends Fragment implements
         switch (item.getItemId()) {
             case R.id.topbar_home_fragment_info:
                 String alertString1 = getString(R.string.info_name_travel) + travel.getTitle();
-                String alertString2 = getString(R.string.info_start_time_travel) + travel.getStartDatetime();
+                String alertString2 = getString(R.string.info_start_time_travel) + TimestampDate.getDate(travel.getID());
                 new MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.info_travel_title)
                         .setMessage(alertString1 + "\n" + alertString2)
@@ -249,30 +249,8 @@ public class HomeFragment extends Fragment implements
                         .setTitle(R.string.add_item_map_title)
                         .setItems(listAddItem, (dialog, which) -> {
                             if (which == 0) {
-                                FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
-
-                                locationClient.getLastLocation()
-                                        .addOnSuccessListener(location -> {
-                                            if (location != null) {
-                                                spinner.setVisibility(View.VISIBLE);
-                                                double latitude = location.getLatitude();
-                                                double longitude = location.getLongitude();
-                                                GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
-                                                gpsPoint.setLongitude(longitude);
-                                                gpsPoint.setLatitude(latitude);
-                                                gpsPoint.setLinkedDataType("none");
-                                                gpsPoint.setLinkedData("none");
-                                                locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
-                                                spinner.setVisibility(View.GONE);
-                                                mapFragment.getMapAsync(this);
-
-                                            }
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.d("MapDemoActivity", "Error trying to get last GPS location");
-                                            e.printStackTrace();
-                                        });
-
+                                dialog.dismiss();
+                                addPoint();
                             } else if (which == 1) {
                                 dialog.dismiss();
                                 addImagePoint();
@@ -342,9 +320,10 @@ public class HomeFragment extends Fragment implements
                         markerDataMap.put(marker, data.get(i));
 
                     } else if (Objects.equals(data.get(i).getLinkedDataType(), "photo")) {
-                        googleMap.addMarker(new MarkerOptions()
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
                                 .position(position)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                        markerDataMap.put(marker, data.get(i));
                     }
                 }
                 Log.d("test", markerDataMap.toString());
@@ -376,6 +355,33 @@ public class HomeFragment extends Fragment implements
         polyline.setColor(SurfaceColors.SURFACE_2.getColor(requireContext()));
         polyline.setJointType(JointType.ROUND);
         polyline.setWidth(20);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void addPoint() {
+        FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
+        locationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        spinner.setVisibility(View.VISIBLE);
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        GpsPoint gpsPoint = new GpsPoint(0, 0, null, null);
+                        gpsPoint.setLongitude(longitude);
+                        gpsPoint.setLatitude(latitude);
+                        gpsPoint.setLinkedDataType("none");
+                        gpsPoint.setLinkedData("none");
+                        locationDb.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+                        spinner.setVisibility(View.GONE);
+                        mapFragment.getMapAsync(this);
+
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                    e.printStackTrace();
+                });
     }
 
     @SuppressLint("MissingPermission")
@@ -430,9 +436,8 @@ public class HomeFragment extends Fragment implements
                     if (location != null) {
                         spinner.setVisibility(View.VISIBLE);
                         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        String filePath = createTempImageFilePath();
-                        currentImageFile = new File(filePath);
-                        Uri imageUri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider", currentImageFile);
+                        currentImageFile = createTempImageFilePath();
+                        Uri imageUri = FileProvider.getUriForFile(requireActivity(), BuildConfig.APPLICATION_ID + ".provider", currentImageFile.getAbsoluteFile());
                         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                         cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         takePictureLaunch.launch(cameraIntent);
@@ -454,7 +459,7 @@ public class HomeFragment extends Fragment implements
             boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
             if (ok) {
                 // Add to storage
-                String imagePath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile, currentImageFile.getName());
+                String imagePath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile);
                 // https://firebasestorage.googleapis.com/v0/b/travelogue-51926.appspot.com/o/images%2F2405kurami%40gmail.com%2F1685367664%2FJPEG_20230529_154115_.jpeg?alt=media&token=9eff4d63-6bae-4234-8711-f938765b09be
                 if (imagePath != null) {
                     FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -492,19 +497,13 @@ public class HomeFragment extends Fragment implements
     }
 
     @SuppressLint("SimpleDateFormat")
-    private String createTempImageFilePath() {
+    private File createTempImageFilePath() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         // Put it in the cache directory ? => getCacheDir()
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File storageDir = requireContext().getCacheDir();
 
-        if (!storageDir.exists()) {
-            if (storageDir.mkdir()) {
-                boolean isCreated = storageDir.mkdirs();
-            }
-        }
-
-        return storageDir.getAbsolutePath() + File.separator + imageFileName + ".jpeg";
+        return new File(storageDir, "images/" + imageFileName + ".jpeg");
     }
 
     // Use in the homeFragment

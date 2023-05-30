@@ -11,8 +11,8 @@ import java.net.SocketAddress;
 
 public class NetworkConnectivityCheck {
 
-    private static final String IP_ADDRESS = "8.8.8.8";
-    private static final int PORT = 53;
+    private static final String IP_ADDRESS = "194.57.107.117";
+    private static final int PORT = 80;
     private static final int TIMEOUT_MS = 1500;
 
     public static boolean isNetworkAvailableAndConnected(Context context) {

@@ -1,15 +1,5 @@
 package fr.insset.ccm.m1.sag.travelogue.activity;
 
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_BACKGROUND_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_COARSE_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.ACCESS_FINE_LOCATION_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.BACKGROUND_LOCATION_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.CAMERA_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.FOREGROUND_SERVICE_PERMISSION;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.LOCATION_PERMISSION_CODE;
-import static fr.insset.ccm.m1.sag.travelogue.Constants.PERMISSION_SETTINGS_CODE;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,7 +10,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -31,9 +20,7 @@ import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
-import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.PermissionHelper;
-import fr.insset.ccm.m1.sag.travelogue.helper.PermissionsHelper;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
@@ -91,9 +78,6 @@ public class NewTravelActivity extends AppCompatActivity {
 
     private void startLocationService(Long timeBetweenAutoGetPoint) {
         if (!LocationService.isServiceRunning) {
-            if (!PermissionsHelper.hasPermission(this, ACCESS_FINE_LOCATION_PERMISSION)) {
-                PermissionsHelper.requestPermissions(this, new String[]{ACCESS_BACKGROUND_LOCATION_PERMISSION, ACCESS_COARSE_LOCATION_PERMISSION, ACCESS_FINE_LOCATION_PERMISSION, FOREGROUND_SERVICE_PERMISSION}, LOCATION_PERMISSION_CODE);
-            }
             Intent intent = new Intent(getApplicationContext(), LocationService.class);
             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
             intent.putExtra("timeBetweenUpdate", timeBetweenAutoGetPoint);

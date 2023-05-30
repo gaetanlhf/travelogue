@@ -21,26 +21,36 @@
         android:textSize="16sp"
         android:layout_marginTop="10dp"/>
 
+    <ProgressBar
+        android:id="@+id/fragment_bottom_sheet_spinner"
+        style="?android:progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="10dp" />
+
     <ImageView
         android:id="@+id/fragment_bottom_sheet_point_image"
+        android:layout_height="480dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
         android:visibility="gone"
         android:layout_marginTop="10dp"/>
 
-    <TextView
-    android:id="@+id/fragment_bottom_sheet_point_time"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textSize="13sp"
-    android:layout_marginTop="20dp"/>
-
-    <TextView
-        android:id="@+id/fragment_bottom_sheet_point_position"
+        <TextView
+        android:id="@+id/fragment_bottom_sheet_point_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="11sp"
-        android:layout_marginTop="5dp"/>
+        android:textSize="13sp"
+        android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:id="@+id/fragment_bottom_sheet_point_position"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:layout_marginTop="5dp"/>
 
 
 

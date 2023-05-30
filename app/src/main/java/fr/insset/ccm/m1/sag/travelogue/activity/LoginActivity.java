@@ -3,8 +3,6 @@ package fr.insset.ccm.m1.sag.travelogue.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -31,7 +29,6 @@ import java.util.Objects;
 
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
-import fr.insset.ccm.m1.sag.travelogue.helper.db.Users;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -45,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private String server_client_id;
     private String authCode;
-    private final Users users = new Users();
+    //private final Users users = new Users();
 
     public static Thread googleApiClientThread;
 
