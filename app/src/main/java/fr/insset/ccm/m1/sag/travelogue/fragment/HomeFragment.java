@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -72,6 +74,7 @@ import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.entity.Travel;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
+import fr.insset.ccm.m1.sag.travelogue.helper.LocationServiceCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.TimestampDate;
@@ -247,17 +250,29 @@ public class HomeFragment extends Fragment implements
                 new MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.add_item_map_title)
                         .setItems(listAddItem, (dialog, which) -> {
+                            LocationServiceCheck locationServiceCheck = new LocationServiceCheck(requireContext());
                             if (which == 0) {
                                 dialog.dismiss();
-                                addPoint();
+                                if (locationServiceCheck.isLocationEnabled()) {
+                                    addPoint();
+                                } else {
+                                    noLocationEnable();
+                                }
                             } else if (which == 1) {
                                 dialog.dismiss();
-                                addImagePoint();
+                                if (locationServiceCheck.isLocationEnabled()) {
+                                    addImagePoint();
+                                } else {
+                                    noLocationEnable();
+                                }
                             } else if (which == 2) {
                                 dialog.dismiss();
-                                addTextPoint();
+                                if (locationServiceCheck.isLocationEnabled()) {
+                                    addTextPoint();
+                                } else {
+                                    noLocationEnable();
+                                }
                             }
-                            dialog.dismiss();
                         })
                         .setNegativeButton(android.R.string.cancel, null)
                         .show();
@@ -352,6 +367,18 @@ public class HomeFragment extends Fragment implements
         polyline.setColor(SurfaceColors.SURFACE_2.getColor(requireContext()));
         polyline.setJointType(JointType.ROUND);
         polyline.setWidth(20);
+    }
+
+    private void noLocationEnable() {
+        MaterialAlertDialogBuilder noLocationEnable = new MaterialAlertDialogBuilder(requireContext());
+        noLocationEnable.setTitle(R.string.alert_no_location_title)
+                .setMessage(R.string.alert_no_location_message)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.yes, (dialog, id) -> {
+                    requireActivity().startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                })
+                .setNegativeButton(android.R.string.no, (dialog, id) -> dialog.cancel());
+        noLocationEnable.show();
     }
 
     @SuppressLint("MissingPermission")
@@ -452,7 +479,7 @@ public class HomeFragment extends Fragment implements
     private void handleTakePictureResult(Intent intent) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            String userEmail = user.getEmail();
+            String userEmail = user.getUid();
             boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
             if (ok) {
                 // Add to storage

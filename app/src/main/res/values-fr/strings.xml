@@ -106,7 +106,7 @@
     <string name="share_subject">"Partage de données GPS du voyage nommé "</string>
     <string name="gps_point_in_menu">Point GPS (en bleu)</string>
     <string name="photo_gps_point_in_menu">Point GPS avec photo (en orange)</string>
-    <string name="text_gps_point_in_menu">Point GPS avec text (en violet)</string>
+    <string name="text_gps_point_in_menu">Point GPS avec texte (en violet)</string>
     <string name="add_item_map_title">Ajouter un élément à la carte</string>
     <string name="alert_add_text_point_title">Ajouter un point GPS avec texte</string>
     <string name="alert_add_text_point_message">Entrez votre texte :</string>
@@ -130,4 +130,6 @@
     <string name="bottom_sheet_point_no_image">L\'image est en cours de téléversement ou ne peut être trouvée.</string>
     <string name="welcome_activity_permissions_alert_title">Avant de commencer</string>
     <string name="welcome_activity_permissions_alert_message">Vous devez accorder des autorisations à l\'application pour que les fonctions décrites dans cet écran fonctionnent. Vous pourrez ensuite vous connecter.</string>
+    <string name="alert_no_location_title">Localisation désactivée</string>
+    <string name="alert_no_location_message">La localisation est désactivée, vous devez l\'activer pour profiter des fonctionnalités de Travelogue. L\'activer ?</string>
 </resources>

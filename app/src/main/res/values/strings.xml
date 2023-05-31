@@ -137,4 +137,6 @@
     <string name="to_date">"to "</string>
     <string name="welcome_activity_permissions_alert_title">Before going on</string>
     <string name="welcome_activity_permissions_alert_message">You must grant permissions to the application for the features described in this screen to work. You can then log in.</string>
+    <string name="alert_no_location_title">Localisation disabled</string>
+    <string name="alert_no_location_message">Localisation is deactivated, you must activate it to take advantage of Travelogue\'s features. Activate it?</string>
 </resources>
