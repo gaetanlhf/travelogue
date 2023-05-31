@@ -171,8 +171,13 @@ public class HomeFragment extends Fragment implements
         }
 
         newTravelBtn.setOnClickListener(v -> {
-            Intent newTravelActivity = new Intent(getActivity(), NewTravelActivity.class);
-            startActivity(newTravelActivity);
+            LocationServiceCheck locationServiceCheck = new LocationServiceCheck(requireContext());
+            if (locationServiceCheck.isLocationEnabled()) {
+                Intent newTravelActivity = new Intent(getActivity(), NewTravelActivity.class);
+                startActivity(newTravelActivity);
+            } else {
+                noLocationEnable();
+            }
         });
 
         ((HomeActivity) requireActivity()).setFragmentRefreshListener(() -> {
