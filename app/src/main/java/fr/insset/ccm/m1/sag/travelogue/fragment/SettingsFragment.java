@@ -19,6 +19,7 @@ import androidx.preference.SwitchPreferenceCompat;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
@@ -26,6 +27,7 @@ import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.activity.HomeActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.LoginActivity;
 import fr.insset.ccm.m1.sag.travelogue.activity.MainActivity;
+import fr.insset.ccm.m1.sag.travelogue.helper.LocationServiceCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.MaterialEditTextPreference;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
@@ -71,20 +73,31 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         switchAutoGps.setWidgetLayoutResource(R.layout.preference_widget_material_switch);
         switchAutoGps.setKey("switch_enable_auto_gps");
         switchAutoGps.setChecked(sharedPrefManager.getBool("AutoGps"));
+
         switchAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
-            settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
-            if (LocationService.isServiceRunning && !Boolean.parseBoolean(newValue.toString())) {
-                Intent intent = new Intent(getContext(), LocationService.class);
-                intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
-                requireContext().startService(intent);
+            LocationServiceCheck locationServiceCheck = new LocationServiceCheck(requireContext());
+            Boolean returnBool = null;
+            if (locationServiceCheck.isLocationEnabled()) {
+                settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
+                if (LocationService.isServiceRunning && !Boolean.parseBoolean(newValue.toString())) {
+                    Intent intent = new Intent(getContext(), LocationService.class);
+                    intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+                    requireContext().startService(intent);
+                }
+                if (!LocationService.isServiceRunning && sharedPrefManager.getBool("Travelling") && Boolean.parseBoolean(newValue.toString())) {
+                    Intent intent = new Intent(requireContext(), LocationService.class);
+                    intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+                    intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
+                    requireContext().startService(intent);
+                }
+                returnBool = true;
+            } else if (!locationServiceCheck.isLocationEnabled() && Boolean.parseBoolean(newValue.toString())){
+                switchAutoGps.setChecked(false);
+                noLocationEnable();
+                returnBool = false;
+
             }
-            if (!LocationService.isServiceRunning && sharedPrefManager.getBool("Travelling") && Boolean.parseBoolean(newValue.toString())) {
-                Intent intent = new Intent(requireContext(), LocationService.class);
-                intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-                intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
-                requireContext().startService(intent);
-            }
-            return true;
+            return returnBool;
         });
         localisationCat.addPreference(switchAutoGps);
 
@@ -156,6 +169,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         dialogFragment.setArguments(bundle);
         dialogFragment.setTargetFragment(this, 0);
         dialogFragment.show(getParentFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
+    }
+
+    private void noLocationEnable() {
+        MaterialAlertDialogBuilder noLocationEnable = new MaterialAlertDialogBuilder(requireContext());
+        noLocationEnable.setTitle(R.string.alert_no_location_title)
+                .setMessage(R.string.alert_no_location_message)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.yes, (dialog, id) -> {
+                    requireActivity().startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                })
+                .setNegativeButton(android.R.string.no, (dialog, id) -> dialog.cancel());
+        noLocationEnable.show();
     }
 
 

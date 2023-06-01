@@ -106,7 +106,7 @@
     <string name="share_subject">"Partage de données GPS du voyage nommé "</string>
     <string name="gps_point_in_menu">Point GPS (en bleu)</string>
     <string name="photo_gps_point_in_menu">Point GPS avec photo (en orange)</string>
-    <string name="text_gps_point_in_menu">Point GPS avec text (en violet)</string>
+    <string name="text_gps_point_in_menu">Point GPS avec texte (en violet)</string>
     <string name="add_item_map_title">Ajouter un élément à la carte</string>
     <string name="alert_add_text_point_title">Ajouter un point GPS avec texte</string>
     <string name="alert_add_text_point_message">Entrez votre texte :</string>
@@ -134,4 +134,6 @@
     <string name="export_images_to_drive_modal_text">"Nombre d'images: "</string>
     <string name="cannot_export_images_to_drive_error_text">Impossible d\'exporter les images de ce voyage dans votre Drive. Veuillez réessayer ultérieurement!</string>
     <string name="export_to_drive_button">Exporter</string>
+    <string name="alert_no_location_title">Localisation désactivée</string>
+    <string name="alert_no_location_message">La localisation est désactivée, vous devez l\'activer pour profiter des fonctionnalités de Travelogue. L\'activer ?</string>
 </resources>
