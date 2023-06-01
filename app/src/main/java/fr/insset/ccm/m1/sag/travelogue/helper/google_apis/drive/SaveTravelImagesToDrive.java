@@ -52,7 +52,7 @@ public class SaveTravelImagesToDrive {
      * Builds a travel folder name for the Drive
      */
     private static String buildTravelFolderName(String travelTitle, String travelId) {
-        return travelTitle + travelId;
+        return travelTitle + "_" + travelId;
     }
 
     /**
