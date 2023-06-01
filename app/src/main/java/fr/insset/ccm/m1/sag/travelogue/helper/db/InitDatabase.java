@@ -2,9 +2,12 @@ package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import fr.insset.ccm.m1.sag.travelogue.Constants;
 
 public class InitDatabase {
     private final String id;
@@ -30,6 +33,7 @@ public class InitDatabase {
         settings.put("timeBetweenAutoGetPoint", 5);
 
         Map<String, Object> state = new HashMap<>();
+        state.put(Constants.DRIVE_FOLDER_DATABASE_KEY, "");
         state.put("isTravelling", false);
         state.put("currentTravel", null);
 

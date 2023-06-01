@@ -23,7 +23,11 @@ public class Constants {
     public static final String UNABLE_TO_GET_IMAGE_FROM_REFERENCE = "Unable to get image from reference.";
     public static final String UNABLE_TO_DELETE_IMAGE_FROM_REFERENCE = "Unable to delete image from reference.";
     public static final String UNABLE_TO_DELETE_TRAVEL_REFERENCE = "Unable to delete the reference of travel.";
+    public static final String UNABLE_TO_COUNT_IMAGES_IN_TRAVEL_REFERENCE = "Unable to count the number of images in this reference of travel.";
     public static final String APP_NAME = "Travelogue";
+    public static final String ACCOUNT_TYPE_FOR_DRIVE_SERVICE = "com.google";
+    public static final String DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
+    public static final String DRIVE_FOLDER_DATABASE_KEY = "travelogueFolderId";
     public static final Integer TIME_CHECK_CONNECTION = 5000;
     public static final Integer TIME_CHECK_CONNECTION_RECONNECT = 2000;
 

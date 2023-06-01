@@ -1,5 +1,9 @@
 package fr.insset.ccm.m1.sag.travelogue.helper.storage;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -7,8 +11,13 @@ import com.google.firebase.storage.UploadTask;
 
 import org.apache.commons.io.FileUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
@@ -49,26 +58,24 @@ public class ManageImages {
             StorageReference imageRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + image.getName());
             String imageRefPath = buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + image.getName();
 
-            if (image != null) {
-                // Create file metadata including the content type
-                StorageMetadata metadata = new StorageMetadata.Builder()
-                        .setContentType(Constants.IMAGES_CONTENT_TYPE)
-                        .setCustomMetadata(userEmailMetadataTitle, userEmail)
-                        .build();
+            // Create file metadata including the content type
+            StorageMetadata metadata = new StorageMetadata.Builder()
+                    .setContentType(Constants.IMAGES_CONTENT_TYPE)
+                    .setCustomMetadata(userEmailMetadataTitle, userEmail)
+                    .build();
 
-                try {
-                    byte[] data = FileUtils.readFileToByteArray(image);
+            try {
+                byte[] data = FileUtils.readFileToByteArray(image);
 
-                    // Upload the file and metadata
-                    UploadTask uploadTask = imageRef.putBytes(data, metadata);
-                    uploadTask.addOnFailureListener(exception -> {
-                        // Handle unsuccessful uploads
-                        displayManageImageError(Constants.UNABLE_TO_ADD_IMAGE_TO_REFERENCE + " => " + imageRefPath);
-                    });
-                    return imageRefPath;
-                } catch (Exception e) {
-                    displayManageImageError(e.getMessage());
-                }
+                // Upload the file and metadata
+                UploadTask uploadTask = imageRef.putBytes(data, metadata);
+                uploadTask.addOnFailureListener(exception -> {
+                    // Handle unsuccessful uploads
+                    displayManageImageError(Constants.UNABLE_TO_ADD_IMAGE_TO_REFERENCE + " => " + imageRefPath);
+                });
+                return imageRefPath;
+            } catch (Exception e) {
+                displayManageImageError(e.getMessage());
             }
         }
 
@@ -125,6 +132,103 @@ public class ManageImages {
         }
 
         return false;
+    }
+
+    public static int countImagesInTravel(String userEmail, String travelId) {
+        AtomicReference<Integer> count = new AtomicReference<>(0);
+        if (userEmail != null && !userEmail.equals("")) {
+            StorageReference travelRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId);
+            travelRef.listAll()
+                    .addOnSuccessListener(listResult -> {
+                        for (StorageReference item : listResult.getItems()) {
+                            // All the items under listRef.
+                            count.set(count.get() + 1);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // Uh-oh, an error occurred!
+                        displayManageImageError(Constants.UNABLE_TO_COUNT_IMAGES_IN_TRAVEL_REFERENCE + " => " + travelId);
+                    });
+        }
+
+        return count.get();
+    }
+
+    public static List<InputStream> getImagesInTravel(String userEmail, String travelId) {
+        List<InputStream> travelImages = new ArrayList<>();
+        if (userEmail != null && !userEmail.equals("")) {
+            StorageReference travelRef = rootStorage.child(buildReferencePath(userEmail) + referenceSeparator + travelId);
+            travelRef.listAll()
+                    .addOnSuccessListener(listResult -> {
+                        for (StorageReference item : listResult.getItems()) {
+                            // String imageRefPath = buildReferencePath(userEmail) + referenceSeparator + travelId + referenceSeparator + image.getName();
+                            // All the items under listRef.
+
+                            item.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
+                                // Use the bytes to display the image
+                                InputStream inputStream = new ByteArrayInputStream(bytes);
+                                travelImages.add(inputStream);
+                            }).addOnFailureListener(exception -> {
+                                // Handle any errors
+                                SharedMethods.displayDebugLogMessage("Getting_images_bytes", exception.getMessage());
+                            });
+
+//                            InputStream tt =
+                            /*
+                            storageRef.child("users/me/profile.png").getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                @Override
+                                public void onSuccess(byte[] bytes) {
+                                    // Use the bytes to display the image
+                                    InputStream myInputStream = new ByteArrayInputStream(myBytes);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle any errors
+                                }
+                            });
+
+                            StorageReference islandRef = storageRef.child("images/island.jpg");
+                            final long ONE_MEGABYTE = 1024 * 1024;
+                            islandRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                @Override
+                                public void onSuccess(byte[] bytes) {
+                                    // Data for "images/island.jpg" is returns, use this as needed
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle any errors
+                                }
+                            });
+                             */
+
+                            /*
+                            islandRef = storageRef.child("images/island.jpg");
+                            File localFile = File.createTempFile("images", "jpg");
+
+                            islandRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                    // Local temp file has been created
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle any errors
+                                }
+                            });
+                             */
+
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // Uh-oh, an error occurred!
+                        displayManageImageError(Constants.UNABLE_TO_COUNT_IMAGES_IN_TRAVEL_REFERENCE + " => " + travelId);
+                    });
+        }
+
+        return travelImages;
     }
 
     private static String buildReferencePath(String userEmail) {

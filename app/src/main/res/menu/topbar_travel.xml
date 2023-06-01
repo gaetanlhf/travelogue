@@ -11,14 +11,20 @@
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/baseline_share"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="@string/topbar_travel_share"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/baseline_delete"
-        android:orderInCategory="100"
+        android:orderInCategory="300"
         android:title="@string/topbar_travel_delete"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_save_to_drive"
+        android:icon="@drawable/_693541_google_drive_storage_cloud_data_icon"
+        android:title="@string/export_images_to_drive_action_title"
+        android:orderInCategory="400"
         app:showAsAction="always" />
 </menu>

@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
+import java.io.IOException;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
@@ -20,6 +21,7 @@ import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.InitDatabase;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Settings;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
+import fr.insset.ccm.m1.sag.travelogue.helper.google_apis.drive.SaveTravelImagesToDrive;
 import fr.insset.ccm.m1.sag.travelogue.helper.storage.ManageImages;
 import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 
@@ -75,12 +77,32 @@ public class MainActivity extends AppCompatActivity {
                         SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_ROOT_STORAGE);
                     }
                 }
+
                 Settings settings = new Settings(currentUser.getUid());
                 settings.getSettings(atomicReferenceArray -> {
                     sharedPrefManager.saveLong("TimeBetweenAutoGps", Long.parseLong(atomicReferenceArray.get(1).toString()));
                     sharedPrefManager.saveBool("AutoGps", Boolean.parseBoolean(atomicReferenceArray.get(0).toString()));
                 });
+
                 State state = new State(currentUser.getUid());
+
+                new Thread(() -> {
+                    try {
+                        String travelogueFolderId = SaveTravelImagesToDrive.initializeTravelogueFolder(getResources(), this, currentUser.getEmail());
+                        state.getTravelogueFolderId(travelogueFolderId1 -> {
+                            if(travelogueFolderId1.get() == null || travelogueFolderId1.get().equals("")) {
+                                state.setTravelogueFolderId(this, travelogueFolderId);
+                                sharedPrefManager.saveString(Constants.DRIVE_FOLDER_DATABASE_KEY, travelogueFolderId);
+                            } else {
+                                state.setTravelogueFolderId(this, travelogueFolderId1.get());
+                                sharedPrefManager.saveString(Constants.DRIVE_FOLDER_DATABASE_KEY, travelogueFolderId1.get());
+                            }
+                        });
+                    } catch (IOException e) {
+                        SharedMethods.displayDebugLogMessage("test_drive", "Exception => " + e.getMessage());
+                    }
+                }).start();
+
                 state.isTravelling(travelling -> {
                     if (travelling.get()) {
                         sharedPrefManager.saveBool("Travelling", travelling.get());
@@ -99,12 +121,14 @@ public class MainActivity extends AppCompatActivity {
                         sharedPrefManager.saveString("CurrentTravel", null);
                     }
                 });
+
                 File cacheExportFolder = new File(getCacheDir(), "/export/");
                 if (!cacheExportFolder.exists()) {
                     if (cacheExportFolder.mkdir()) {
                         Boolean isCreated = cacheExportFolder.mkdirs();
                     }
                 }
+
                 File cacheImagesFolder = new File(getCacheDir(), "/images/");
                 if (!cacheImagesFolder.exists()) {
                     if (cacheImagesFolder.mkdir()) {

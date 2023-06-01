@@ -20,6 +20,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.elevation.SurfaceColors;
+import com.google.api.services.drive.DriveScopes;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,21 +34,8 @@ import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
 
 public class LoginActivity extends AppCompatActivity {
-
-    private static final String writingPhotoScope = "https://www.googleapis.com/auth/photoslibrary.appendonly";
-    private static final String readingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata";
-    private static final String editingOnlyPhotosCreatedPhotoByTravelogueScope = "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata";
-    private static final String sharingPhotoScope = "https://www.googleapis.com/auth/photoslibrary.sharing";
-    private static final String viewAndManageOnlyDriveDataCreatedByTravelogueScope = "https://www.googleapis.com/auth/drive.file";
-    private static final String viewAndManageOnlyTravelogueDataInDriveAppsScope = "https://www.googleapis.com/auth/drive.appdata";
     public static Thread googleApiClientThread;
     private FirebaseAuth mAuth;
-    private ProgressBar spinner;
-    private SignInButton signInButton;
-    private GoogleSignInClient mGoogleSignInClient;
-    private String server_client_id;
-    //private final Users users = new Users();
-    private String authCode;
     private final ActivityResultLauncher<Intent> activityResultLaunch = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -58,9 +46,9 @@ public class LoginActivity extends AppCompatActivity {
                     SharedMethods.displayToast(getApplicationContext(), getString(R.string.unable_to_sign_in_with_google_error_text));
                 }
             });
-    private String accessToken;
-    private String refreshToken;
-    private Long expiresInSeconds;
+    private ProgressBar spinner;
+    private SignInButton signInButton;
+    private GoogleSignInClient mGoogleSignInClient;
     private Thread connectivityCheckThread;
     private volatile boolean threadRunning = false;
 
@@ -94,11 +82,10 @@ public class LoginActivity extends AppCompatActivity {
         signInButton.setColorScheme(SignInButton.COLOR_DARK);
         customizeGooglePlusButton(signInButton);
 
-        server_client_id = getString(R.string.server_client_id);
+        String server_client_id = getString(R.string.server_client_id);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(new Scope(viewAndManageOnlyDriveDataCreatedByTravelogueScope),
-                        new Scope(viewAndManageOnlyTravelogueDataInDriveAppsScope))
-                .requestServerAuthCode(server_client_id)
+                .requestScopes(new Scope(DriveScopes.DRIVE_FILE),
+                        new Scope(DriveScopes.DRIVE_APPDATA))
                 .requestIdToken(server_client_id)
                 .requestEmail()
                 .build();
@@ -156,7 +143,6 @@ public class LoginActivity extends AppCompatActivity {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            this.authCode = account.getServerAuthCode();
 
             // When sign in account is not equal to null initialize auth credential
             AuthCredential authCredential = GoogleAuthProvider.getCredential(account.getIdToken(), null);

@@ -137,4 +137,8 @@
     <string name="to_date">"to "</string>
     <string name="welcome_activity_permissions_alert_title">Before going on</string>
     <string name="welcome_activity_permissions_alert_message">You must grant permissions to the application for the features described in this screen to work. You can then log in.</string>
+    <string name="export_images_to_drive_action_title">Export travel images to Drive</string>
+    <string name="export_images_to_drive_modal_text">Number of images:</string>
+    <string name="cannot_export_images_to_drive_error_text">We could not export the images of this trip to your Drive. Please try agin later!</string>
+    <string name="export_to_drive_button">Export</string>
 </resources>

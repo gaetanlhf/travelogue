@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
@@ -49,8 +51,12 @@ import fr.insset.ccm.m1.sag.travelogue.fragment.BottomSheetPoint;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateGpx;
 import fr.insset.ccm.m1.sag.travelogue.helper.GenerateKml;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
+import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.TimestampDate;
+import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.TravelHelper;
+import fr.insset.ccm.m1.sag.travelogue.helper.google_apis.drive.SaveTravelImagesToDrive;
 import fr.insset.ccm.m1.sag.travelogue.helper.storage.ManageImages;
 
 public class TravelActivity extends AppCompatActivity implements
@@ -189,6 +195,59 @@ public class TravelActivity extends AppCompatActivity implements
                                         finish();
                                     }
                                 }, travel.getID());
+                                finish();
+                            }
+                        })
+                        .show();
+                return true;
+            case R.id.action_save_to_drive:
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle(getString(R.string.export_images_to_drive_action_title))
+                        .setMessage(
+                                getString(R.string.export_images_to_drive_modal_text) + " " + ManageImages.countImagesInTravel(mAuth.getCurrentUser().getEmail(), travel.getID())
+                        )
+                        .setNegativeButton(android.R.string.no, null)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (mAuth.getCurrentUser() != null) {
+                                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                                    String userEmail = currentUser.getEmail();
+                                    String travelEndDate = travel.getEndTimestamp();
+                                    AtomicReference<String> travelogueFolderID = new AtomicReference<>(SharedPrefManager.getInstance(getApplicationContext()).getString(Constants.DRIVE_FOLDER_DATABASE_KEY));
+
+                                    State state = new State(currentUser.getUid());
+                                    state.getTravelogueFolderId(travelogueFolderId -> {
+                                        if(travelogueFolderId.get() != null && !travelogueFolderId.get().equals("")) {
+                                            travelogueFolderID.set(travelogueFolderId.get());
+                                        }
+                                    });
+
+                                    // Export images to drive
+                                    new Thread(() -> {
+                                        try {
+                                            boolean couldExport = SaveTravelImagesToDrive.exportTravelImagesToDrive(
+                                                    getResources(),
+                                                    getApplicationContext(),
+                                                    userEmail,
+                                                    travelogueFolderID.get(),
+                                                    travel.getID(),
+                                                    travelEndDate,
+                                                    travel.getTitle()
+                                            );
+
+                                            if(!couldExport) {
+                                                SharedMethods.displayDebugLogMessage("test_drive", getString(R.string.cannot_export_images_to_drive_error_text));
+                                            }
+                                        } catch (IOException e) {
+                                            SharedMethods.displayDebugLogMessage("test_drive", "Exception => " + e.getMessage());
+                                        }
+                                    }).start();
+
+//                                        if(!couldExport) {
+//                                            SharedMethods.displayToast(getApplicationContext(), getString(R.string.cannot_export_images_to_drive_error_text));
+//                                        }
+                                }
                                 finish();
                             }
                         })

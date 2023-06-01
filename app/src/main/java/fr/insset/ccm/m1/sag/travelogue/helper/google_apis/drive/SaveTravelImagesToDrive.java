@@ -1,182 +1,189 @@
 package fr.insset.ccm.m1.sag.travelogue.helper.google_apis.drive;
 
+import android.accounts.Account;
+import android.content.Context;
 import android.content.res.Resources;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.http.FileContent;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.GoogleCredentials;
-import java.io.IOException;
-import java.util.Arrays;
-
+import com.google.api.services.drive.model.FileList;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
-import fr.insset.ccm.m1.sag.travelogue.helper.SharedMethods;
-import fr.insset.ccm.m1.sag.travelogue.helper.db.Users;
+import fr.insset.ccm.m1.sag.travelogue.R;
+import fr.insset.ccm.m1.sag.travelogue.helper.storage.ManageImages;
 
 public class SaveTravelImagesToDrive {
-    private FirebaseAuth mAuth;
-    private FirebaseUser currentUser;
-    private final Users users = new Users();
 
-    private String accessToken;
-    private String refreshToken;
-    private Long expiresInSeconds;
+    /** Creates a Drive Service */
+    private static Drive createDriveService(Context context, String userEmail) {
+        Account account = new Account(userEmail, Constants.ACCOUNT_TYPE_FOR_DRIVE_SERVICE);
 
-    private boolean saveTravelImages(FirebaseAuth mAuth) {
-        this.mAuth = mAuth;
-        this.currentUser = this.mAuth.getCurrentUser();
+        GoogleAccountCredential credential =
+                GoogleAccountCredential.usingOAuth2(
+                        context, Arrays.asList(DriveScopes.DRIVE_FILE, DriveScopes.DRIVE_APPDATA));
+        credential.setSelectedAccount(account);
 
-        // Get images from ManageImages (Firebase Storage)
-        // boolean couldUploadAllFiles = true; List<String> errorImages ?
-        // And loop it using uploadToFolder(travelogueDriveFolderId, file);
-        // if error / null file, errorImages.add(file)
-        // if(errorImages.size() > 0) couldUploadAllFiles = false;
-        // return couldUploadAllFiles
-
-        return false;
-    }
-
-    /**
-     * Upload a file to the specified folder.
-     *
-     * @param realFolderId Id of the folder.
-     * @return Inserted file metadata if successful, {@code null} otherwise.
-     * @throws IOException if service account credentials file not found.
-     */
-    public static File uploadToFolder(String realFolderId, java.io.File imageFile) throws IOException {
-        // Load pre-authorized user credentials from the environment.
-        // TODO(developer) - See https://developers.google.com/identity for
-        // guides on implementing OAuth2 for your application.
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
-                .createScoped(Collections.singletonList(DriveScopes.DRIVE_FILE));
-        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(
-                credentials);
-
-        // Build a new authorized API client service.
-        Drive service = new Drive.Builder(new NetHttpTransport(),
-                GsonFactory.getDefaultInstance(),
-                requestInitializer)
+        return new Drive.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new GsonFactory(),
+                credential)
                 .setApplicationName(Constants.APP_NAME)
                 .build();
+    }
 
-        // File's metadata.
+    /** Builds a travel folder name for the Drive */
+    private static String buildTravelFolderName(String travelTitle, String travelId) {
+        return travelTitle + travelId;
+    }
+
+    /** Initializes the app (Travelogue) folder */
+    public static String initializeTravelogueFolder(Resources resources, Context context, String userEmail) throws IOException {
+        // Build a new authorized API client service.
+        Drive service = createDriveService(context, userEmail);
+        String travelogueFolderID = createChildFolder(service, context, userEmail, Constants.APP_NAME, null);
+        if(travelogueFolderID != null && !travelogueFolderID.equals("")) {
+            InputStream imageTravStream = resources.openRawResource(R.raw.travelogue_logo);
+            String travelogueLogo = Constants.APP_NAME + "_logo.jpeg";
+            boolean isOK = uploadFileFromInputStream(service, imageTravStream, travelogueLogo, travelogueFolderID);
+        }
+
+        return travelogueFolderID;
+    }
+
+    /** Create new folder. */
+    public static String createChildFolder(Drive service, Context context, String userEmail, String folderName, String parentId) throws IOException {
+        boolean folderExists = (searchCreatedFolder(service, context, userEmail, folderName).size() > 0);
+        if(!folderExists) {
+            // Folder's metadata.
+            File folderMetadata = new File();
+            folderMetadata.setName(folderName);
+            if(parentId != null) {
+                folderMetadata.setParents(Collections.singletonList(parentId));
+            }
+            folderMetadata.setMimeType(Constants.DRIVE_FOLDER_MIME_TYPE);
+            try {
+                File folder = service.files().create(folderMetadata)
+                        .setFields("id")
+                        .execute();
+
+                return folder.getId();
+            } catch (GoogleJsonResponseException e) {
+                System.err.println("Unable to create folder: " + e.getDetails());
+                throw e;
+            }
+        } else {
+            return searchCreatedFolder(service, context, userEmail, folderName).get(0);
+        }
+    }
+
+    /** Create new folder. */
+    private static String createFolder(Drive service, Context context, String userEmail) throws IOException {
+        return createChildFolder(service, context, userEmail, Constants.APP_NAME, null);
+    }
+
+    private enum FileType {
+        InputStream,
+        File
+    }
+
+    private static void uploadFileBasic(Drive service, java.io.File imageFile, String fileName, String parentId) {
+        String filename = (fileName.contains(".jpeg") || fileName.contains(".jpg") || fileName.contains(".png")) ? fileName : fileName.concat(".jpeg");
+
         File fileMetadata = new File();
-        fileMetadata.setName(imageFile.getName());
-        fileMetadata.setParents(Collections.singletonList(realFolderId));
-        FileContent mediaContent = new FileContent(Constants.IMAGES_CONTENT_TYPE, imageFile);
+        fileMetadata.setName(filename);
+        fileMetadata.setParents(Collections.singletonList(parentId));
+        FileContent content = new FileContent(Constants.IMAGES_CONTENT_TYPE, imageFile);
+
         try {
-            File file = service.files().create(fileMetadata, mediaContent)
+            File fileLogo = service.files().create(fileMetadata, content)
                     .setFields("id, parents")
                     .execute();
-            System.out.println("File ID: " + file.getId());
-            return file;
-        } catch (GoogleJsonResponseException e) {
-            // TODO(developer) - handle error appropriately
-            System.err.println("Unable to upload file: " + e.getDetails());
-            throw e;
+            System.out.println(fileLogo.getId());
+        } catch (IOException exc) {
+            System.err.println("Unable to upload file: " + exc.getMessage());
         }
     }
 
+    private static boolean uploadFileFromInputStream(Drive service, InputStream inputStream, String fileName, String parentId) {
+        String filename = (fileName.contains(".jpeg") || fileName.contains(".jpg") || fileName.contains(".png")) ? fileName : fileName.concat(".jpeg");
+        AtomicBoolean isOk = new AtomicBoolean(false);
 
-    /**
-     * Create new folder.
-     *
-     * @return Inserted folder id if successful, {@code null} otherwise.
-     * @throws IOException if service account credentials file not found.
-     */
-    public static String createFolder() throws IOException {
-        // Load pre-authorized user credentials from the environment.
-        // TODO(developer) - See https://developers.google.com/identity for
-        // guides on implementing OAuth2 for your application.
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
-                .createScoped(Collections.singletonList(DriveScopes.DRIVE_FILE));
-        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(
-                credentials);
-
-        // Build a new authorized API client service.
-        Drive service = new Drive.Builder(new NetHttpTransport(),
-                GsonFactory.getDefaultInstance(),
-                requestInitializer)
-                .setApplicationName(Constants.APP_NAME)
-                .build();
-        // File's metadata.
         File fileMetadata = new File();
-        fileMetadata.setName(Constants.APP_NAME);
-        fileMetadata.setMimeType("application/vnd.google-apps.folder");
+        fileMetadata.setName(filename);
+        fileMetadata.setParents(Collections.singletonList(parentId));
+        InputStreamContent content = new InputStreamContent(Constants.IMAGES_CONTENT_TYPE, inputStream);
+
         try {
-            File file = service.files().create(fileMetadata)
-                    .setFields("id")
+            File file = service.files().create(fileMetadata, content)
+                    .setFields("id, parents")
                     .execute();
-            System.out.println("Folder ID: " + file.getId());
-            return file.getId();
-        } catch (GoogleJsonResponseException e) {
-            // TODO(developer) - handle error appropriately
-            System.err.println("Unable to create folder: " + e.getDetails());
-            throw e;
+            System.out.println(file.getId());
+            isOk.set(true);
+        } catch (IOException exc) {
+            System.err.println("Unable to upload file: " + exc.getMessage());
         }
+
+        return isOk.get();
     }
 
+    /** Search for a specific folder */
+    private static List<String> searchCreatedFolder(Drive service, Context context, String userEmail, String folderName) throws IOException {
+        List<String> foldersId = new ArrayList<>();
+        String pageToken = null;
+        do {
+            FileList result = service.files().list()
+                    .setQ("mimeType = '" + Constants.DRIVE_FOLDER_MIME_TYPE + "' and name = '" + folderName + "' and trashed = false")
+                    .setSpaces("drive")
+                    .setFields("nextPageToken, files(id, name)")
+                    .setPageToken(pageToken)
+                    .execute();
 
+            result.getFiles().forEach(f -> {
+                foldersId.add(f.getId());  // Must return 0 or 1 element
+            });
 
-    private Thread startGoogleDriveClient(String userAuthCode, Resources resources) {
-        if (currentUser != null) {
-            if (!users.getAlbumCreated(currentUser.getEmail())) {
-                if(!userAuthCode.equals("")) {
-                    return new Thread(() -> {
-                        // do background stuff here
-                        String REDIRECT_URI = "";
-                        GoogleClientSecrets clientSecrets = null;
-                        try {
-                            clientSecrets = SharedMethods.getClientSecrets(resources);
-                            GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
-                                    new NetHttpTransport(),
-                                    GsonFactory.getDefaultInstance(),
-                                    "https://www.googleapis.com/oauth2/v4/token",
-                                    clientSecrets.getDetails().getClientId(),
-                                    clientSecrets.getDetails().getClientSecret(),
-                                    userAuthCode,
-                                    REDIRECT_URI)
-                                    .execute();
-                            accessToken = tokenResponse.getAccessToken();
-                            refreshToken = tokenResponse.getRefreshToken();
-                            expiresInSeconds = tokenResponse.getExpiresInSeconds();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+//            folders.addAll(result.getFiles());
+            pageToken = result.getNextPageToken();
+        } while (pageToken != null);
 
-//                        runOnUiThread(() -> {
-//                            // OnPostExecute stuff here
-//                        });
-                    });
-                }
-            }
-        }
+        return foldersId;
+    }
 
-        return null;
+    private static String buildImageFileName(String travelDate, int imageNumber) {
+        return ("JPEG_".concat(travelDate)).concat("_").concat(String.valueOf(imageNumber)).concat(".jpeg");
+    }
+
+    public static boolean exportTravelImagesToDrive(Resources resources, Context context, String userEmail, String travelogueFolderId, String travelId, String travelDate, String travelTitle) throws IOException {
+        AtomicBoolean canExportImages = new AtomicBoolean(true);
+        String travelFolderName = buildTravelFolderName(travelTitle, travelId);
+        Drive service = createDriveService(context, userEmail);
+        String travelFolderId = createChildFolder(service, context, userEmail, travelFolderName, travelogueFolderId);
+
+        List<InputStream> images = ManageImages.getImagesInTravel(userEmail, travelId);
+
+        AtomicInteger imageNb = new AtomicInteger(1);
+        images.forEach(image -> {
+            String filename = buildImageFileName(travelDate, imageNb.get());
+            canExportImages.set(canExportImages.get() && uploadFileFromInputStream(service, image, filename, travelFolderId));
+            imageNb.getAndIncrement();
+        });
+
+        return canExportImages.get();
     }
 }
