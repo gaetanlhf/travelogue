@@ -25,12 +25,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
-import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.storage.ManageImages;
 
 public class SaveTravelImagesToDrive {
 
-    /** Creates a Drive Service */
+    /**
+     * Creates a Drive Service
+     */
     private static Drive createDriveService(Context context, String userEmail) {
         Account account = new Account(userEmail, Constants.ACCOUNT_TYPE_FOR_DRIVE_SERVICE);
 
@@ -47,33 +48,32 @@ public class SaveTravelImagesToDrive {
                 .build();
     }
 
-    /** Builds a travel folder name for the Drive */
+    /**
+     * Builds a travel folder name for the Drive
+     */
     private static String buildTravelFolderName(String travelTitle, String travelId) {
         return travelTitle + travelId;
     }
 
-    /** Initializes the app (Travelogue) folder */
+    /**
+     * Initializes the app (Travelogue) folder
+     */
     public static String initializeTravelogueFolder(Resources resources, Context context, String userEmail) throws IOException {
         // Build a new authorized API client service.
         Drive service = createDriveService(context, userEmail);
-        String travelogueFolderID = createChildFolder(service, context, userEmail, Constants.APP_NAME, null);
-        if(travelogueFolderID != null && !travelogueFolderID.equals("")) {
-            InputStream imageTravStream = resources.openRawResource(R.raw.travelogue_logo);
-            String travelogueLogo = Constants.APP_NAME + "_logo.jpeg";
-            boolean isOK = uploadFileFromInputStream(service, imageTravStream, travelogueLogo, travelogueFolderID);
-        }
-
-        return travelogueFolderID;
+        return createChildFolder(service, context, userEmail, Constants.APP_NAME, null);
     }
 
-    /** Create new folder. */
+    /**
+     * Create new folder.
+     */
     public static String createChildFolder(Drive service, Context context, String userEmail, String folderName, String parentId) throws IOException {
         boolean folderExists = (searchCreatedFolder(service, context, userEmail, folderName).size() > 0);
-        if(!folderExists) {
+        if (!folderExists) {
             // Folder's metadata.
             File folderMetadata = new File();
             folderMetadata.setName(folderName);
-            if(parentId != null) {
+            if (parentId != null) {
                 folderMetadata.setParents(Collections.singletonList(parentId));
             }
             folderMetadata.setMimeType(Constants.DRIVE_FOLDER_MIME_TYPE);
@@ -92,14 +92,11 @@ public class SaveTravelImagesToDrive {
         }
     }
 
-    /** Create new folder. */
+    /**
+     * Create new folder.
+     */
     private static String createFolder(Drive service, Context context, String userEmail) throws IOException {
         return createChildFolder(service, context, userEmail, Constants.APP_NAME, null);
-    }
-
-    private enum FileType {
-        InputStream,
-        File
     }
 
     private static void uploadFileBasic(Drive service, java.io.File imageFile, String fileName, String parentId) {
@@ -142,7 +139,9 @@ public class SaveTravelImagesToDrive {
         return isOk.get();
     }
 
-    /** Search for a specific folder */
+    /**
+     * Search for a specific folder
+     */
     private static List<String> searchCreatedFolder(Drive service, Context context, String userEmail, String folderName) throws IOException {
         List<String> foldersId = new ArrayList<>();
         String pageToken = null;
@@ -166,7 +165,7 @@ public class SaveTravelImagesToDrive {
     }
 
     private static String buildImageFileName(String travelDate, int imageNumber) {
-        return ("JPEG_".concat(travelDate)).concat("_").concat(String.valueOf(imageNumber)).concat(".jpeg");
+        return ("JPEG_" .concat(travelDate)).concat("_").concat(String.valueOf(imageNumber)).concat(".jpeg");
     }
 
     public static boolean exportTravelImagesToDrive(Resources resources, Context context, String userEmail, String travelogueFolderId, String travelId, String travelDate, String travelTitle) throws IOException {
@@ -185,5 +184,10 @@ public class SaveTravelImagesToDrive {
         });
 
         return canExportImages.get();
+    }
+
+    private enum FileType {
+        InputStream,
+        File
     }
 }
