@@ -484,7 +484,7 @@ public class HomeFragment extends Fragment implements
     private void handleTakePictureResult(Intent intent) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            String userEmail = user.getUid();
+            String userEmail = user.getEmail();
             boolean ok = ManageImages.initializeTravelStorage(userEmail, travel.getID());
             if (ok) {
                 // Add to storage

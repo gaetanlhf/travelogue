@@ -131,9 +131,11 @@
     <string name="welcome_activity_permissions_alert_title">Avant de commencer</string>
     <string name="welcome_activity_permissions_alert_message">Vous devez accorder des autorisations à l\'application pour que les fonctions décrites dans cet écran fonctionnent. Vous pourrez ensuite vous connecter.</string>
     <string name="export_images_to_drive_action_title">Exporter les photos du voyage dans Drive</string>
-    <string name="export_images_to_drive_modal_text">"Nombre d'images: "</string>
+    <string name="export_images_to_drive_modal_text">Vos images sont exportées de manière asynchrone.\nL\'opération peut prendre jusqu\'à 5 minutes ou plus en raison des performances du lecteur.\nVeuillez patienter quelques minutes avant de voir les résultats dans votre dossier drive Travelogue.\nNous vous prions de nous excuser pour ce désagrément.\n\nN\'oubliez pas que si vous ne nous avez pas donné l\'autorisation d\'accéder à votre Drive et/ou si votre voyage ne contient aucune image, rien ne sera exporté.\nPour accorder l\'autorisation, vous pouvez vous déconnecter et vous reconnecter. Un écran s\'affichera pour vous demander l\'autorisation.\n\nL\'équipe de Travelogue.</string>
     <string name="cannot_export_images_to_drive_error_text">Impossible d\'exporter les images de ce voyage dans votre Drive. Veuillez réessayer ultérieurement!</string>
     <string name="export_to_drive_button">Exporter</string>
     <string name="alert_no_location_title">Localisation désactivée</string>
     <string name="alert_no_location_message">La localisation est désactivée, vous devez l\'activer pour profiter des fonctionnalités de Travelogue. L\'activer ?</string>
+    <string name="revoke_access_title">Revoquer l\'accès à votre compte Google</string>
+    <string name="revoke_access_summary">Cliquez-ici pour revoquer l\'accès à votre compte Google.\nVous serez déconnecté(e).</string>
 </resources>

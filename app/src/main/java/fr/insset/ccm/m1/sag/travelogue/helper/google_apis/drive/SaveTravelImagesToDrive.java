@@ -22,7 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.Nullable;
 
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.helper.storage.ManageImages;
@@ -68,7 +69,7 @@ public class SaveTravelImagesToDrive {
      * Create new folder.
      */
     public static String createChildFolder(Drive service, Context context, String userEmail, String folderName, String parentId) throws IOException {
-        boolean folderExists = (searchCreatedFolder(service, context, userEmail, folderName).size() > 0);
+        boolean folderExists = (searchCreatedFolder(service, folderName).size() > 0);
         if (!folderExists) {
             // Folder's metadata.
             File folderMetadata = new File();
@@ -88,36 +89,48 @@ public class SaveTravelImagesToDrive {
                 throw e;
             }
         } else {
-            return searchCreatedFolder(service, context, userEmail, folderName).get(0);
+            return searchCreatedFolder(service, folderName).get(0);
         }
     }
 
     /**
-     * Create new folder.
+     * Create new folder without a parent folder.
      */
     private static String createFolder(Drive service, Context context, String userEmail) throws IOException {
         return createChildFolder(service, context, userEmail, Constants.APP_NAME, null);
     }
 
-    private static void uploadFileBasic(Drive service, java.io.File imageFile, String fileName, String parentId) {
+    public static void uploadFileBasic(Drive service, java.io.File imageFile, String fileName, String parentId) throws IOException {
         String filename = (fileName.contains(".jpeg") || fileName.contains(".jpg") || fileName.contains(".png")) ? fileName : fileName.concat(".jpeg");
+        AtomicBoolean canUpload = new AtomicBoolean(true);
 
-        File fileMetadata = new File();
-        fileMetadata.setName(filename);
-        fileMetadata.setParents(Collections.singletonList(parentId));
-        FileContent content = new FileContent(Constants.IMAGES_CONTENT_TYPE, imageFile);
+        List<String> createdFilesId = searchCreatedFile(service, parentId, filename);
+        if (createdFilesId.size() == 0) {
+            File fileMetadata = new File();
+            fileMetadata.setName(filename);
+            fileMetadata.setParents(Collections.singletonList(parentId));
+            FileContent content = new FileContent(Constants.IMAGES_CONTENT_TYPE, imageFile);
 
-        try {
-            File fileLogo = service.files().create(fileMetadata, content)
-                    .setFields("id, parents")
-                    .execute();
-            System.out.println(fileLogo.getId());
-        } catch (IOException exc) {
-            System.err.println("Unable to upload file: " + exc.getMessage());
+            try {
+                File fileLogo = service.files().create(fileMetadata, content)
+                        .setFields("id, parents")
+                        .execute();
+                System.out.println(fileLogo.getId());
+            } catch (IOException exc) {
+                System.err.println("Unable to upload file: " + exc.getMessage());
+                canUpload.set(false);
+            }
         }
+
+        canUpload.get();
     }
 
-    private static boolean uploadFileFromInputStream(Drive service, InputStream inputStream, String fileName, String parentId) {
+    public static boolean uploadFileFromInputStream(@Nullable Drive serviceN, InputStream inputStream, String fileName, String parentId, Context context, String userEmail) {
+        Drive service = serviceN;
+        if (serviceN == null) {
+            service = createDriveService(context, userEmail);
+        }
+
         String filename = (fileName.contains(".jpeg") || fileName.contains(".jpg") || fileName.contains(".png")) ? fileName : fileName.concat(".jpeg");
         AtomicBoolean isOk = new AtomicBoolean(false);
 
@@ -142,7 +155,7 @@ public class SaveTravelImagesToDrive {
     /**
      * Search for a specific folder
      */
-    private static List<String> searchCreatedFolder(Drive service, Context context, String userEmail, String folderName) throws IOException {
+    private static List<String> searchCreatedFolder(Drive service, String folderName) throws IOException {
         List<String> foldersId = new ArrayList<>();
         String pageToken = null;
         do {
@@ -157,37 +170,45 @@ public class SaveTravelImagesToDrive {
                 foldersId.add(f.getId());  // Must return 0 or 1 element
             });
 
-//            folders.addAll(result.getFiles());
             pageToken = result.getNextPageToken();
         } while (pageToken != null);
 
         return foldersId;
     }
 
-    private static String buildImageFileName(String travelDate, int imageNumber) {
-        return ("JPEG_" .concat(travelDate)).concat("_").concat(String.valueOf(imageNumber)).concat(".jpeg");
+    /**
+     * Search for a specific folder
+     */
+    private static List<String> searchCreatedFile(Drive service, String parentFolderId, String filename) throws IOException {
+        List<String> filesId = new ArrayList<>();
+        String pageToken = null;
+        do {
+            // '1234567' in parents
+            FileList result = service.files().list()
+                    .setQ("mimeType != '" + Constants.DRIVE_FOLDER_MIME_TYPE + "' and '" + parentFolderId + "' in parents and name = '" + filename + "' and trashed = false")
+                    .setSpaces("drive")
+                    .setFields("nextPageToken, files(id, name)")
+                    .setPageToken(pageToken)
+                    .execute();
+
+            result.getFiles().forEach(f -> {
+                filesId.add(f.getId());  // Must return 0 or 1 element
+            });
+
+            pageToken = result.getNextPageToken();
+        } while (pageToken != null);
+
+        return filesId;
     }
 
-    public static boolean exportTravelImagesToDrive(Resources resources, Context context, String userEmail, String travelogueFolderId, String travelId, String travelDate, String travelTitle) throws IOException {
-        AtomicBoolean canExportImages = new AtomicBoolean(true);
+    public static String buildImageFileName(String travelDate, int imageNumber) {
+        return ("JPEG_".concat(travelDate)).concat("_").concat(String.valueOf(imageNumber)).concat(".jpeg");
+    }
+
+    public static boolean exportTravelImagesToDrive(Context context, String userEmail, String travelogueFolderId, String travelId, String travelDate, String travelTitle) throws IOException {
         String travelFolderName = buildTravelFolderName(travelTitle, travelId);
         Drive service = createDriveService(context, userEmail);
         String travelFolderId = createChildFolder(service, context, userEmail, travelFolderName, travelogueFolderId);
-
-        List<InputStream> images = ManageImages.getImagesInTravel(userEmail, travelId);
-
-        AtomicInteger imageNb = new AtomicInteger(1);
-        images.forEach(image -> {
-            String filename = buildImageFileName(travelDate, imageNb.get());
-            canExportImages.set(canExportImages.get() && uploadFileFromInputStream(service, image, filename, travelFolderId));
-            imageNb.getAndIncrement();
-        });
-
-        return canExportImages.get();
-    }
-
-    private enum FileType {
-        InputStream,
-        File
+        return ManageImages.downloadTravelImages(userEmail, travelId, travelDate, travelFolderId, service, context);
     }
 }

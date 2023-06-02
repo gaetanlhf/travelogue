@@ -138,9 +138,11 @@
     <string name="welcome_activity_permissions_alert_title">Before going on</string>
     <string name="welcome_activity_permissions_alert_message">You must grant permissions to the application for the features described in this screen to work. You can then log in.</string>
     <string name="export_images_to_drive_action_title">Export travel images to Drive</string>
-    <string name="export_images_to_drive_modal_text">Number of images:</string>
+    <string name="export_images_to_drive_modal_text">Your images are exported asynchronously.\nThe operation can take up to 5 minutes or more due to Drive Performance.\nPlease wait a few minutes to see the results in your Travelogue drive folder.\nOur apologies for the inconvenience.\n\nPlease bear in mind that, if you have not given us permission to access your Drive and/or if your trip contains no picture, nothing will be exported.\nIn order to grant permission, you can log out and log back in. A screen will appear requesting permission.\n\nThe Travelogue team.</string>
     <string name="cannot_export_images_to_drive_error_text">We could not export the images of this trip to your Drive. Please try agin later!</string>
     <string name="export_to_drive_button">Export</string>
     <string name="alert_no_location_title">Localisation disabled</string>
     <string name="alert_no_location_message">Localisation is deactivated, you must activate it to take advantage of Travelogue\'s features. Activate it?</string>
+    <string name="revoke_access_title">Revoke access to Google account</string>
+    <string name="revoke_access_summary">Click here to revoke the access to your Google account.\nYou will be logged out.</string>
 </resources>

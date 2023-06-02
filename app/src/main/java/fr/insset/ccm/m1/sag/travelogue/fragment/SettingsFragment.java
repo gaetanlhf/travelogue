@@ -91,7 +91,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     requireContext().startService(intent);
                 }
                 returnBool = true;
-            } else if (!locationServiceCheck.isLocationEnabled() && Boolean.parseBoolean(newValue.toString())){
+            } else if (!locationServiceCheck.isLocationEnabled() && Boolean.parseBoolean(newValue.toString())) {
                 switchAutoGps.setChecked(false);
                 noLocationEnable();
                 returnBool = false;
@@ -148,6 +148,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             return true;
         });
         screen.addPreference(logOut);
+
+        Preference revokeAccess = new Preference(requireActivity());
+        revokeAccess.setTitle(R.string.revoke_access_title);
+        revokeAccess.setIcon(R.drawable.baseline_revoke_access);
+        revokeAccess.setSummary(R.string.revoke_access_summary);
+        revokeAccess.setOnPreferenceClickListener(preference -> {
+            mAuth.signOut();
+            sharedPrefManager.clearPreferences();
+            mGoogleSignInClient.revokeAccess()
+                    .addOnCompleteListener(requireActivity(), task -> {
+                        if (LoginActivity.googleApiClientThread != null) {
+                            LoginActivity.googleApiClientThread.interrupt();
+                        }
+                        requireActivity().finish();
+                        Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+                        startActivity(mainActivity);
+                    });
+            return true;
+        });
+        screen.addPreference(revokeAccess);
 
         setPreferenceScreen(screen);
         timeBetweenAutoGps.setDependency(switchAutoGps.getKey());

@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             initDatabase.isInit(init -> {
                 if (!init.get()) {
                     initDatabase.initDb();
-                    boolean ok = ManageImages.initializeStorage(currentUser.getUid());
+                    boolean ok = ManageImages.initializeStorage(currentUser.getEmail());
                     if (!ok) {
                         SharedMethods.displayDebugLogMessage(Constants.IMAGES_MANAGEMENT_LOG_TAG, Constants.UNABLE_TO_INITIALIZE_ROOT_STORAGE);
                     }
@@ -86,22 +86,29 @@ public class MainActivity extends AppCompatActivity {
 
                 State state = new State(currentUser.getUid());
 
-                new Thread(() -> {
-                    try {
-                        String travelogueFolderId = SaveTravelImagesToDrive.initializeTravelogueFolder(getResources(), this, currentUser.getEmail());
-                        state.getTravelogueFolderId(travelogueFolderId1 -> {
-                            if(travelogueFolderId1.get() == null || travelogueFolderId1.get().equals("")) {
+                state.getTravelogueFolderId(travelogueFolderId1 -> {
+                    if (travelogueFolderId1.get() == null || travelogueFolderId1.get().equals("")) {
+                        new Thread(() -> {
+                            try {
+                                String travelogueFolderId = SaveTravelImagesToDrive.initializeTravelogueFolder(getResources(), this, currentUser.getEmail());
                                 state.setTravelogueFolderId(this, travelogueFolderId);
                                 sharedPrefManager.saveString(Constants.DRIVE_FOLDER_DATABASE_KEY, travelogueFolderId);
-                            } else {
-                                state.setTravelogueFolderId(this, travelogueFolderId1.get());
-                                sharedPrefManager.saveString(Constants.DRIVE_FOLDER_DATABASE_KEY, travelogueFolderId1.get());
+
+                                if (travelogueFolderId != null) {
+                                    SaveTravelImagesToDrive.uploadFileFromInputStream(
+                                            null, getResources().openRawResource(R.raw.travelogue_logo), "travelogue_logo.jpeg",
+                                            travelogueFolderId, getApplicationContext(), currentUser.getEmail()
+                                    );
+                                }
+                            } catch (IOException e) {
+                                SharedMethods.displayDebugLogMessage("test_drive", "Exception => " + e.getMessage());
                             }
-                        });
-                    } catch (IOException e) {
-                        SharedMethods.displayDebugLogMessage("test_drive", "Exception => " + e.getMessage());
+                        }).start();
+                    } else {
+                        state.setTravelogueFolderId(this, travelogueFolderId1.get());
+                        sharedPrefManager.saveString(Constants.DRIVE_FOLDER_DATABASE_KEY, travelogueFolderId1.get());
                     }
-                }).start();
+                });
 
                 state.isTravelling(travelling -> {
                     if (travelling.get()) {

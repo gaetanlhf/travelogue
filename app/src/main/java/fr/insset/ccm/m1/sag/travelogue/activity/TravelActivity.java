@@ -203,11 +203,9 @@ public class TravelActivity extends AppCompatActivity implements
             case R.id.action_save_to_drive:
                 new MaterialAlertDialogBuilder(this)
                         .setTitle(getString(R.string.export_images_to_drive_action_title))
-                        .setMessage(
-                                getString(R.string.export_images_to_drive_modal_text) + " " + ManageImages.countImagesInTravel(mAuth.getCurrentUser().getEmail(), travel.getID())
-                        )
+                        .setMessage(getString(R.string.export_images_to_drive_modal_text))
                         .setNegativeButton(android.R.string.no, null)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.export_to_drive_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (mAuth.getCurrentUser() != null) {
@@ -218,7 +216,7 @@ public class TravelActivity extends AppCompatActivity implements
 
                                     State state = new State(currentUser.getUid());
                                     state.getTravelogueFolderId(travelogueFolderId -> {
-                                        if(travelogueFolderId.get() != null && !travelogueFolderId.get().equals("")) {
+                                        if (travelogueFolderId.get() != null && !travelogueFolderId.get().equals("")) {
                                             travelogueFolderID.set(travelogueFolderId.get());
                                         }
                                     });
@@ -226,8 +224,7 @@ public class TravelActivity extends AppCompatActivity implements
                                     // Export images to drive
                                     new Thread(() -> {
                                         try {
-                                            boolean couldExport = SaveTravelImagesToDrive.exportTravelImagesToDrive(
-                                                    getResources(),
+                                            Boolean couldExport = SaveTravelImagesToDrive.exportTravelImagesToDrive(
                                                     getApplicationContext(),
                                                     userEmail,
                                                     travelogueFolderID.get(),
@@ -235,20 +232,11 @@ public class TravelActivity extends AppCompatActivity implements
                                                     travelEndDate,
                                                     travel.getTitle()
                                             );
-
-                                            if(!couldExport) {
-                                                SharedMethods.displayDebugLogMessage("test_drive", getString(R.string.cannot_export_images_to_drive_error_text));
-                                            }
                                         } catch (IOException e) {
                                             SharedMethods.displayDebugLogMessage("test_drive", "Exception => " + e.getMessage());
                                         }
                                     }).start();
-
-//                                        if(!couldExport) {
-//                                            SharedMethods.displayToast(getApplicationContext(), getString(R.string.cannot_export_images_to_drive_error_text));
-//                                        }
                                 }
-                                finish();
                             }
                         })
                         .show();
