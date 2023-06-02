@@ -26,7 +26,7 @@ public class InitDatabase {
 
     public void initDb() {
         Map<String, Object> settings = new HashMap<>();
-        settings.put("enableAutoGetPoint", true);
+        settings.put("enableAutoGetPoint", false);
         settings.put("timeBetweenAutoGetPoint", 5);
 
         Map<String, Object> state = new HashMap<>();
