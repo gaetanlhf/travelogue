@@ -125,28 +125,31 @@ public class SaveTravelImagesToDrive {
         canUpload.get();
     }
 
-    public static boolean uploadFileFromInputStream(@Nullable Drive serviceN, InputStream inputStream, String fileName, String parentId, Context context, String userEmail) {
+    public static boolean uploadFileFromInputStream(@Nullable Drive serviceN, InputStream inputStream, String fileName, String parentId, Context context, String userEmail) throws IOException {
         Drive service = serviceN;
         if (serviceN == null) {
             service = createDriveService(context, userEmail);
         }
 
         String filename = (fileName.contains(".jpeg") || fileName.contains(".jpg") || fileName.contains(".png")) ? fileName : fileName.concat(".jpeg");
-        AtomicBoolean isOk = new AtomicBoolean(false);
+        AtomicBoolean isOk = new AtomicBoolean(true);
 
-        File fileMetadata = new File();
-        fileMetadata.setName(filename);
-        fileMetadata.setParents(Collections.singletonList(parentId));
-        InputStreamContent content = new InputStreamContent(Constants.IMAGES_CONTENT_TYPE, inputStream);
+        List<String> createdFilesId = searchCreatedFile(service, parentId, filename);
+        if (createdFilesId.size() == 0) {
+            File fileMetadata = new File();
+            fileMetadata.setName(filename);
+            fileMetadata.setParents(Collections.singletonList(parentId));
+            InputStreamContent content = new InputStreamContent(Constants.IMAGES_CONTENT_TYPE, inputStream);
 
-        try {
-            File file = service.files().create(fileMetadata, content)
-                    .setFields("id, parents")
-                    .execute();
-            System.out.println(file.getId());
-            isOk.set(true);
-        } catch (IOException exc) {
-            System.err.println("Unable to upload file: " + exc.getMessage());
+            try {
+                File file = service.files().create(fileMetadata, content)
+                        .setFields("id, parents")
+                        .execute();
+                System.out.println(file.getId());
+            } catch (IOException exc) {
+                System.err.println("Unable to upload file: " + exc.getMessage());
+                isOk.set(false);
+            }
         }
 
         return isOk.get();
