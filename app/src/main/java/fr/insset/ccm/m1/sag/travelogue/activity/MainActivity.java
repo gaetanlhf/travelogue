@@ -93,13 +93,6 @@ public class MainActivity extends AppCompatActivity {
                                 String travelogueFolderId = SaveTravelImagesToDrive.initializeTravelogueFolder(getResources(), this, currentUser.getEmail());
                                 state.setTravelogueFolderId(this, travelogueFolderId);
                                 sharedPrefManager.saveString(Constants.DRIVE_FOLDER_DATABASE_KEY, travelogueFolderId);
-
-                                if (travelogueFolderId != null) {
-                                    SaveTravelImagesToDrive.uploadFileFromInputStream(
-                                            null, getResources().openRawResource(R.raw.travelogue_logo), "travelogue_logo.jpeg",
-                                            travelogueFolderId, getApplicationContext(), currentUser.getEmail()
-                                    );
-                                }
                             } catch (IOException e) {
                                 SharedMethods.displayDebugLogMessage("test_drive", "Exception => " + e.getMessage());
                             }
