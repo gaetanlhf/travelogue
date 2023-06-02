@@ -489,7 +489,6 @@ public class HomeFragment extends Fragment implements
             if (ok) {
                 // Add to storage
                 String imagePath = ManageImages.addImageToTravelStorage(userEmail, travel.getID(), currentImageFile);
-                // https://firebasestorage.googleapis.com/v0/b/travelogue-51926.appspot.com/o/images%2F2405kurami%40gmail.com%2F1685367664%2FJPEG_20230529_154115_.jpeg?alt=media&token=9eff4d63-6bae-4234-8711-f938765b09be
                 if (imagePath != null) {
                     FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
                     locationClient.getLastLocation()
