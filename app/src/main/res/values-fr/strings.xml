@@ -72,7 +72,7 @@
     <string name="home_fragment_text_view_1">Lancez-vous dans une nouvelle aventure</string>
     <string name="home_fragment_text_view_2">en commançant un nouveau voyage avec Travelogue</string>
     <string name="no_connection_activity_textview_1">Pas de connexion Internet</string>
-    <string name="no_connection_activity_textview_2">Travelogue est une application en nuage et nécessite une connexion internet. Ne vous inquiétez pas, nous vous reconnecterons dès que la connexion sera rétablie</string>
+    <string name="no_connection_activity_textview_2">Travelogue est une application en nuage et nécessite une connexion internet \nNe vous inquiétez pas, nous vous reconnecterons dès que la connexion sera rétablie</string>
     <string name="require_location_permission">Veuillez autoriser l\'accès à la localisation</string>
     <string name="sign_in_with_google_button_text">Se connecter avec Google</string>
     <string name="sign_up_with_google_button_text">S\'inscrire avec Google</string>
@@ -84,7 +84,7 @@
     <string name="travelogue_service_name">Service de localisation Travelogue</string>
     <string name="travelogue_service_running">En fonctionnement</string>
     <string name="background_location_permission_alert_title">Autorisation de localisation en arrière-plan nécessaire</string>
-    <string name="background_location_permission_alert_desc">Cette application nécessite l\'autorisation de la localisation en arrière-plan pour fonctionner. Veuillez accorder cette autorisation dans les paramètres de l\'application en sélectionnant \"Autoriser tout le temps\".</string>
+    <string name="background_location_permission_alert_desc">Cette application nécessite l\'autorisation de la localisation en arrière-plan pour fonctionner. \nVeuillez accorder cette autorisation dans les paramètres de l\'application en sélectionnant \"Autoriser tout le temps\".</string>
     <string name="background_location_permission_alert_open_settings">Ouvrir les paramètres</string>
     <string name="gps_point">Point GPS</string>
     <string name="text_gps_point">Point GPS avec texte</string>
@@ -132,10 +132,10 @@
     <string name="welcome_activity_permissions_alert_message">Vous devez accorder des autorisations à l\'application pour que les fonctions décrites dans cet écran fonctionnent. Vous pourrez ensuite vous connecter.</string>
     <string name="export_images_to_drive_action_title">Exporter les photos du voyage dans Drive</string>
     <string name="export_images_to_drive_modal_text">Vos images sont exportées de manière asynchrone.\nL\'opération peut prendre jusqu\'à 5 minutes ou plus en raison des performances du lecteur.\nVeuillez patienter quelques minutes avant de voir les résultats dans votre dossier drive Travelogue.\nNous vous prions de nous excuser pour ce désagrément.\n\nN\'oubliez pas que si vous ne nous avez pas donné l\'autorisation d\'accéder à votre Drive et/ou si votre voyage ne contient aucune image, rien ne sera exporté.\nPour accorder l\'autorisation, vous pouvez vous déconnecter et vous reconnecter. Un écran s\'affichera pour vous demander l\'autorisation.\n\nL\'équipe de Travelogue.</string>
-    <string name="cannot_export_images_to_drive_error_text">Impossible d\'exporter les images de ce voyage dans votre Drive. Veuillez réessayer ultérieurement!</string>
+    <string name="cannot_export_images_to_drive_error_text">Impossible d\'exporter les images de ce voyage dans votre Drive. \nVeuillez réessayer ultérieurement !</string>
     <string name="export_to_drive_button">Exporter</string>
     <string name="alert_no_location_title">Localisation désactivée</string>
-    <string name="alert_no_location_message">La localisation est désactivée, vous devez l\'activer pour profiter des fonctionnalités de Travelogue. L\'activer ?</string>
-    <string name="revoke_access_title">Revoquer l\'accès à votre compte Google</string>
-    <string name="revoke_access_summary">Cliquez-ici pour revoquer l\'accès à votre compte Google.\nVous serez déconnecté(e).</string>
+    <string name="alert_no_location_message">La localisation est désactivée, vous devez l\'activer pour profiter des fonctionnalités de Travelogue.\nL\'activer ?</string>
+    <string name="revoke_access_title">Révoquer l\'accès à votre compte Google</string>
+    <string name="revoke_access_summary">Cliquez-ici pour révoquer l\'accès à votre compte Google.\nVous serez déconnecté(e).</string>
 </resources>
