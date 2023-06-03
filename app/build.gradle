@@ -17,6 +17,28 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        def keyAliasProp = properties.getProperty("KEY_ALIAS")
+        def storePasswordProp = properties.getProperty("STORE_PASSWORD")
+        def keyPasswordProp = properties.getProperty("KEY_PASSWORD")
+
+        signingConfigs {
+            release {
+                storeFile file("../travelogue.jks")
+                keyAlias keyAliasProp
+                keyPassword keyPasswordProp
+                storePassword storePasswordProp
+            }
+            debug {
+                storeFile file("../travelogue.jks")
+                keyAlias keyAliasProp
+                keyPassword keyPasswordProp
+                storePassword storePasswordProp
+            }
+        }
+
     }
 
     buildTypes {
