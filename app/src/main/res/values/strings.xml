@@ -78,7 +78,7 @@
     <string name="home_fragment_text_view_1">Set off on a new adventure</string>
     <string name="home_fragment_text_view_2">by starting a new travel with Travelogue</string>
     <string name="no_connection_activity_textview_1">No Internet connection</string>
-    <string name="no_connection_activity_textview_2">Travelogue is a cloud application and requires an internet connection. Don\'t worry, we will reconnect you when the connection is restored</string>
+    <string name="no_connection_activity_textview_2">Travelogue is a cloud application and requires an internet connection\nDon\'t worry, we will reconnect you when the connection is restored</string>
     <string name="require_location_permission">Please grant permission to access the location</string>
     <string name="sign_in_with_google_button_text">Continue with Google</string>
     <string name="sign_up_with_google_button_text">Sign up with Google</string>
@@ -91,7 +91,7 @@
     <string name="travelogue_service_name">Travelogue Location service</string>
     <string name="travelogue_service_running">Running</string>
     <string name="background_location_permission_alert_title">Background location permission needed</string>
-    <string name="background_location_permission_alert_desc">This app requires the Background Location permission to do its job. Please grant this permission in app settings by selecting \'Allow all the time\'.</string>
+    <string name="background_location_permission_alert_desc">This app requires the Background Location permission to do its job. \nPlease grant this permission in app settings by selecting \"Allow all the time\".</string>
     <string name="background_location_permission_alert_open_settings">Open settings</string>
     <string name="gps_point">GPS point</string>
     <string name="text_gps_point">GPS text point</string>
@@ -139,10 +139,10 @@
     <string name="welcome_activity_permissions_alert_message">You must grant permissions to the application for the features described in this screen to work. You can then log in.</string>
     <string name="export_images_to_drive_action_title">Export travel images to Drive</string>
     <string name="export_images_to_drive_modal_text">Your images are exported asynchronously.\nThe operation can take up to 5 minutes or more due to Drive Performance.\nPlease wait a few minutes to see the results in your Travelogue drive folder.\nOur apologies for the inconvenience.\n\nPlease bear in mind that, if you have not given us permission to access your Drive and/or if your trip contains no picture, nothing will be exported.\nIn order to grant permission, you can log out and log back in. A screen will appear requesting permission.\n\nThe Travelogue team.</string>
-    <string name="cannot_export_images_to_drive_error_text">We could not export the images of this trip to your Drive. Please try agin later!</string>
+    <string name="cannot_export_images_to_drive_error_text">We could not export the images of this trip to your Drive. \nPlease try agin later!</string>
     <string name="export_to_drive_button">Export</string>
     <string name="alert_no_location_title">Localisation disabled</string>
-    <string name="alert_no_location_message">Localisation is deactivated, you must activate it to take advantage of Travelogue\'s features. Activate it?</string>
+    <string name="alert_no_location_message">Localisation is deactivated, you must activate it to take advantage of Travelogue\'s features.\nActivate it?</string>
     <string name="revoke_access_title">Revoke access to Google account</string>
     <string name="revoke_access_summary">Click here to revoke the access to your Google account.\nYou will be logged out.</string>
 </resources>
