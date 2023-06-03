@@ -306,19 +306,17 @@ public class HomeFragment extends Fragment implements
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        markerDataMap.clear();
+        googleMap.clear();
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
         uiSettings.setCompassEnabled(false);
         uiSettings.setMapToolbarEnabled(false);
         uiSettings.setMyLocationButtonEnabled(false);
-
         Polyline polyline = googleMap.addPolyline(new PolylineOptions()
                 .clickable(true));
-
         List<LatLng> listLatLng = new ArrayList<>();
         TravelHelper travelHelper = new TravelHelper(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-        markerDataMap.clear();
-        googleMap.clear();
         travelHelper.getPoints(data -> {
             googleMap.setOnMarkerClickListener(null);
             if (data.length() > 0) {
@@ -345,9 +343,6 @@ public class HomeFragment extends Fragment implements
                         markerDataMap.put(marker, data.get(i));
                     }
                 }
-                Log.d("test", markerDataMap.toString());
-
-
                 polyline.setPoints(listLatLng);
                 stylePolyline(polyline);
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(listLatLng.get(0), 10));
