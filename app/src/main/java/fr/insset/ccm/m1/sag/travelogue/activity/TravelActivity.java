@@ -276,6 +276,8 @@ public class TravelActivity extends AppCompatActivity implements
     }
 
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        markerDataMap.clear();
+        googleMap.clear();
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
         uiSettings.setCompassEnabled(false);
@@ -287,8 +289,6 @@ public class TravelActivity extends AppCompatActivity implements
 
         List<LatLng> listLatLng = new ArrayList<>();
         TravelHelper travelHelper = new TravelHelper(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-        markerDataMap.clear();
-        googleMap.clear();
         travelHelper.getPoints(data -> {
             googleMap.setOnMarkerClickListener(null);
             if (data.length() > 0) {
