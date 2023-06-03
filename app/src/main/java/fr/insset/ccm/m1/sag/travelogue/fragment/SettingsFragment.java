@@ -77,33 +77,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         switchAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
             LocationServiceCheck locationServiceCheck = new LocationServiceCheck(requireContext());
             Boolean returnBool = null;
-
-            if (LocationService.isServiceRunning) {
+            if (Boolean.parseBoolean(newValue.toString())) {
                 if (sharedPrefManager.getBool("Travelling")) {
-                    if (Boolean.parseBoolean(newValue.toString())) {
-                        if (locationServiceCheck.isLocationEnabled()) {
+                    if (locationServiceCheck.isLocationEnabled()) {
+                        if (!LocationService.isServiceRunning) {
                             Intent intent = new Intent(requireContext(), LocationService.class);
                             intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+                            settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
+                            switchAutoGps.setChecked(true);
                             intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
                             requireContext().startService(intent);
                             returnBool = true;
-                        } else {
-                            switchAutoGps.setChecked(false);
-                            noLocationEnable();
-                            returnBool = false;
                         }
                     } else {
-                        Intent intent = new Intent(getContext(), LocationService.class);
-                        settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
-                        intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
-                        requireContext().startService(intent);
+                        switchAutoGps.setChecked(false);
+                        noLocationEnable();
                         returnBool = false;
                     }
-                }
-
-            } else {
-                if (Boolean.parseBoolean(newValue.toString())) {
+                } else {
                     if (locationServiceCheck.isLocationEnabled()) {
+                        settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
                         switchAutoGps.setChecked(true);
                         returnBool = true;
                     } else {
@@ -111,7 +104,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         noLocationEnable();
                         returnBool = false;
                     }
+                }
+            } else {
+                if (LocationService.isServiceRunning) {
+                    Intent intent = new Intent(getContext(), LocationService.class);
+                    settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
+                    intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+                    requireContext().startService(intent);
+                    switchAutoGps.setChecked(false);
+                    returnBool = false;
                 } else {
+                    settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
                     switchAutoGps.setChecked(false);
                     returnBool = false;
                 }
