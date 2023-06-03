@@ -162,9 +162,9 @@ public class TravelActivity extends AppCompatActivity implements
                                     Uri uri = FileProvider.getUriForFile(this, this.getPackageName() + ".provider", shareKmlFile);
                                     Intent intent = new ShareCompat.IntentBuilder(this)
                                             .setType("application/vnd.google-earth.kml+xml")
-                                            .setSubject(R.string.share_subject + travel.getTitle())
+                                            .setSubject(getString(R.string.share_subject)+ travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle(R.string.sharing_gps_data)
+                                            .setChooserTitle(getString(R.string.sharing_gps_data))
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
