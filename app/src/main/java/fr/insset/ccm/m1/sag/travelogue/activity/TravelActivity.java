@@ -224,13 +224,35 @@ public class TravelActivity extends AppCompatActivity implements
                                     // Export images to drive
                                     new Thread(() -> {
                                         try {
-                                            Boolean couldExport = SaveTravelImagesToDrive.exportTravelImagesToDrive(
+                                            String travelFolderId = SaveTravelImagesToDrive.exportTravelImagesToDrive(
                                                     getApplicationContext(),
                                                     userEmail,
                                                     travelogueFolderID.get(),
                                                     travel.getID(),
                                                     travelEndDate,
                                                     travel.getTitle()
+                                            );
+
+                                            // GPX
+                                            File shareGpxFile = new File(getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".gpx");
+                                            GenerateGpx.generate(shareGpxFile, travel.getTitle(), pointsList);
+                                            SaveTravelImagesToDrive.uploadTravelGPXandKMLFile(
+                                                    getApplicationContext(),
+                                                    userEmail,
+                                                    shareGpxFile,
+                                                    shareGpxFile.getName(),
+                                                    travelFolderId
+                                            );
+
+                                            // KML
+                                            File shareKmlFile = new File(getCacheDir(), "export/" + travel.getTitle() + "-" + travel.getID() + ".kml");
+                                            GenerateKml.generate(shareKmlFile, travel.getTitle(), pointsList);
+                                            SaveTravelImagesToDrive.uploadTravelGPXandKMLFile(
+                                                    getApplicationContext(),
+                                                    userEmail,
+                                                    shareKmlFile,
+                                                    shareKmlFile.getName(),
+                                                    travelFolderId
                                             );
                                         } catch (IOException e) {
                                             SharedMethods.displayDebugLogMessage("test_drive", "Exception => " + e.getMessage());

@@ -100,8 +100,7 @@ public class SaveTravelImagesToDrive {
         return createChildFolder(service, context, userEmail, Constants.APP_NAME, null);
     }
 
-    public static void uploadFileBasic(Drive service, java.io.File imageFile, String fileName, String parentId) throws IOException {
-        String filename = (fileName.contains(".jpeg") || fileName.contains(".jpg") || fileName.contains(".png")) ? fileName : fileName.concat(".jpeg");
+    private static void uploadFileBasic(Drive service, java.io.File file, String filename, String parentId, String fileContentType) throws IOException {
         AtomicBoolean canUpload = new AtomicBoolean(true);
 
         List<String> createdFilesId = searchCreatedFile(service, parentId, filename);
@@ -109,13 +108,13 @@ public class SaveTravelImagesToDrive {
             File fileMetadata = new File();
             fileMetadata.setName(filename);
             fileMetadata.setParents(Collections.singletonList(parentId));
-            FileContent content = new FileContent(Constants.IMAGES_CONTENT_TYPE, imageFile);
+            FileContent content = new FileContent(fileContentType, file);
 
             try {
-                File fileLogo = service.files().create(fileMetadata, content)
+                File fileToCreate = service.files().create(fileMetadata, content)
                         .setFields("id, parents")
                         .execute();
-                System.out.println(fileLogo.getId());
+                System.out.println(fileToCreate.getId());
             } catch (IOException exc) {
                 System.err.println("Unable to upload file: " + exc.getMessage());
                 canUpload.set(false);
@@ -123,6 +122,16 @@ public class SaveTravelImagesToDrive {
         }
 
         canUpload.get();
+    }
+
+    public static void uploadImageFile(Drive service, java.io.File imageFile, String fileName, String parentId) throws IOException {
+        String filename = (fileName.contains(".jpeg") || fileName.contains(".jpg") || fileName.contains(".png")) ? fileName : fileName.concat(".jpeg");
+        uploadFileBasic(service, imageFile, filename, parentId, Constants.IMAGES_CONTENT_TYPE);
+    }
+
+    public static void uploadTravelGPXandKMLFile(Context context, String userEmail, java.io.File file, String filename, String parentId) throws IOException {
+        Drive service = createDriveService(context, userEmail);
+        uploadFileBasic(service, file, filename, parentId, null);
     }
 
     public static boolean uploadFileFromInputStream(@Nullable Drive serviceN, InputStream inputStream, String fileName, String parentId, Context context, String userEmail) throws IOException {
@@ -208,10 +217,11 @@ public class SaveTravelImagesToDrive {
         return ("JPEG_".concat(travelDate)).concat("_").concat(String.valueOf(imageNumber)).concat(".jpeg");
     }
 
-    public static boolean exportTravelImagesToDrive(Context context, String userEmail, String travelogueFolderId, String travelId, String travelDate, String travelTitle) throws IOException {
+    public static String exportTravelImagesToDrive(Context context, String userEmail, String travelogueFolderId, String travelId, String travelDate, String travelTitle) throws IOException {
         String travelFolderName = buildTravelFolderName(travelTitle, travelId);
         Drive service = createDriveService(context, userEmail);
         String travelFolderId = createChildFolder(service, context, userEmail, travelFolderName, travelogueFolderId);
-        return ManageImages.downloadTravelImages(userEmail, travelId, travelDate, travelFolderId, service, context);
+        boolean couldExport = ManageImages.downloadTravelImages(userEmail, travelId, travelDate, travelFolderId, service, context);
+        return travelFolderId;
     }
 }

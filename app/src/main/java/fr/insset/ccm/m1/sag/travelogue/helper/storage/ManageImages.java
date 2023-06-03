@@ -144,7 +144,7 @@ public class ManageImages {
                                 // Local temp file has been created
                                 new Thread(() -> {
                                     try {
-                                        SaveTravelImagesToDrive.uploadFileBasic(service, localFile, filename, travelFolderId);
+                                        SaveTravelImagesToDrive.uploadImageFile(service, localFile, filename, travelFolderId);
                                     } catch (IOException exception) {
                                         SharedMethods.displayDebugLogMessage("test_download", "Cannot download image");
                                     }
