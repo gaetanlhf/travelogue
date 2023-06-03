@@ -77,25 +77,44 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         switchAutoGps.setOnPreferenceChangeListener((preference, newValue) -> {
             LocationServiceCheck locationServiceCheck = new LocationServiceCheck(requireContext());
             Boolean returnBool = null;
-            if (locationServiceCheck.isLocationEnabled()) {
-                settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
-                if (LocationService.isServiceRunning && !Boolean.parseBoolean(newValue.toString())) {
-                    Intent intent = new Intent(getContext(), LocationService.class);
-                    intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
-                    requireContext().startService(intent);
-                }
-                if (!LocationService.isServiceRunning && sharedPrefManager.getBool("Travelling") && Boolean.parseBoolean(newValue.toString())) {
-                    Intent intent = new Intent(requireContext(), LocationService.class);
-                    intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-                    intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
-                    requireContext().startService(intent);
-                }
-                returnBool = true;
-            } else if (!locationServiceCheck.isLocationEnabled() && Boolean.parseBoolean(newValue.toString())) {
-                switchAutoGps.setChecked(false);
-                noLocationEnable();
-                returnBool = false;
 
+            if (LocationService.isServiceRunning) {
+                if (sharedPrefManager.getBool("Travelling")) {
+                    if (Boolean.parseBoolean(newValue.toString())) {
+                        if (locationServiceCheck.isLocationEnabled()) {
+                            Intent intent = new Intent(requireContext(), LocationService.class);
+                            intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+                            intent.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
+                            requireContext().startService(intent);
+                            returnBool = true;
+                        } else {
+                            switchAutoGps.setChecked(false);
+                            noLocationEnable();
+                            returnBool = false;
+                        }
+                    } else {
+                        Intent intent = new Intent(getContext(), LocationService.class);
+                        settings.setAutoGps(requireContext(), Boolean.parseBoolean(newValue.toString()));
+                        intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+                        requireContext().startService(intent);
+                        returnBool = false;
+                    }
+                }
+
+            } else {
+                if (Boolean.parseBoolean(newValue.toString())) {
+                    if (locationServiceCheck.isLocationEnabled()) {
+                        switchAutoGps.setChecked(true);
+                        returnBool = true;
+                    } else {
+                        switchAutoGps.setChecked(false);
+                        noLocationEnable();
+                        returnBool = false;
+                    }
+                } else {
+                    switchAutoGps.setChecked(false);
+                    returnBool = false;
+                }
             }
             return returnBool;
         });
