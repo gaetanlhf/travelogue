@@ -219,9 +219,9 @@ public class HomeFragment extends Fragment implements
                                     Uri uri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", shareGpxFile);
                                     Intent intent = new ShareCompat.IntentBuilder(requireContext())
                                             .setType("application/gpx+xml")
-                                            .setSubject(R.string.share_subject + travel.getTitle())
+                                            .setSubject(getString(R.string.share_subject) + travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle(R.string.sharing_gps_data)
+                                            .setChooserTitle(getString(R.string.sharing_gps_data))
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
@@ -235,9 +235,9 @@ public class HomeFragment extends Fragment implements
                                     Uri uri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", shareKmlFile);
                                     Intent intent = new ShareCompat.IntentBuilder(requireContext())
                                             .setType("application/vnd.google-earth.kml+xml")
-                                            .setSubject(R.string.share_subject + travel.getTitle())
+                                            .setSubject(getString(R.string.share_subject)+ travel.getTitle())
                                             .setStream(uri)
-                                            .setChooserTitle(R.string.sharing_gps_data)
+                                            .setChooserTitle(getString(R.string.sharing_gps_data))
                                             .createChooserIntent()
                                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     startActivity(intent);
