@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.TravelsFragment">
+
+    <LinearLayout
+        android:id="@+id/travels_fragment_no_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/travels_fragment_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="206dp"
+            android:layout_marginBottom="20dp"
+            app:srcCompat="@drawable/undraw_void" />
+
+        <TextView
+            android:id="@+id/travels_fragment_text_view_1"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:text="@string/travels_fragment_text_view_1"
+            android:textSize="34sp" />
+
+        <TextView
+            android:id="@+id/travels_fragment_text_view_2"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:text="@string/travels_fragment_text_view_2" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fragment_travels_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:visibility="gone">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/travels_fragment_spinner"
+        style="?android:progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:visibility="gone" />
+
+</FrameLayout>

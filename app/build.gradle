@@ -1,0 +1,119 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+
+}
+
+android {
+    namespace 'fr.insset.ccm.m1.sag.travelogue'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "fr.insset.ccm.m1.sag.travelogue"
+        minSdk 28
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        def keyAliasProp = properties.getProperty("KEY_ALIAS")
+        def storePasswordProp = properties.getProperty("STORE_PASSWORD")
+        def keyPasswordProp = properties.getProperty("KEY_PASSWORD")
+
+        signingConfigs {
+            release {
+                storeFile file("../travelogue.jks")
+                keyAlias keyAliasProp
+                keyPassword keyPasswordProp
+                storePassword storePasswordProp
+            }
+            debug {
+                storeFile file("../travelogue.jks")
+                keyAlias keyAliasProp
+                keyPassword keyPasswordProp
+                storePassword storePasswordProp
+            }
+        }
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        resources.excludes.add("LICENSE.txt")
+        resources.excludes.add("META-INF/LICENSE")
+        resources.excludes.add("META-INF/DEPENDENCIES")
+        resources.excludes.add("META-INF/LICENSE.txt")
+        resources.excludes.add("META-INF/license.txt")
+        resources.excludes.add("META-INF/NOTICE")
+        resources.excludes.add("META-INF/NOTICE.txt")
+        resources.excludes.add("META-INF/notice.txt")
+        resources.excludes.add("META-INF/ASL2.0")
+        resources.excludes.add("META-INF/*.kotlin_module")
+        /**/
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.compose.material3:material3:1.1.0'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.preference:preference:1.2.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-storage'
+    // FirebaseUI Storage only
+    def firebaseui_version = "7.2.0"
+    implementation "com.firebaseui:firebase-ui-storage:$firebaseui_version"
+
+    // Google Play & api dependencies
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+//    implementation 'com.google.api-client:google-api-client:2.2.0'
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.16.1'
+
+    // For Drive (DO NOT UPGRADE)
+    implementation 'com.google.api-client:google-api-client-android:1.23.0'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev136-1.25.0'
+//    implementation 'com.google.apis:google-api-services-drive:v2-rev20220815-2.0.0'
+
+    // Needed dependencies
+    implementation 'com.firebase:geofire-android-common:3.1.0'
+    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'commons-io:commons-io:2.5'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+}
+
+configurations.implementation {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    exclude group: 'com.google.api.grpc', module: 'proto-google-common-protos'
+//    exclude group: 'com.google.protobuf', module: 'protobuf-java'
+//    exclude group: 'com.google.protobuf', module: 'protobuf-javalite'
+//    exclude group: 'com.google.firebase', module: 'protolite-well-known-types'
+}

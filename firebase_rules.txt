@@ -1,0 +1,25 @@
+Firestore:
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{userId}/{documents=**} {
+       allow write: if request.auth.uid == userId
+       allow create: if request.auth.uid != null;
+       allow read: if request.auth.uid == userId;
+     }
+  }
+}
+
+Storage:
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /images/{allPaths=**} {
+      allow write: if request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+      allow read;
+      allow delete;
+    }
+  }
+}
+

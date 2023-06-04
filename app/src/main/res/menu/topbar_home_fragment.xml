@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/topbar_home_fragment_info"
+        android:icon="@drawable/baseline_info"
+        android:orderInCategory="100"
+        android:title="@string/travel_information_icon_title"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/topbar_home_fragment_share"
+        android:icon="@drawable/baseline_share"
+        android:orderInCategory="200"
+        android:title="@string/travel_share_icon_title"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/topbar_home_fragment_add"
+        android:icon="@drawable/baseline_add"
+        android:orderInCategory="300"
+        android:title="@string/travel_add_icon_title"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/topbar_home_fragment_stop"
+        android:icon="@drawable/baseline_stop"
+        android:orderInCategory="400"
+        android:title="@string/travel_stop_icon_title"
+        app:showAsAction="always" />
+</menu>
