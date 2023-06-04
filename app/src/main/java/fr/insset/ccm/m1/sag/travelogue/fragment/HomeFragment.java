@@ -475,6 +475,12 @@ public class HomeFragment extends Fragment implements
                 });
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        requireActivity().unregisterReceiver(updateReceiver);
+    }
+
     @SuppressLint("MissingPermission")
     private void handleTakePictureResult(Intent intent) {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -553,5 +559,7 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
+        requireActivity().registerReceiver(updateReceiver, new IntentFilter("updateHomeFragment"));
+
     }
 }
