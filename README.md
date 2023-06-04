@@ -94,6 +94,6 @@ Les variables suivantes doivent donc ếtre définies dans le `local.properties`
 
 Veuillez synchroniser le projet avec Graddle (`Sync Project with Graddle Files` dans le menu `File` ou dans la barre d'outils).
 
-## Exécuter le projet
+## Exécution du projet
 
 Vous pouvez ensuite exécuter le projet sur votre téléphone Android en cliquant dans le menu `Run` ou dans la barre d'outils sur le bouton `Run 'App'`.
