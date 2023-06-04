@@ -14,6 +14,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.gms.location.Granularity;
 import com.google.android.gms.location.LocationCallback;
@@ -54,6 +55,8 @@ public class LocationService extends Service {
             Location location = new Location(currentUser.getUid());
             sharedPrefManager = SharedPrefManager.getInstance(getApplicationContext());
             location.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+            Intent intent = new Intent("updateHomeFragment");
+            sendBroadcast(intent);
         }
         }
     };
