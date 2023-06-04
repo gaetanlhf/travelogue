@@ -101,21 +101,19 @@ public class TravelActivity extends AppCompatActivity implements
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
 
-        try {
-            travelHelper.getTravel(data -> {
 
-                travel = data.get();
-                getSupportActionBar().setTitle(travel.getTitle());
+        travelHelper.getTravel(data -> {
 
-                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.map);
-                assert mapFragment != null;
-                mapFragment.getMapAsync(this);
+            travel = data.get();
+            getSupportActionBar().setTitle(travel.getTitle());
 
-            }, intent.getStringExtra("travelId"));
-        } catch (Exception e) {
-            finish();
-        }
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            assert mapFragment != null;
+            mapFragment.getMapAsync(this);
+
+        }, intent.getStringExtra("travelId"));
+
 
     }
 
