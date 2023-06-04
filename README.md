@@ -16,13 +16,15 @@ Le sujet propose différents niveaux de difficultés qui vous permettront de gag
 - La version minimaliste vous rapportera au maximum 10/20 :  
 Dans cette version, votre application permettra de créer des voyages.  
 Entre le moment ou un voyage commence et le moment où il se termine, votre application enregistrera périodiquement (cette période devra pouvoir être configurée) ou à la demande dans une base de données SQLite les instants (date, heure, minute, seconde) et les coordonnées GPS de votre périple.   
-Votre application permettra le regroupement des points GPS dans un fichier .gpx/.kml et elle donnera la possibilité à l’utilisateur de l’envoyer par mail à un destinataire.  Cette version de l’application vous donnera l’occasion de mettre en application un grand nombre de notions vu ensemble.   
+Votre application permettra le regroupement des points GPS dans un fichier .gpx/.kml et elle donnera la possibilité à l’utilisateur de l’envoyer par mail à un destinataire.  
+Cette version de l’application vous donnera l’occasion de mettre en application un grand nombre de notions vu ensemble.   
 Elle vous permettra également de découvrir comment utiliser le GPS sous Android, comment utiliser le SGBD SQLite embarqué par tout périphérique Android, comment écrire/lire un fichier sous Android et enfin comment envoyer un courriel à partir d’une application Android.
+
 - La version intermédiaire vous rapportera au maximum 14/20 :  
 Dans cette version, votre application ne sauvera pas nécessairement ses données dans une base de données locale SQLite mais dans une base de données Firebase/Firestore.  
 Elle proposera en plus la possibilité de visualiser votre voyage sur une GoogleMap. La fonction d’envoi par courriel de fichiers .gpx/.kml demandée dans la version minimaliste devra également être proposée.
 
-- La version évoluée vous rapportera au maximum 17/20 :
+- La version évoluée vous rapportera au maximum 17/20 :  
 Cette version de l’application reprendra la version intermédiaire.  
 Elle permettra en plus au voyageur de prendre des photos qui seront associées à une position durant le voyage et qui seront stockées dans un Storage (sur Firebase).  
 Des markers sur la GoogleMap permettront de donner accès aux photo associées (soit en les visualisant soit en en donnant une url).
