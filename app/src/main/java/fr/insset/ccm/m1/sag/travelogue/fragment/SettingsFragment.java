@@ -134,13 +134,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             if (!newValue.toString().equals(String.valueOf(sharedPrefManager.getLong("TimeBetweenAutoGps")))) {
                 settings.setTimeBetweenAutoGps(requireContext(), Long.parseLong(newValue.toString()));
                 sharedPrefManager.updateLong("TimeBetweenAutoGps", Long.parseLong(newValue.toString()));
-                Intent intentStop = new Intent(getContext(), LocationService.class);
-                intentStop.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
-                requireContext().startService(intentStop);
-                Intent intentStart = new Intent(requireContext(), LocationService.class);
-                intentStart.setAction(Constants.ACTION_START_LOCATION_SERVICE);
-                intentStart.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
-                requireContext().startService(intentStart);
+                if (sharedPrefManager.getBool("Travelling") && sharedPrefManager.getBool("AutoGps")) {
+                    if (LocationService.isServiceRunning) {
+                        Intent intentStop = new Intent(getContext(), LocationService.class);
+                        intentStop.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+                        requireContext().startService(intentStop);
+                        Intent intentStart = new Intent(requireContext(), LocationService.class);
+                        intentStart.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+                        intentStart.putExtra("timeBetweenUpdate", sharedPrefManager.getLong("TimeBetweenAutoGps"));
+                        requireContext().startService(intentStart);
+                    }
+                }
+
             }
             return true;
         });
