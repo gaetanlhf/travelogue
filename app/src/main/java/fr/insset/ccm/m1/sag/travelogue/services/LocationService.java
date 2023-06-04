@@ -9,12 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.gms.location.Granularity;
 import com.google.android.gms.location.LocationCallback;
@@ -30,7 +28,6 @@ import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.entity.GpsPoint;
 import fr.insset.ccm.m1.sag.travelogue.helper.SharedPrefManager;
 import fr.insset.ccm.m1.sag.travelogue.helper.db.Location;
-import fr.insset.ccm.m1.sag.travelogue.helper.db.State;
 
 public class LocationService extends Service {
 
@@ -43,21 +40,21 @@ public class LocationService extends Service {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
             FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null) {
-            super.onLocationResult(locationResult);
-            locationResult.getLastLocation();
-            double latitude = locationResult.getLastLocation().getLatitude();
-            double longitude = locationResult.getLastLocation().getLongitude();
-            gpsPoint.setLongitude(longitude);
-            gpsPoint.setLatitude(latitude);
-            gpsPoint.setLinkedDataType("none");
-            gpsPoint.setLinkedData("none");
-            Location location = new Location(currentUser.getUid());
-            sharedPrefManager = SharedPrefManager.getInstance(getApplicationContext());
-            location.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
-            Intent intent = new Intent("updateHomeFragment");
-            sendBroadcast(intent);
-        }
+            if (currentUser != null) {
+                super.onLocationResult(locationResult);
+                locationResult.getLastLocation();
+                double latitude = locationResult.getLastLocation().getLatitude();
+                double longitude = locationResult.getLastLocation().getLongitude();
+                gpsPoint.setLongitude(longitude);
+                gpsPoint.setLatitude(latitude);
+                gpsPoint.setLinkedDataType("none");
+                gpsPoint.setLinkedData("none");
+                Location location = new Location(currentUser.getUid());
+                sharedPrefManager = SharedPrefManager.getInstance(getApplicationContext());
+                location.addPoint(gpsPoint, sharedPrefManager.getString("CurrentTravel"));
+                Intent intent = new Intent("updateHomeFragment");
+                sendBroadcast(intent);
+            }
         }
     };
 
@@ -105,9 +102,9 @@ public class LocationService extends Service {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        LocationRequest locationRequest = new LocationRequest.Builder(timeBetweenUpdateLocation*60000)
+        LocationRequest locationRequest = new LocationRequest.Builder(timeBetweenUpdateLocation * 60000)
                 .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
-                .setMinUpdateIntervalMillis(timeBetweenUpdateLocation*1000)
+                .setMinUpdateIntervalMillis(timeBetweenUpdateLocation * 1000)
                 .setGranularity(Granularity.GRANULARITY_FINE)
                 .build();
 
