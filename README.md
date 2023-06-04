@@ -29,7 +29,7 @@ Des markers sur la GoogleMap permettront de donner accès aux photo associées (
 
 - La super version vous rapportera au maximum 20/20 :  
 Cette version de l’application reprendra la version évoluée.  
-Elle permettra en plus au voyageur de prendre des photos qui seront associées à une position durant le voyage et qui seront stockées en utilisant ’API Google Photo.  
+Elle permettra en plus au voyageur de prendre des photos qui seront associées à une position durant le voyage et qui seront stockées en utilisant l’API Google Photo.  
 Nul besoin dans ce cas de stocker les photos dans Storage.
 
 # Notre groupe
