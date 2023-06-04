@@ -26,7 +26,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -87,6 +86,7 @@ import fr.insset.ccm.m1.sag.travelogue.services.LocationService;
 public class HomeFragment extends Fragment implements
         OnMapReadyCallback {
     private final ArrayList<GpsPoint> pointsList = new ArrayList<>();
+    private final Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
     private FirebaseAuth mAuth;
     private ProgressBar spinner;
     private TravelHelper travelHelper;
@@ -103,7 +103,6 @@ public class HomeFragment extends Fragment implements
             mapFragment.getMapAsync(HomeFragment.this);
         }
     };
-    private final Map<Marker, GpsPoint> markerDataMap = new HashMap<>();
     private View noCurrentTravel;
 
     private SharedPrefManager sharedPrefManager;
@@ -235,7 +234,7 @@ public class HomeFragment extends Fragment implements
                                     Uri uri = FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", shareKmlFile);
                                     Intent intent = new ShareCompat.IntentBuilder(requireContext())
                                             .setType("application/vnd.google-earth.kml+xml")
-                                            .setSubject(getString(R.string.share_subject)+ travel.getTitle())
+                                            .setSubject(getString(R.string.share_subject) + travel.getTitle())
                                             .setStream(uri)
                                             .setChooserTitle(getString(R.string.sharing_gps_data))
                                             .createChooserIntent()

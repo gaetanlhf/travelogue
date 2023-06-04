@@ -26,6 +26,7 @@ public class GpsPoint {
         this.linkedData = linkedData;
         this.linkedDataType = linkedDataType;
     }
+
     public GpsPoint(double longitude, double latitude, String linkedDataType, String linkedData, String timestamp) {
         this.longitude = longitude;
         this.latitude = latitude;

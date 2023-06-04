@@ -2,7 +2,6 @@ package fr.insset.ccm.m1.sag.travelogue.helper.db;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;

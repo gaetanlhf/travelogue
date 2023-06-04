@@ -24,12 +24,12 @@ import fr.insset.ccm.m1.sag.travelogue.helper.TimestampDate;
 public class TravelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context context;
     private final List<String> initialTitles;
+    private final List<String> endTimestamp;
     Map<String, String> idToTravel = new HashMap<String, String>();
     Map<String, String> idToEndTimestamp = new HashMap<String, String>();
     Map<String, String> travelToId = new HashMap<String, String>();
     private List<String> ids;
     private List<String> titles;
-    private final List<String> endTimestamp;
 
     public TravelAdapter(Context context, List<String> ids, List<String> titles, List<String> endTimestamp) {
         this.context = context;
