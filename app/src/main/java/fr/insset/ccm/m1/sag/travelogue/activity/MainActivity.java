@@ -154,6 +154,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!threadRunning) {
+            threadRunning = true;
+            connectivityCheckThread = new Thread(() -> {
+                while (threadRunning) {
+                    if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                        Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    }
+
+                    try {
+                        Thread.sleep(Constants.TIME_CHECK_CONNECTION);
+                    } catch (InterruptedException e) {
+                        threadRunning = false;
+                    }
+                }
+            });
+            connectivityCheckThread.start();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         threadRunning = false;

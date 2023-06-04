@@ -13,6 +13,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.elevation.SurfaceColors;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.fragment.HomeFragment;
@@ -47,6 +49,7 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
                 if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
                     Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
+                    getSupportFragmentManager().beginTransaction().remove(fragment).commit();
                     finish();
                     break;
                 }
@@ -70,11 +73,44 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onResume() {
         super.onResume();
-        if (getFragmentRefreshListener() != null) {
-            getFragmentRefreshListener().onRefresh();
-        }
+        AtomicReference<Boolean> fragmentReload = new AtomicReference<>(true);
         if (!sharedPrefManager.getBool("PermissionsRequested")) {
             PermissionHelper.verifyPermissions(this);
+        }
+        if (!threadRunning) {
+            threadRunning = true;
+            connectivityCheckThread = new Thread(() -> {
+                while (threadRunning) {
+                    if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                        Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                        startActivity(intent);
+                        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                        finish();
+                        break;
+                    } else {
+                        if (getFragmentRefreshListener() != null && fragmentReload.get()) {
+                            fragmentReload.set(false);
+                            getFragmentRefreshListener().onRefresh();
+                        }
+                    }
+
+                    try {
+                        Thread.sleep(Constants.TIME_CHECK_CONNECTION);
+                    } catch (InterruptedException e) {
+                        threadRunning = false;
+                    }
+                }
+            });
+            connectivityCheckThread.start();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
         }
     }
 

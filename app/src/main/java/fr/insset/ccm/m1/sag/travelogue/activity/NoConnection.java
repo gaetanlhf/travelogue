@@ -10,6 +10,7 @@ import com.google.android.material.elevation.SurfaceColors;
 import fr.insset.ccm.m1.sag.travelogue.Constants;
 import fr.insset.ccm.m1.sag.travelogue.R;
 import fr.insset.ccm.m1.sag.travelogue.helper.NetworkConnectivityCheck;
+import fr.insset.ccm.m1.sag.travelogue.helper.PermissionHelper;
 
 public class NoConnection extends AppCompatActivity {
     private Thread connectivityCheckThread;
@@ -39,6 +40,40 @@ public class NoConnection extends AppCompatActivity {
             }
         });
         connectivityCheckThread.start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!threadRunning) {
+            threadRunning = true;
+            connectivityCheckThread = new Thread(() -> {
+                while (threadRunning) {
+                    if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                        Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    }
+
+                    try {
+                        Thread.sleep(Constants.TIME_CHECK_CONNECTION);
+                    } catch (InterruptedException e) {
+                        threadRunning = false;
+                    }
+                }
+            });
+            connectivityCheckThread.start();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
+        }
     }
 
     @Override

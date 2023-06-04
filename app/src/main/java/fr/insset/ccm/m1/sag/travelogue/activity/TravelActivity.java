@@ -101,18 +101,21 @@ public class TravelActivity extends AppCompatActivity implements
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         travelHelper = new TravelHelper(mAuth.getCurrentUser().getUid());
 
-        travelHelper.getTravel(data -> {
+        try {
+            travelHelper.getTravel(data -> {
 
-            travel = data.get();
-            getSupportActionBar().setTitle(travel.getTitle());
+                travel = data.get();
+                getSupportActionBar().setTitle(travel.getTitle());
 
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
-            assert mapFragment != null;
-            mapFragment.getMapAsync(this);
+                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.map);
+                assert mapFragment != null;
+                mapFragment.getMapAsync(this);
 
-        }, intent.getStringExtra("travelId"));
-
+            }, intent.getStringExtra("travelId"));
+        } catch (Exception e) {
+            finish();
+        }
 
     }
 
@@ -343,6 +346,41 @@ public class TravelActivity extends AppCompatActivity implements
         polyline.setJointType(JointType.ROUND);
         polyline.setWidth(20);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!threadRunning) {
+            threadRunning = true;
+            connectivityCheckThread = new Thread(() -> {
+                while (threadRunning) {
+                    if (!NetworkConnectivityCheck.isNetworkAvailableAndConnected(this)) {
+                        Intent intent = new Intent(this, NoConnection.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    }
+
+                    try {
+                        Thread.sleep(Constants.TIME_CHECK_CONNECTION);
+                    } catch (InterruptedException e) {
+                        threadRunning = false;
+                    }
+                }
+            });
+            connectivityCheckThread.start();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        threadRunning = false;
+        if (connectivityCheckThread != null) {
+            connectivityCheckThread.interrupt();
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
